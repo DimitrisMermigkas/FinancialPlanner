@@ -14,7 +14,10 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@my-workspace/prisma-schema": ["libs/prisma-schema/src/index.ts"],
+      "@my-workspace/react-components": ["libs/react-components/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

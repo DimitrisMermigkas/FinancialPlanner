@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TransactionType {
+  income // Money coming in
+  expense // Money going out
+  fund // Money set aside in Funds (not considered an expense)
+}
+
+model Transaction {
+  id          String          @id @default(uuid()) @db.Uuid
+  type        TransactionType // "income", "expense", or "fund"
+  description String? // Description of the transaction (e.g., "Salary", "Groceries", "Savings")
+  amount      Float // Amount of the transaction
+  completedAt DateTime // Date of the transaction
+  fundsId     String?         @db.Uuid // Optional link to Funds if this is a "fund" transaction
+  funds       Funds?          @relation(fields: [fundsId], references: [id])
+
+  @@index([type])
+}
+
+model Reason {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  funds       Funds[]
+}
+
+model Funds {
+  id           String        @id @default(uuid()) @db.Uuid
+  amount       Float
+  description  String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  reasonId     String        @db.Uuid // Foreign key to Reason
+  reason       Reason?       @relation(fields: [reasonId], references: [id])
+  transactions Transaction[]
+}
+
+model Balance {
+  id        String   @id @default(uuid()) @db.Uuid
+  amount    Float // Current balance in the main account
+  updatedAt DateTime @updatedAt
+}
