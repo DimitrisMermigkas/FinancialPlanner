@@ -1,6 +1,6 @@
-import axios from "axios";
+import axios from 'axios';
 
-const API_URL = "http://localhost:4000"; // Update with your server address if necessary
+const API_URL = 'http://localhost:4000'; // Update with your server address if necessary
 
 // Define the types for the expected data structures
 export interface Transaction {
@@ -8,7 +8,7 @@ export interface Transaction {
   description: string;
   amount: number;
   completedAt: Date; // or string, depending on how the date is formatted
-  type: "expense" | "income" | "fund"; // Adjust this type based on your enum or string literals for TransactionType
+  type: 'expense' | 'income' | 'fund'; // Adjust this type based on your enum or string literals for TransactionType
 }
 
 export interface Fund {
@@ -36,22 +36,38 @@ export interface Reason {
  ********************************************************************
  */
 
+export const updateTransaction = async (
+  id: string,
+  updatedTransaction: {
+    amount?: number;
+    type?: 'expense' | 'income' | 'fund';
+    description?: string;
+    completedAt?: Date;
+  }
+) => {
+  const response = await axios.patch(
+    `${API_URL}/transactions/${id}`,
+    updatedTransaction
+  );
+  return response.data as Transaction; // Return updated Transaction
+};
+
 /* Post APIs
  ********************************************************************
  */
-export const addReason = async (reason: Omit<Reason, "id">) => {
+export const addReason = async (reason: Omit<Reason, 'id'>) => {
   const response = await axios.post(`${API_URL}/reasons`, reason);
   return response.data as Reason; // Return added Reason
 };
 
-export const addFunds = async (fund: Omit<Fund, "id">) => {
+export const addFunds = async (fund: Omit<Fund, 'id'>) => {
   const response = await axios.post(`${API_URL}/funds`, fund);
   return response.data; // Return the added transaction data
 };
 
 export const addTransaction = async (transaction: {
   amount: number;
-  type: "expense" | "income" | "fund";
+  type: 'expense' | 'income' | 'fund';
   description: string;
   completedAt: Date;
 }) => {
@@ -60,18 +76,18 @@ export const addTransaction = async (transaction: {
 };
 
 export const updateBalance = async (
-  type: "expense" | "income" | "fund",
+  type: 'expense' | 'income' | 'fund',
   amount: number
 ) => {
   try {
     const currentBalance = await fetchCurrentBalance();
 
     if (!currentBalance) {
-      throw new Error("Could not fetch current balance.");
+      throw new Error('Could not fetch current balance.');
     }
 
     const newBalance =
-      type === "expense"
+      type === 'expense'
         ? currentBalance.amount - amount
         : currentBalance.amount + amount;
 
@@ -81,7 +97,7 @@ export const updateBalance = async (
 
     return response.data as Balance; // Return updated balance data
   } catch (error) {
-    console.error("Error updating balance:", error);
+    console.error('Error updating balance:', error);
     throw error; // Rethrow error for further handling
   }
 };

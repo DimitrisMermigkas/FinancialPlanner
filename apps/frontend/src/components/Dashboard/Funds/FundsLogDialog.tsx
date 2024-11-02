@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -7,9 +8,17 @@ import {
   DialogTitle,
   TextField,
   Typography,
-} from "@mui/material";
-import { Fund } from "../../services/api"; // Adjust the import path according to your project structure
-import { formatTimestamp } from "../../utils/formatDate";
+  useTheme,
+} from '@mui/material';
+import { Fund } from '../../../services/api'; // Adjust the import path according to your project structure
+import { formatTimestamp } from '../../../utils/formatDate';
+import {
+  DataGrid,
+  GridColDef,
+  GridRenderCellParams,
+  GridValueGetter,
+  GridValueParser,
+} from '@mui/x-data-grid';
 
 interface FundsLogDialogProps {
   open: boolean;
@@ -26,37 +35,62 @@ const FundsLogDialog: React.FC<FundsLogDialogProps> = ({
   selectedReason,
   handleWithdraw,
 }) => {
+  const theme = useTheme();
   const [withdrawalAmount, setWithdrawalAmount] = useState<number>(0);
 
   const sumOfLogs = logs.reduce((acc, log) => acc + log.amount, 0);
 
+  const logColumns: GridColDef[] = [
+    {
+      field: 'completedAt',
+      headerName: 'Date',
+      width: 140,
+      valueGetter: (value, row, column) => {
+        return formatTimestamp(row.createdAt);
+      },
+    },
+
+    {
+      field: 'amount',
+      headerName: 'Amount',
+      width: 125,
+      renderCell: (params: GridRenderCellParams) => {
+        return (
+          <Box
+            sx={{
+              color: theme.palette.text.primary,
+              width: '100%',
+              height: '100%',
+            }}
+          >
+            €{params.value.toFixed(2)}
+          </Box>
+        );
+      },
+    },
+    {
+      field: 'description',
+      headerName: 'Description',
+      width: 200,
+    },
+  ];
+  const paginationModel = { page: 0, pageSize: 5 };
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      PaperProps={{ style: { width: "500px", minHeight: "40%" } }}
+      PaperProps={{ style: { width: '500px', minHeight: '40%' } }}
     >
       <DialogTitle>Deposit Logs</DialogTitle>
       <DialogContent>
         <Typography variant="h6">Logs for {selectedReason?.title}</Typography>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Amount</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {logs.map((log) => (
-              <tr key={log.id}>
-                <td>{log.id}</td>
-                <td>€{log.amount.toFixed(2)}</td>
-                <td>{formatTimestamp(log.createdAt)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <DataGrid
+          rows={logs}
+          columns={logColumns}
+          initialState={{ pagination: { paginationModel } }}
+          pageSizeOptions={[5, 10, 20]}
+          getRowId={(row) => row.id} // Set unique ID for each row
+        />
         <Typography variant="h6">
           Total Amount: €{sumOfLogs.toFixed(2)}
         </Typography>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Container } from '@mui/material';
-import TransactionsCard from './TransactionCard';
-import BalanceDisplay from './BalanceDisplay';
-import FundsCard from './FundsCard';
+import TransactionsCard from './Transactions/TransactionCard';
+import BalanceDisplay from './Balance/BalanceDisplay';
+import FundsCard from './Funds/FundsCard';
 import {
   fetchBalanceHistory,
   fetchCurrentBalance,
@@ -10,8 +10,9 @@ import {
   fetchReasons,
   fetchTransactions,
 } from '../../services/api';
-import BalanceChart from './BalanceChart';
+import BalanceChart from './Balance/BalanceChart';
 import useDashboardHandlers from '../../handlers/Dashboard.handlers';
+import PlannedTransactions from './Transactions/PlannedTransactions';
 
 const Dashboard: React.FC = () => {
   const [transactions, setTransactions] = useState<any[]>([]);
@@ -52,13 +53,7 @@ const Dashboard: React.FC = () => {
         flexDirection: 'column',
       }}
     >
-      <BalanceDisplay balance={balance} />
-      {/* Button to show the chart */}
-      <div style={{}}>
-        <Button variant="contained" onClick={() => setShowChart(true)}>
-          Show Balance History
-        </Button>
-      </div>
+      <BalanceDisplay balance={balance} setShowChart={setShowChart} />
       <div
         style={{
           display: 'flex',
@@ -67,6 +62,11 @@ const Dashboard: React.FC = () => {
         }}
       >
         <TransactionsCard
+          transactions={transactions}
+          setTransactions={setTransactions}
+          setBalance={setBalance}
+        />
+        <PlannedTransactions
           transactions={transactions}
           setTransactions={setTransactions}
           setBalance={setBalance}

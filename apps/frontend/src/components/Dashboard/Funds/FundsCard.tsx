@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Autocomplete,
   Button,
@@ -10,9 +10,8 @@ import {
   DialogTitle,
   TextField,
   Typography,
-} from "@mui/material";
-import { PieChart, PieSeriesType } from "@mui/x-charts"; // Updated import
-import { VirtualizedSelect } from "../Selects/VirtualizedSelect";
+} from '@mui/material';
+import { PieChart, PieSeriesType } from '@mui/x-charts'; // Updated import
 import {
   addFunds,
   addReason,
@@ -21,9 +20,10 @@ import {
   Fund,
   Reason,
   updateBalance,
-} from "../../services/api";
-import { formatTimestamp } from "../../utils/formatDate";
-import FundsLogDialog from "./FundsLogDialog";
+} from '../../../services/api';
+import { formatTimestamp } from '../../../utils/formatDate';
+import FundsLogDialog from './FundsLogDialog';
+import { VirtualizedSelect } from '@my-workspace/react-components';
 
 interface Option {
   value: string | number;
@@ -50,7 +50,7 @@ const FundsCard: React.FC<FundsCardProps> = ({
     id?: string;
     title: string;
     description: string;
-  }>({ title: "", description: "" });
+  }>({ title: '', description: '' });
   const [reasonOptions, setReasonOptions] = useState<Option[]>([]);
   const [selectedFund, setSelectedFund] = useState<Fund | null>(null);
   const [logs, setLogs] = useState<Fund[]>([]); // Logs for deposits
@@ -70,7 +70,7 @@ const FundsCard: React.FC<FundsCardProps> = ({
 
     if (!acc[reasonId]) {
       const reason = reasons.find((reason) => reason.id === reasonId);
-      const label = reason ? reason.title : "Unknown"; // Default to "Unknown" if not found
+      const label = reason ? reason.title : 'Unknown'; // Default to "Unknown" if not found
 
       acc[reasonId] = { reasonId, label, totalAmount: 0 };
     }
@@ -91,10 +91,10 @@ const FundsCard: React.FC<FundsCardProps> = ({
   const handleCloseInsert = () => {
     setOpenInsertDialog(false);
     setFundAmount(0);
-    setSelectedReason({ title: "", description: "" });
+    setSelectedReason({ title: '', description: '' });
   };
 
-  const handleUpdateReason = (name: "description" | "title", newValue: any) => {
+  const handleUpdateReason = (name: 'description' | 'title', newValue: any) => {
     const updatedReason = { ...selectedReason, [name]: newValue };
     setSelectedReason(updatedReason);
   };
@@ -107,7 +107,7 @@ const FundsCard: React.FC<FundsCardProps> = ({
       },
     ];
     setReasonOptions(updatedOptions);
-    handleUpdateReason("title", newValue);
+    handleUpdateReason('title', newValue);
   };
   const handleAddFund = async () => {
     if (selectedReason) {
@@ -122,11 +122,11 @@ const FundsCard: React.FC<FundsCardProps> = ({
       }
       await addTransaction({
         amount: fundAmount,
-        type: "fund",
+        type: 'fund',
         description: `Funds for ${selectedReason.title}`,
         completedAt: new Date(),
       });
-      await updateBalance("expense", fundAmount);
+      await updateBalance('expense', fundAmount);
       handleCloseInsert();
     }
   };
@@ -146,7 +146,7 @@ const FundsCard: React.FC<FundsCardProps> = ({
     if (selectedReason && selectedReason.id) {
       // Here you would typically call your API to update the balance and funds
       await addFunds({ amount: value, reasonId: selectedReason.id });
-      const updatedBalance = await updateBalance("income", -value);
+      const updatedBalance = await updateBalance('income', -value);
       setBalance(updatedBalance.amount);
       // Close the dialog after withdrawing
       setOpenLogsDialog(false);
@@ -154,16 +154,44 @@ const FundsCard: React.FC<FundsCardProps> = ({
   };
 
   return (
-    <Card sx={{ width: "48%" }}>
-      <CardContent>
-        <Typography variant="h5">Funds</Typography>
+    <Card
+      sx={{
+        width: '22%',
+        height: '100%',
+        borderRadius: '16px',
+        background: '#c5d2e7ff',
+        padding: '16px',
+      }}
+    >
+      <CardContent
+        style={{ display: 'flex', flexDirection: 'column', rowGap: '16px' }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="h5" color="#4d5061ff">
+            Funds
+          </Typography>{' '}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleClickOpenInsert}
+          >
+            Insert Funds
+          </Button>
+        </div>
         <PieChart
-          colors={["#FF6384", "#36A2EB", "#FFCE56"]}
+          colors={['#FF6384', '#36A2EB', '#FFCE56']}
           series={[
             {
               data: fundsDataChart,
-              highlightScope: { fade: "global", highlight: "item" },
-              faded: { innerRadius: 30, additionalRadius: -30, color: "gray" },
+              highlightScope: { fade: 'global', highlight: 'item' },
+              faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
             },
           ]}
           width={400}
@@ -174,36 +202,29 @@ const FundsCard: React.FC<FundsCardProps> = ({
           Total Funds: €
           {funds.reduce((acc, fund) => acc + fund.amount, 0).toFixed(2)}
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleClickOpenInsert}
-        >
-          Insert Funds
-        </Button>
       </CardContent>
 
       {/* Dialog for inserting funds */}
       <Dialog
         open={openInsertDialog}
         onClose={handleCloseInsert}
-        PaperProps={{ style: { width: "500px", minHeight: "40%" } }}
+        PaperProps={{ style: { width: '500px', minHeight: '40%' } }}
       >
         <DialogTitle>Insert Funds</DialogTitle>
         <DialogContent
           style={{
-            display: "flex",
-            justifyContent: "center",
+            display: 'flex',
+            justifyContent: 'center',
           }}
         >
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              width: "70%",
-              justifyContent: "center",
-              alignContent: "center",
-              rowGap: "10px",
+              display: 'flex',
+              flexDirection: 'column',
+              width: '70%',
+              justifyContent: 'center',
+              alignContent: 'center',
+              rowGap: '10px',
             }}
           >
             <TextField
@@ -219,11 +240,11 @@ const FundsCard: React.FC<FundsCardProps> = ({
             <VirtualizedSelect
               value={selectedReason}
               options={reasonOptions}
-              onChange={(newValue) => handleUpdateReason("title", newValue)}
+              onChange={(newValue) => handleUpdateReason('title', newValue)}
               onCreate={createNewReason}
               textfieldProps={{
-                label: "Select a Reason",
-                variant: "outlined",
+                label: 'Select a Reason',
+                variant: 'outlined',
               }}
             />
             <TextField
@@ -235,7 +256,7 @@ const FundsCard: React.FC<FundsCardProps> = ({
               variant="outlined"
               value={selectedReason?.description}
               onChange={(e) =>
-                handleUpdateReason("description", e.target.value)
+                handleUpdateReason('description', e.target.value)
               }
             />
           </div>

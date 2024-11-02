@@ -17,6 +17,7 @@ import {
   TextField,
   MenuItem,
   Box,
+  useTheme,
 } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 
@@ -26,8 +27,8 @@ import {
   fetchTransactions,
   Transaction,
   updateBalance,
-} from '../../services/api';
-import { formatTimestamp } from '../../utils/formatDate';
+} from '../../../services/api';
+import { formatTimestamp } from '../../../utils/formatDate';
 import { DatePicker } from '@mui/x-date-pickers';
 
 interface TransactionsCardProps {
@@ -41,6 +42,7 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
   setTransactions,
   setBalance,
 }) => {
+  const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [newTransaction, setNewTransaction] = useState<Omit<Transaction, 'id'>>(
     {
@@ -50,7 +52,10 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
       completedAt: new Date(),
     }
   );
-
+  const today = new Date();
+  const paidTransactions = transactions.filter(
+    (tran) => new Date(tran.completedAt) <= today
+  );
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -110,12 +115,12 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
     {
       field: 'type',
       headerName: 'Type',
-      width: 100,
+      width: 125,
     },
     {
       field: 'amount',
       headerName: 'Amount',
-      width: 150,
+      width: 155,
       renderCell: (params: GridRenderCellParams) => {
         const color =
           params.row.type == 'expense'
@@ -141,21 +146,52 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
     {
       field: 'description',
       headerName: 'Description',
-      width: 250,
+      width: 350,
     },
   ];
   const paginationModel = { page: 0, pageSize: 5 };
 
   return (
-    <Card sx={{ width: '48%', height: '100%' }}>
-      <CardContent style={{ paddingInline: '16px', paddingBlock: 0 }}>
-        <Typography variant="h5">Transactions</Typography>
-        <Button variant="contained" color="primary" onClick={handleClickOpen}>
-          Add Transaction
-        </Button>
+    <Card
+      sx={{
+        width: '48%',
+        height: '100%',
+        borderRadius: '16px',
+        background: '#c5d2e7ff',
+        padding: '16px',
+      }}
+    >
+      <CardContent
+        style={{ display: 'flex', flexDirection: 'column', rowGap: '16px' }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="h5" color="#4d5061ff">
+            Transactions
+          </Typography>
+          <Button variant="contained" color="primary" onClick={handleClickOpen}>
+            Add Transaction
+          </Button>
+        </div>
+
         <div style={{ height: 400, width: '100%' }}>
           <DataGrid
-            rows={transactions}
+            sx={{
+              borderColor: 'primary.light',
+              '& .MuiDataGrid-cell:hover': {
+                color: 'primary.main',
+              },
+              '&. .MuiDataGrid-row--borderBottom': {
+                backgroundColor: theme.palette.secondary.main,
+              },
+            }}
+            rows={paidTransactions}
             columns={columns}
             initialState={{ pagination: { paginationModel } }}
             pageSizeOptions={[5, 10, 20]}

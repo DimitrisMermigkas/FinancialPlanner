@@ -7,12 +7,14 @@ import {
 } from '@my-workspace/react-components';
 import { useState } from 'react';
 import Dashboard from '../components/Dashboard/Dashboard';
+import { useTheme } from '@mui/material';
 
 const drawerVariant = 'persistent';
 const drawerAnchor = 'left';
 const appBarHeight = '64px';
 
 export function App() {
+  const theme = useTheme();
   /*                            Loader Handling Area
    *************************************************************************************************
    */
@@ -38,12 +40,14 @@ export function App() {
           display: 'flex',
           flexDirection: drawerAnchor === 'left' ? 'row' : 'row-reverse',
           height: '100%',
+          backgroundColor: '#30323dff',
         }}
       >
         <CustomAppBar
           title="MainPage"
           style={{
-            backgroundColor: 'alice blue',
+            background:
+              'linear-gradient(180deg, rgba(92,128,188,1) 0%, rgba(77,80,97,1) 100%)',
             height: appBarHeight,
             display: 'flex',
             justifyContent: 'center',
@@ -62,8 +66,9 @@ export function App() {
           paperStyle={{ top: appBarHeight }}
         ></CustomDrawer> */}
         <PageLayout
-          title="Dashboard"
+          title="Current Balance"
           style={{
+            color: '#f2f4f7ff',
             display: 'flex',
             flexDirection: 'column',
             marginTop: appBarHeight,
