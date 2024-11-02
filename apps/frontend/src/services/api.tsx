@@ -46,7 +46,7 @@ export const updateTransaction = async (
   }
 ) => {
   const response = await axios.patch(
-    `${API_URL}/transactions/${id}`,
+    `${API_URL}/transaction/${id}`,
     updatedTransaction
   );
   return response.data as Transaction; // Return updated Transaction
