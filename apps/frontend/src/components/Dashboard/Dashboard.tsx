@@ -44,6 +44,10 @@ const Dashboard: React.FC = () => {
     fetchData();
   }, []);
 
+  const today = new Date();
+  const futureTransactions = transactions.filter(
+    (transaction) => new Date(transaction.completedAt) > today
+  );
   return (
     <div
       style={{
@@ -68,6 +72,7 @@ const Dashboard: React.FC = () => {
         />
         <PlannedTransactions
           transactions={transactions}
+          futureTransactions={futureTransactions}
           setTransactions={setTransactions}
           setBalance={setBalance}
         />
@@ -83,7 +88,9 @@ const Dashboard: React.FC = () => {
       {showChart && monthlyBalances && (
         <BalanceChart
           open={showChart}
-          data={monthlyBalances}
+          monthlyBalances={monthlyBalances}
+          funds={funds}
+          futureTransactions={futureTransactions}
           onClose={() => setShowChart(false)}
         />
       )}

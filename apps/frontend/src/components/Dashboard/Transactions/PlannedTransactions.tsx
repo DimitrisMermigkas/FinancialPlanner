@@ -24,22 +24,18 @@ import TaskAltIcon from '@mui/icons-material/TaskAlt';
 
 interface PlannedTransactionsProps {
   transactions: Transaction[];
+  futureTransactions: Transaction[];
   setBalance: React.Dispatch<React.SetStateAction<number>>;
   setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
 }
 
 const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
   transactions,
+  futureTransactions,
   setBalance,
   setTransactions,
 }) => {
-  const today = new Date();
   const [openDialog, setOpenDialog] = useState<boolean>(false);
-
-  // Filter transactions to include only those with a future date
-  const futureTransactions = transactions.filter(
-    (transaction) => new Date(transaction.completedAt) > today
-  );
 
   const planTransaction = async (
     formData: {
@@ -56,7 +52,9 @@ const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
         description: formData.textValue,
         completedAt: formData.dateValue,
       };
-      addTransaction(plannedTransaction);
+      await addTransaction(plannedTransaction);
+      const updatedTransactions = await fetchTransactions();
+      setTransactions(updatedTransactions); // Update the transactions state
     }
     setOpenDialog(false);
   };

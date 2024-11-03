@@ -11,12 +11,10 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  <StrictMode>
-    <ThemeProvider theme={theme}>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <GlobalStyles />
-        <App />
-      </LocalizationProvider>
-    </ThemeProvider>
-  </StrictMode>
+  <ThemeProvider theme={theme}>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <GlobalStyles />
+      <App />
+    </LocalizationProvider>
+  </ThemeProvider>
 );
