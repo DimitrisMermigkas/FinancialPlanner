@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Typography } from '@mui/material';
+import { Typography, useTheme } from '@mui/material';
 
 const titleHeight = 72;
 
@@ -49,12 +49,17 @@ export const PageLayout = ({
   contentStyle,
   style,
 }: PageLayoutProps) => {
+  const theme = useTheme();
   return (
     <div style={{ display: 'flex', width: '100%', height: '100%', ...style }}>
       {(title || toolbarContent) && (
         <ToolbarDiv>
           {title && (
-            <Typography variant="h4" style={{ fontWeight: 700, ...titleStyle }}>
+            <Typography
+              color={theme.palette.text.primary}
+              variant="h4"
+              style={{ fontWeight: 700, ...titleStyle }}
+            >
               {title}
             </Typography>
           )}

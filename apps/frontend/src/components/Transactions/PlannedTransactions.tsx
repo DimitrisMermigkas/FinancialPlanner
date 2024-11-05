@@ -16,10 +16,10 @@ import {
   Transaction,
   updateBalance,
   updateTransaction,
-} from '../../../services/api';
-import { formatTimestamp } from '../../../utils/formatDate';
+} from '../../services/api';
+import { formatTimestamp } from '../../utils/formatDate';
 import { v4 as uuidv4 } from 'uuid';
-import DialogWithForm from '../../Forms/DialogForm';
+import DialogWithForm from '../Forms/DialogForm';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 
 interface PlannedTransactionsProps {
@@ -83,8 +83,7 @@ const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
     <>
       <Card
         sx={{
-          width: '22%',
-          height: '100%',
+          flex: 1,
           borderRadius: '16px',
           background: '#c5d2e7ff',
           padding: '16px',

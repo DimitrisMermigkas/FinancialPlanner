@@ -20,11 +20,11 @@ import {
   Fund,
   Reason,
   updateBalance,
-} from '../../../services/api';
-import { formatTimestamp } from '../../../utils/formatDate';
-import FundsLogDialog from './FundsLogDialog';
+} from '../../services/api';
+import { formatTimestamp } from '../../utils/formatDate';
 import { VirtualizedSelect } from '@my-workspace/react-components';
 import useFundsHandlers from 'apps/frontend/src/handlers/Funds.handlers';
+import FundsLogs from './FundsLogs';
 
 interface Option {
   value: string | number;
@@ -72,11 +72,12 @@ const FundsCard: React.FC<FundsCardProps> = ({
   return (
     <Card
       sx={{
-        width: '22%',
+        flex: 0.6,
         height: '100%',
         borderRadius: '16px',
         background: '#c5d2e7ff',
         padding: '16px',
+        boxSizing: 'border-box',
       }}
     >
       <CardContent
@@ -92,7 +93,7 @@ const FundsCard: React.FC<FundsCardProps> = ({
         >
           <Typography variant="h5" color="#4d5061ff">
             Funds
-          </Typography>{' '}
+          </Typography>
           <Button
             variant="contained"
             color="primary"
@@ -101,23 +102,43 @@ const FundsCard: React.FC<FundsCardProps> = ({
             Insert Funds
           </Button>
         </div>
-        <PieChart
-          colors={['#FF6384', '#36A2EB', '#FFCE56']}
-          series={[
-            {
-              data: fundsDataChart,
-              highlightScope: { fade: 'global', highlight: 'item' },
-              faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
-            },
-          ]}
-          width={400}
-          height={200}
-          onItemClick={handlePieChartClick}
-        />
-        <Typography variant="h6">
-          Total Funds: €
-          {funds.reduce((acc, fund) => acc + fund.amount, 0).toFixed(2)}
-        </Typography>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <PieChart
+              colors={['#FF6384', '#36A2EB', '#FFCE56']}
+              series={[
+                {
+                  data: fundsDataChart,
+                  highlightScope: { fade: 'global', highlight: 'item' },
+                  faded: {
+                    innerRadius: 30,
+                    additionalRadius: -30,
+                    color: 'gray',
+                  },
+                },
+              ]}
+              width={400}
+              height={200}
+              onItemClick={handlePieChartClick}
+            />
+            <Typography variant="h6">
+              Total Funds: €
+              {funds.reduce((acc, fund) => acc + fund.amount, 0).toFixed(2)}
+            </Typography>
+          </div>
+          <FundsLogs
+            logs={logs}
+            selectedReason={selectedReason}
+            handleWithdraw={handleWithdraw}
+          />
+        </div>
       </CardContent>
 
       {/* Dialog for inserting funds */}
@@ -184,14 +205,6 @@ const FundsCard: React.FC<FundsCardProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-
-      <FundsLogDialog
-        open={openLogsDialog}
-        onClose={() => setOpenLogsDialog(false)}
-        logs={logs}
-        selectedReason={selectedReason}
-        handleWithdraw={handleWithdraw}
-      />
     </Card>
   );
 };

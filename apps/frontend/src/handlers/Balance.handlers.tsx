@@ -7,33 +7,11 @@ interface MonthlyData {
   amount: number;
 }
 
-const useBalanceHandlers = (data: Balance[]) => {
+const useBalanceHandlers = () => {
   const [showProjected, setShowProjected] = useState(false);
   const [monthsAhead, setMonthsAhead] = useState(4); // Default months ahead to forecast
   const [projectedData, setProjectedData] = useState<MonthlyData[]>([]);
   const [myIncome, setMyIncome] = useState<number>(1450);
-
-  // Sort data by date
-  const sortedData = data.sort(
-    (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
-  );
-
-  // Define the date range and initialize arrays
-  const endDate = new Date();
-  const startDate = subDays(endDate, 33);
-  const dateRange = eachDayOfInterval({ start: startDate, end: endDate });
-
-  // Map sortedData amounts to corresponding dates or set to `null` if no data exists for that date
-  const dataset = dateRange.map((date) => {
-    const dateString = format(date, 'yyyy-MM-dd');
-    const record = sortedData.find(
-      (item) => format(new Date(item.updatedAt), 'yyyy-MM-dd') === dateString
-    );
-    return {
-      date: format(date, 'MMM-dd'),
-      amount: record ? record.amount : null,
-    };
-  });
 
   // Function to get the latest entry for each month
   const getMonthlyBalanceData = (data: Balance[]) => {
@@ -258,7 +236,17 @@ const useBalanceHandlers = (data: Balance[]) => {
       }
     }
 
-    return forecastData;
+    // Find the index of the current date in forecastData
+    const startIndex = forecastData.findIndex(
+      (data) => data.date === currentMMMYY
+    );
+
+    // Calculate the ending index based on monthsAhead
+    const endIndex = startIndex + monthsAhead + 1; // +1 to include the current month
+
+    // Slice forecastData up to the calculated endIndex
+    const adjustedForecastData = forecastData.slice(0, endIndex);
+    return adjustedForecastData;
   };
 
   return {
@@ -267,7 +255,6 @@ const useBalanceHandlers = (data: Balance[]) => {
     calculateMonthlyFutureTransactions,
     addFundsToMonthlyBalance,
     forecastMonthlyData,
-    dataset,
     showProjected,
     setShowProjected,
     projectedData,

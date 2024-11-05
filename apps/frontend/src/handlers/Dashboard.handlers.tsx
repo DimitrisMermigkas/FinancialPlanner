@@ -1,9 +1,35 @@
-import { useState } from "react";
-import { Balance, fetchBalanceHistory } from "../services/api";
+import { useEffect, useState } from 'react';
+import { Balance, fetchBalanceHistory, fetchCurrentBalance, fetchFunds, fetchReasons, fetchTransactions } from '../services/api';
 
 const useDashboardHandlers = () => {
   const [balanceHistory, setBalanceHistory] = useState<Balance[]>();
   const [monthlyBalances, setMonthlyBalances] = useState<Balance[]>();
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [funds, setFunds] = useState<any[]>([]);
+  const [reasons, setReasons] = useState<any[]>([]);
+  const [balance, setBalance] = useState<number>(0);
+  const [showChart, setShowChart] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const transactionsData = await fetchTransactions();
+        const fundsData = await fetchFunds();
+        const balanceData = await fetchCurrentBalance();
+        const reasonsList = await fetchReasons();
+        setTransactions(transactionsData);
+        setFunds(fundsData);
+        setBalance(balanceData.amount);
+        setReasons(reasonsList);
+        getBalanceHistory();
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const getBalanceHistory = async () => {
     try {
       const balanceData = await fetchBalanceHistory();
@@ -13,7 +39,7 @@ const useDashboardHandlers = () => {
       const groupedByDay = balanceData.reduce(
         (acc: Record<string, Balance>, entry) => {
           const date = new Date(entry.updatedAt); // Convert to Date object
-          const dateKey = date.toISOString().split("T")[0]; // Extract YYYY-MM-DD format
+          const dateKey = date.toISOString().split('T')[0]; // Extract YYYY-MM-DD format
 
           // Only keep the entry if it's the latest for the day
           if (
@@ -35,7 +61,7 @@ const useDashboardHandlers = () => {
       );
       setMonthlyBalances(result);
     } catch (error) {
-      console.error("Error fetching balance history:", error);
+      console.error('Error fetching balance history:', error);
     }
   };
 
@@ -43,6 +69,16 @@ const useDashboardHandlers = () => {
     balanceHistory,
     monthlyBalances,
     getBalanceHistory,
+    transactions,
+    funds,
+    reasons,
+    balance,
+    showChart,
+    setTransactions,
+    setFunds,
+    setReasons,
+    setBalance,
+    setShowChart,
   };
 };
 

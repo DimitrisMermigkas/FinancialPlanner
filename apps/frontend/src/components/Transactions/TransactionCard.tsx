@@ -27,8 +27,8 @@ import {
   fetchTransactions,
   Transaction,
   updateBalance,
-} from '../../../services/api';
-import { formatTimestamp } from '../../../utils/formatDate';
+} from '../../services/api';
+import { formatTimestamp } from '../../utils/formatDate';
 import { DatePicker } from '@mui/x-date-pickers';
 
 interface TransactionsCardProps {
@@ -108,19 +108,19 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
     {
       field: 'completedAt',
       headerName: 'Date',
-      width: 200,
-      // valueGetter: (params) =>
-      //   formatTimestamp(new Date(params.row.completedAt).toISOString()),
+      width: 150,
+      valueFormatter: (value: string) =>
+        formatTimestamp(new Date(value).toISOString()),
     },
     {
       field: 'type',
       headerName: 'Type',
-      width: 125,
+      width: 105,
     },
     {
       field: 'amount',
       headerName: 'Amount',
-      width: 155,
+      width: 125,
       renderCell: (params: GridRenderCellParams) => {
         const color =
           params.row.type == 'expense'
@@ -146,7 +146,8 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
     {
       field: 'description',
       headerName: 'Description',
-      width: 350,
+      width: 300,
+      resizable: false,
     },
   ];
   const paginationModel = { page: 0, pageSize: 5 };
@@ -154,15 +155,20 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
   return (
     <Card
       sx={{
-        width: '48%',
-        height: '100%',
+        flex: 1,
         borderRadius: '16px',
         background: '#c5d2e7ff',
         padding: '16px',
       }}
     >
       <CardContent
-        style={{ display: 'flex', flexDirection: 'column', rowGap: '16px' }}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          rowGap: '16px',
+          boxSizing: 'border-box',
+          height: '100%',
+        }}
       >
         <div
           style={{
@@ -180,12 +186,18 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
           </Button>
         </div>
 
-        <div style={{ height: 400, width: '100%' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: '520px',
+          }}
+        >
           <DataGrid
             sx={{
               borderColor: 'primary.light',
               '& .MuiDataGrid-cell:hover': {
-                color: 'primary.main',
+                color: theme.palette.primary.main,
               },
               '&. .MuiDataGrid-row--borderBottom': {
                 backgroundColor: theme.palette.secondary.main,
