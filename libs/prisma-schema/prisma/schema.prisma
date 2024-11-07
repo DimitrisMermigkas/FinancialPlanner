@@ -56,3 +56,24 @@ model Balance {
   amount    Float // Current balance in the main account
   updatedAt DateTime @updatedAt
 }
+
+model Goal {
+  id          String     @id @default(uuid()) @db.Uuid
+  description String // Reason/description for the goal
+  amount      Float // The target amount for the goal (could be a limit or deposit)
+  type        GoalType // Enum to define the type of goal (deposit, limit, etc.)
+  status      GoalStatus // Enum to define the status of the goal
+  createdAt   DateTime   @default(now())
+}
+
+enum GoalType {
+  LIMIT
+  SAVINGS
+}
+
+enum GoalStatus {
+  PENDING // Goal has not been achieved yet
+  IN_PROGRESS // Goal is currently being worked on
+  ACHIEVED // Goal has been reached
+  FAILED // Goal could not be reached
+}
