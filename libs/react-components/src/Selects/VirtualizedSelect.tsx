@@ -5,7 +5,7 @@ import {
   AutocompleteVirtualizedProps,
   filteredOptionsSelect,
   ListboxComponent,
-  newOption,
+  OptionWithIsNew,
   renderRows,
 } from './sharedSelectPropsAndUtils';
 
@@ -19,7 +19,7 @@ import {
  * @param {(value: ValueType | null, reason?: CustomAutocompleteChangeReason['reason']) => void} onChange - Callback function invoked when the selected value changes, with the new value and an optional reason.
  * @param {boolean} [error] - Optional. Indicates if the component should display an error state.
  * @param {string} [helperText] - Optional. Text displayed below the input field to provide additional context or error messages.
- * @param {React.ComponentProps<typeof CustomTextField>} [textfieldProps] - Optional. Props to be passed to the custom text field used for input.
+ * @param {React.ComponentProps<typeof CustomTextField>} [textFieldProps] - Optional. Props to be passed to the custom text field used for input.
  * @param {(option: Option) => boolean} [getOptionDisabled] - Optional. A function that determines whether an option is disabled based on its properties.
  * @param {(value: string) => void} [onCreate] - Optional. Callback function triggered when a new value is created (for free solo mode).
  * @param {boolean} [freeSolo] - Optional. Allows users to input values that are not in the list of options.
@@ -33,33 +33,39 @@ export const VirtualizedSelect = <ValueType,>({
   onChange,
   error,
   helperText,
-  textfieldProps,
+  textFieldProps,
   onCreate,
   freeSolo,
-  renderOption = renderRows,
-}: AutocompleteVirtualizedProps<ValueType>) => {
-  const handleChange = (v: newOption) => {
-    if (onCreate && v?.isNew) {
-      const modifiedNewItem = { value: v.value, label: v.value } as newOption;
+  renderOption = renderRows<ValueType | string>,
+}: AutocompleteVirtualizedProps<ValueType, false>) => {
+  const handleChange = (v: OptionWithIsNew<ValueType> | null) => {
+    if (v === null) {
+      // If the value is null (clear selection), pass null to onChange
+      onChange?.(null);
+    } else if (onCreate && v?.isNew) {
+      const modifiedNewItem = {
+        value: v.value,
+        label: String(v.value),
+      };
       onCreate(modifiedNewItem);
     } else {
-      onChange && onChange(v.value as ValueType);
+      onChange && onChange(v?.value ?? null);
     }
   };
 
   return (
-    <Autocomplete
+    <Autocomplete<OptionWithIsNew<ValueType>, false, false, boolean>
       value={options.find((option) => option.value === value) || null}
       onChange={(_, newValue) => {
         let updatedValue = newValue;
         if (typeof updatedValue === 'string') {
           updatedValue = {
             label: updatedValue, // Use the string as the label
-            value: updatedValue, // Use the string as the value (or any other logic to generate a value)
+            value: updatedValue as ValueType, // Use the string as the value (or any other logic to generate a value)
             isNew: true,
-          } as newOption;
+          };
         }
-        handleChange(updatedValue as newOption);
+        handleChange(updatedValue);
       }}
       disableListWrap
       freeSolo={!!onCreate || freeSolo}
@@ -86,10 +92,10 @@ export const VirtualizedSelect = <ValueType,>({
           }}
           error={error}
           helperText={helperText}
-          {...textfieldProps}
+          {...textFieldProps}
         />
       )}
-      filterOptions={filteredOptionsSelect}
+      filterOptions={filteredOptionsSelect<ValueType>}
     />
   );
 };

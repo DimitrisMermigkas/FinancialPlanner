@@ -7,7 +7,7 @@ import { CustomTextFieldProps } from '../Textfields/CustomTextField';
  *
  * Extends the DatePickerProps from MUI with additional customization options.
  */
-interface CustomDatePickerProps extends DatePickerProps<Date> {
+export interface CustomDatePickerProps extends DatePickerProps<Date> {
   /**
    * Optional props for the underlying text field component.
    * This can include styles, placeholder, and other properties specific to the text field.

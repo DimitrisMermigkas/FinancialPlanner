@@ -3,21 +3,21 @@ import Checkbox from '@mui/material/Checkbox';
 import { Autocomplete, AutocompleteRenderOptionState } from '@mui/material';
 import CustomTextField from '../Textfields/CustomTextField';
 import {
-  AutocompleteVirtualizedProps,
   CustomAutocompleteChangeReason,
   filteredOptionsSelect,
   ListboxComponent,
-  newOption,
+  OptionWithIsNew,
   Option,
   renderRows,
+  AutocompleteVirtualizedProps,
 } from './sharedSelectPropsAndUtils';
 
-const renderedListItem = (
+const renderedListItem = <ValueType,>(
   props: object,
-  option: Option,
+  option: Option<ValueType>,
   state: AutocompleteRenderOptionState,
   handleChange: (
-    v: newOption[],
+    v: OptionWithIsNew<ValueType>[],
     reason: CustomAutocompleteChangeReason['reason']
   ) => void
 ) => {
@@ -47,28 +47,28 @@ const renderedListItem = (
  * @param {(value: ValueType[], reason?: CustomAutocompleteChangeReason['reason']) => void} onChange - Callback function invoked when the selected values change, with the new values and an optional reason.
  * @param {boolean} [error] - Optional. Indicates if the component should display an error state.
  * @param {string} [helperText] - Optional. Text displayed below the input field to provide additional context or error messages.
- * @param {React.ComponentProps<typeof CustomTextField>} [textfieldProps] - Optional. Props to be passed to the custom text field used for input.
- * @param {(value: newOption) => void} [onCreate] - Optional. Callback function triggered when a new value is created (for free solo mode).
+ * @param {React.ComponentProps<typeof CustomTextField>} [textFieldProps] - Optional. Props to be passed to the custom text field used for input.
+ * @param {(value: OptionWithIsNew) => void} [onCreate] - Optional. Callback function triggered when a new value is created (for free solo mode).
  * @param {boolean} [freeSolo] - Optional. Allows users to input values that are not in the list of options.
  * @param {(props: any, option: Option, state: AutocompleteRenderOptionState) => React.ReactNode} [renderOption] - Optional. Custom function to render each option in the dropdown.
  * @param {object} [ChipProps] - Optional. Additional props to customize the Chip components rendered for selected options.
  */
 
-export const VirtualizedMultipleSelect = <ValueType,>({
+export const VirtualizedMultipleSelect = <ValueType extends string | number>({
   options,
   label,
   value,
   onChange,
   error,
   helperText,
-  textfieldProps,
+  textFieldProps,
   onCreate,
   freeSolo,
   renderOption,
   ChipProps,
-}: AutocompleteVirtualizedProps<ValueType>) => {
+}: AutocompleteVirtualizedProps<ValueType, true>) => {
   const handleChange = (
-    v: newOption[],
+    v: OptionWithIsNew<ValueType>[],
     reason: CustomAutocompleteChangeReason['reason']
   ) => {
     const findNewItem = v.find((item) => item.isNew === true);
@@ -80,22 +80,22 @@ export const VirtualizedMultipleSelect = <ValueType,>({
           typeof findNewItem.value === 'string'
             ? findNewItem.value
             : String(findNewItem.value),
-      } as newOption;
+      };
       onCreate(modifiedNewItem); // Handle creation of new option
     } else {
-      let passedValue = v;
+      let newValue: ValueType[];
       if (reason === 'checkboxRemove') {
         const checkBoxOption = v[0];
         const updatedOptions = Array.isArray(value) ? value : []; // Ensure value is an array
-        passedValue = updatedOptions.filter(
-          (option) => option.value !== checkBoxOption.value
+        newValue = updatedOptions.filter(
+          (option) => option !== checkBoxOption.value
         ); // Filter out the option being removed
       } else if (reason === 'checkboxAdd') {
         const checkBoxOption = v[0];
         const updatedOptions = Array.isArray(value) ? value : []; // Ensure value is an array
-        passedValue = [...updatedOptions, checkBoxOption];
-      } else passedValue = v;
-      onChange && onChange(passedValue as ValueType, reason); // Pass the updated array
+        newValue = [...updatedOptions, checkBoxOption.value];
+      } else newValue = v.map((item) => item.value);
+      onChange?.(newValue, reason); // Pass the updated array
     }
   };
 
@@ -107,9 +107,7 @@ export const VirtualizedMultipleSelect = <ValueType,>({
       freeSolo={!!onCreate || freeSolo}
       value={
         Array.isArray(value)
-          ? options.filter((option) =>
-              value.some((v) => v.value === option.value)
-            )
+          ? options.filter((option) => value.some((v) => v === option.value))
           : [] // Fallback if value is not an array
       }
       onChange={(_, newValue, reason) => {
@@ -119,14 +117,14 @@ export const VirtualizedMultipleSelect = <ValueType,>({
           for (let i = 0; i < updatedValues.length; i++) {
             if (typeof updatedValues[i] === 'string') {
               updatedValues[i] = {
-                label: updatedValues[i], // Use the string as the label
-                value: updatedValues[i], // Use the string as the value (or any other logic to generate a value)
+                label: String(updatedValues[i]), // Use the string as the label
+                value: updatedValues[i] as ValueType, // Use the string as the value (or any other logic to generate a value)
                 isNew: true,
-              } as newOption;
+              };
             }
           }
         }
-        handleChange(updatedValues as newOption[], reason);
+        handleChange(updatedValues as OptionWithIsNew<ValueType>[], reason);
       }}
       disableListWrap
       ListboxComponent={
@@ -152,7 +150,7 @@ export const VirtualizedMultipleSelect = <ValueType,>({
           }}
           error={error}
           helperText={helperText}
-          {...textfieldProps}
+          {...textFieldProps}
         />
       )}
       ChipProps={ChipProps}

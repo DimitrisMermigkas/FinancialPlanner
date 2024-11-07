@@ -2,7 +2,7 @@ import React from 'react';
 import { TimePicker, TimePickerProps } from '@mui/x-date-pickers';
 import { CustomTextFieldProps } from '../Textfields/CustomTextField';
 
-interface CustomTimePickerProps extends TimePickerProps<Date> {
+export interface CustomTimePickerProps extends TimePickerProps<Date> {
   clockSx?: React.CSSProperties; // Styles for the clock
   /**
    * Optional props for the underlying text field component.
