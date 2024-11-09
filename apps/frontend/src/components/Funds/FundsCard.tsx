@@ -25,6 +25,7 @@ import { formatTimestamp } from '../../utils/formatDate';
 import { VirtualizedSelect } from '@my-workspace/react-components';
 import useFundsHandlers from 'apps/frontend/src/handlers/Funds.handlers';
 import FundsLogs from './FundsLogs';
+import CardComponent from '../CardComponent/CardComponent';
 
 interface Option {
   value: string | number;
@@ -70,38 +71,13 @@ const FundsCard: React.FC<FundsCardProps> = ({
   });
 
   return (
-    <Card
-      sx={{
-        flex: 0.6,
-        height: '100%',
-        borderRadius: '16px',
-        background: '#c5d2e7ff',
-        padding: '16px',
-        boxSizing: 'border-box',
-      }}
-    >
-      <CardContent
-        style={{ display: 'flex', flexDirection: 'column', rowGap: '16px' }}
+    <>
+      <CardComponent
+        title="Funds"
+        buttonText="Deposit Funds"
+        cardStyle={{ flex: 0.6 }}
+        onClick={handleClickOpenInsert}
       >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Typography variant="h5" color="#4d5061ff">
-            Funds
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleClickOpenInsert}
-          >
-            Insert Funds
-          </Button>
-        </div>
         <div
           style={{
             display: 'flex',
@@ -139,7 +115,7 @@ const FundsCard: React.FC<FundsCardProps> = ({
             handleWithdraw={handleWithdraw}
           />
         </div>
-      </CardContent>
+      </CardComponent>
 
       {/* Dialog for inserting funds */}
       <Dialog
@@ -175,11 +151,11 @@ const FundsCard: React.FC<FundsCardProps> = ({
               onChange={(e) => setFundAmount(Number(e.target.value))}
             />
             <VirtualizedSelect
-              value={selectedReason}
+              value={selectedReason.id}
               options={reasonOptions}
               onChange={(newValue) => handleUpdateReason('title', newValue)}
               onCreate={createNewReason}
-              textfieldProps={{
+              textFieldProps={{
                 label: 'Select a Reason',
                 variant: 'outlined',
               }}
@@ -205,7 +181,7 @@ const FundsCard: React.FC<FundsCardProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </Card>
+    </>
   );
 };
 

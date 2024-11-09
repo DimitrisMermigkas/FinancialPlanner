@@ -44,6 +44,7 @@ export function App() {
   );
   const PlannerPage = withLazyLoad(() => import('../pages/Planner/Planner'));
   const DepositPage = withLazyLoad(() => import('../pages/Deposit/Deposit'));
+  const InfoPage = withLazyLoad(() => import('../pages/Info/Info'));
 
   const drawerItems = [
     {
@@ -64,6 +65,12 @@ export function App() {
       link: '/deposit',
       icon: null,
     },
+    {
+      key: 3,
+      text: 'Info',
+      link: '/info',
+      icon: null,
+    },
   ];
 
   const router = createBrowserRouter([
@@ -76,6 +83,7 @@ export function App() {
         { path: 'dashboard', element: <DashboardPage /> },
         { path: 'plan', element: <PlannerPage /> },
         { path: 'deposit', element: <DepositPage /> },
+        { path: 'info', element: <InfoPage /> },
       ],
     },
   ]);

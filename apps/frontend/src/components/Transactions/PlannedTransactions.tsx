@@ -21,6 +21,7 @@ import { formatTimestamp } from '../../utils/formatDate';
 import { v4 as uuidv4 } from 'uuid';
 import DialogWithForm from '../Forms/DialogForm';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
+import CardComponent from '../CardComponent/CardComponent';
 
 interface PlannedTransactionsProps {
   transactions: Transaction[];
@@ -81,64 +82,39 @@ const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
 
   return (
     <>
-      <Card
-        sx={{
-          flex: 1,
-          borderRadius: '16px',
-          background: '#c5d2e7ff',
-          padding: '16px',
-        }}
+      <CardComponent
+        title="Planned Transactions"
+        buttonText="Plan a Transaction"
+        onClick={() => setOpenDialog(true)}
       >
-        <CardContent
-          style={{ display: 'flex', flexDirection: 'column', rowGap: '16px' }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Typography variant="h5" color="#4d5061ff">
-              Planned Transactions
-            </Typography>
-            <Button
-              onClick={() => setOpenDialog(true)}
-              variant="contained"
-              color="primary"
-            >
-              Plan a transaction
-            </Button>
-          </div>
-          <List>
-            {futureTransactions.map((transaction) => (
-              <ListItem key={transaction.id}>
-                <ListItemText
-                  primary={transaction.description}
-                  secondary={formatTimestamp(
-                    new Date(transaction.completedAt).toISOString()
-                  )}
-                />
-                <Box
-                  sx={{
-                    color:
-                      transaction.type === 'expense' ? '#910707' : '#087d00',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  €{transaction.amount.toFixed(2)}
-                </Box>
-                <IconButton
-                  onClick={() => markAsPaid(transaction.id)}
-                  sx={{ color: 'inherit', mr: 0.5 }}
-                >
-                  <TaskAltIcon />
-                </IconButton>
-              </ListItem>
-            ))}
-          </List>
-        </CardContent>
-      </Card>
+        <List>
+          {futureTransactions.map((transaction) => (
+            <ListItem key={transaction.id}>
+              <ListItemText
+                style={{ marginBottom: 0, marginTop: 0 }}
+                primary={transaction.description}
+                secondary={formatTimestamp(
+                  new Date(transaction.completedAt).toISOString()
+                )}
+              />
+              <Box
+                sx={{
+                  color: transaction.type === 'expense' ? '#910707' : '#087d00',
+                  fontWeight: 'bold',
+                }}
+              >
+                €{transaction.amount.toFixed(2)}
+              </Box>
+              <IconButton
+                onClick={() => markAsPaid(transaction.id)}
+                sx={{ color: 'inherit', mr: 0.5 }}
+              >
+                <TaskAltIcon />
+              </IconButton>
+            </ListItem>
+          ))}
+        </List>
+      </CardComponent>
       <DialogWithForm
         open={openDialog}
         hasOptions={true}

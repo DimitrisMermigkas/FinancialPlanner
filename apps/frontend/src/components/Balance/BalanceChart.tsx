@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { eachDayOfInterval, format, subDays } from 'date-fns';
+import CardComponent from '../CardComponent/CardComponent';
 
 interface BalanceChartProps {
   monthlyBalances: Balance[] | undefined;
@@ -44,48 +45,30 @@ const BalanceChart: React.FC<BalanceChartProps> = ({ monthlyBalances }) => {
   };
 
   return (
-    <Card
-      sx={{
-        flex: 1,
-        height: '100%',
-        borderRadius: '16px',
-        background: '#c5d2e7ff',
-        padding: '16px',
-        boxSizing: 'border-box',
-      }}
-    >
-      <CardContent
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          rowGap: '16px',
-          height: '100%',
-        }}
-      >
-        {monthlyBalances && (
-          <ResponsiveContainer width="100%" height={500}>
-            <LineChart
-              height={200}
-              data={calculateBalanceDataSet(monthlyBalances)}
-              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
+    <CardComponent>
+      {monthlyBalances && (
+        <ResponsiveContainer width="100%" height={500}>
+          <LineChart
+            height={200}
+            data={calculateBalanceDataSet(monthlyBalances)}
+            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
 
-              <Line
-                data={calculateBalanceDataSet(monthlyBalances)}
-                type="monotone"
-                dataKey="amount"
-                stroke="#8884d8"
-                connectNulls
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        )}
-      </CardContent>
-    </Card>
+            <Line
+              data={calculateBalanceDataSet(monthlyBalances)}
+              type="monotone"
+              dataKey="amount"
+              stroke="#8884d8"
+              connectNulls
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      )}
+    </CardComponent>
   );
 };
 

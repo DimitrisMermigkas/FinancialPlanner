@@ -9,7 +9,7 @@ const BalanceDisplay: React.FC<BalanceDisplayProps> = ({ balance }) => {
   return (
     <Box mb={3}>
       <Typography style={{ fontSize: '48px' }}>
-        €{balance.toFixed(2)}
+        €{balance?.toFixed(2)}
       </Typography>
     </Box>
   );

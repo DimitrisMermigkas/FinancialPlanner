@@ -91,6 +91,7 @@ export const CustomDrawer: React.FC<CustomDrawer> = ({
         sx={{
           flexGrow: 1,
           paddingInline: theme.spacing(3),
+          paddingBottom: theme.spacing(3),
           transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
