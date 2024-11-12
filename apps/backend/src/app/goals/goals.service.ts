@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service'; // Prisma service to interact with database
 import { Goal } from '@prisma/client';
-import { CreateGoals } from 'libs/common/src';
+import { CreateGoals } from '@my-workspace/common';
 
 @Injectable()
 export class GoalService {

@@ -20,16 +20,15 @@ import {
   useTheme,
 } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-
 import {
   addTransaction,
-  Balance,
   fetchTransactions,
-  Transaction,
   updateBalance,
 } from '../../services/api';
 import { formatTimestamp } from '../../utils/formatDate';
 import { DatePicker } from '@mui/x-date-pickers';
+import CardComponent from '../CardComponent/CardComponent';
+import { Transaction, TransactionType } from '@my-workspace/common';
 
 interface TransactionsCardProps {
   transactions: Transaction[];
@@ -47,7 +46,7 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
   const [newTransaction, setNewTransaction] = useState<Omit<Transaction, 'id'>>(
     {
       amount: 0,
-      type: 'expense', // Default type
+      type: 'expense' as TransactionType, // Default type
       description: '',
       completedAt: new Date(),
     }
@@ -91,7 +90,8 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
       // Update the balance based on the transaction type
       const newBalance = await updateBalance(
         newTransaction.type,
-        newTransaction.amount
+        newTransaction.amount,
+        newTransaction.completedAt
       );
       setBalance(newBalance.amount);
       // Fetch updated transactions after adding the new one
@@ -153,39 +153,12 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
   const paginationModel = { page: 0, pageSize: 5 };
 
   return (
-    <Card
-      sx={{
-        flex: 1,
-        borderRadius: '16px',
-        background: '#c5d2e7ff',
-        padding: '16px',
-      }}
-    >
-      <CardContent
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          rowGap: '16px',
-          boxSizing: 'border-box',
-          height: '100%',
-        }}
+    <>
+      <CardComponent
+        title="Transactions"
+        buttonText="Add Transaction"
+        onClick={handleClickOpen}
       >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}
-        >
-          <Typography variant="h5" color="#4d5061ff">
-            Transactions
-          </Typography>
-          <Button variant="contained" color="primary" onClick={handleClickOpen}>
-            Add Transaction
-          </Button>
-        </div>
-
         <div
           style={{
             display: 'flex',
@@ -210,7 +183,7 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
             getRowId={(row) => row.id} // Set unique ID for each row
           />
         </div>
-      </CardContent>
+      </CardComponent>
 
       {/* Dialog for adding a new transaction */}
       <Dialog open={open} onClose={handleClose}>
@@ -264,7 +237,7 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </Card>
+    </>
   );
 };
 

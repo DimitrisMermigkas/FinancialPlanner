@@ -12,20 +12,13 @@ import {
   Typography,
 } from '@mui/material';
 import { PieChart, PieSeriesType } from '@mui/x-charts'; // Updated import
-import {
-  addFunds,
-  addReason,
-  addTransaction,
-  fetchFunds,
-  Fund,
-  Reason,
-  updateBalance,
-} from '../../services/api';
+
 import { formatTimestamp } from '../../utils/formatDate';
 import { VirtualizedSelect } from '@my-workspace/react-components';
 import useFundsHandlers from 'apps/frontend/src/handlers/Funds.handlers';
 import FundsLogs from './FundsLogs';
 import CardComponent from '../CardComponent/CardComponent';
+import { Funds, Reason } from '@my-workspace/common';
 
 interface Option {
   value: string | number;
@@ -33,7 +26,7 @@ interface Option {
 }
 
 interface FundsCardProps {
-  funds: Fund[];
+  funds: Funds[];
   reasons: Reason[];
   setReasons: React.Dispatch<React.SetStateAction<Reason[]>>;
   setBalance: React.Dispatch<React.SetStateAction<number>>;

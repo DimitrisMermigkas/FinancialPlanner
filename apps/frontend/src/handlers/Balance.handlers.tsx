@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Balance, Fund, Transaction } from '../services/api';
 import { eachDayOfInterval, format, subDays } from 'date-fns';
+import { Balance, Funds, Transaction } from '@my-workspace/common';
 
 interface MonthlyData {
   date: string;
@@ -17,6 +17,9 @@ const useBalanceHandlers = () => {
   const getMonthlyBalanceData = (data: Balance[]) => {
     const latestEntriesByMonth = Object.entries(
       data.reduce((acc: { [key: string]: Balance }, entry: Balance) => {
+        // Ensure that updatedAt is defined before processing
+        if (!entry.updatedAt) return acc;
+
         const date = new Date(entry.updatedAt);
         const monthKey = `${date.toLocaleString('default', {
           month: 'short',
@@ -25,7 +28,8 @@ const useBalanceHandlers = () => {
         // If no entry for the month or if this entry is more recent, update the record for the month
         if (
           !acc[monthKey] ||
-          new Date(entry.updatedAt) > new Date(acc[monthKey].updatedAt)
+          (acc[monthKey].updatedAt &&
+            new Date(entry.updatedAt) > new Date(acc[monthKey].updatedAt!))
         ) {
           acc[monthKey] = entry;
         }
@@ -41,7 +45,7 @@ const useBalanceHandlers = () => {
     }));
   };
 
-  const calculateMonthlyFunds = (funds: Fund[]) => {
+  const calculateMonthlyFunds = (funds: Funds[]) => {
     const monthlyTotals: Record<string, number> = {};
 
     funds.forEach((fund) => {

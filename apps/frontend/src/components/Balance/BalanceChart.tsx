@@ -1,6 +1,5 @@
 import React from 'react';
 import { CardContent, Card } from '@mui/material';
-import { Balance } from '../../services/api';
 import {
   LineChart,
   Line,
@@ -12,6 +11,7 @@ import {
 } from 'recharts';
 import { eachDayOfInterval, format, subDays } from 'date-fns';
 import CardComponent from '../CardComponent/CardComponent';
+import { Balance } from '@my-workspace/common';
 
 interface BalanceChartProps {
   monthlyBalances: Balance[] | undefined;
@@ -19,11 +19,12 @@ interface BalanceChartProps {
 
 const BalanceChart: React.FC<BalanceChartProps> = ({ monthlyBalances }) => {
   const calculateBalanceDataSet = (balances: Balance[]) => {
-    // Sort data by date
-    const sortedData = balances.sort(
-      (a, b) =>
-        new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
-    );
+    // Sort data by date, ensuring `updatedAt` is defined
+    const sortedData = balances.sort((a, b) => {
+      const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+      const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+      return dateA - dateB;
+    });
 
     // Define the date range and initialize arrays
     const endDate = new Date();
@@ -33,14 +34,19 @@ const BalanceChart: React.FC<BalanceChartProps> = ({ monthlyBalances }) => {
     // Map sortedData amounts to corresponding dates or set to `null` if no data exists for that date
     const dataset = dateRange.map((date) => {
       const dateString = format(date, 'yyyy-MM-dd');
-      const record = sortedData.find(
-        (item) => format(new Date(item.updatedAt), 'yyyy-MM-dd') === dateString
-      );
+
+      // Find the record safely checking for `updatedAt`
+      const record = sortedData.find((item) => {
+        if (!item.updatedAt) return false; // Skip items with undefined `updatedAt`
+        return format(new Date(item.updatedAt), 'yyyy-MM-dd') === dateString;
+      });
+
       return {
         date: format(date, 'MMM-dd'),
         amount: record ? record.amount : null,
       };
     });
+
     return dataset;
   };
 

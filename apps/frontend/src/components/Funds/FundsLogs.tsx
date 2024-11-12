@@ -10,19 +10,13 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import { Fund } from '../../services/api'; // Adjust the import path according to your project structure
 import { formatTimestamp } from '../../utils/formatDate';
-import {
-  DataGrid,
-  GridColDef,
-  GridRenderCellParams,
-  GridValueGetter,
-  GridValueParser,
-} from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
+import { Funds, Reason } from '@my-workspace/common';
 
 interface FundsLogsProps {
-  logs: Fund[];
-  selectedReason: { title: string; description: string };
+  logs: Funds[];
+  selectedReason: Omit<Reason, 'createdAt' | 'updatedAt'>;
   handleWithdraw: (amount: number) => void;
 }
 

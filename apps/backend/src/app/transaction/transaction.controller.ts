@@ -9,7 +9,8 @@ import {
 } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { CreateTransaction } from 'libs/common/src';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Transaction') // Tag for grouping in Swagger
 @Controller('transaction')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}

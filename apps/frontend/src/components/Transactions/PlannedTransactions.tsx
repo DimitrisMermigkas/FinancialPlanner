@@ -12,16 +12,27 @@ import {
 } from '@mui/material';
 import {
   addTransaction,
+  deleteTransaction,
   fetchTransactions,
-  Transaction,
   updateBalance,
   updateTransaction,
 } from '../../services/api';
 import { formatTimestamp } from '../../utils/formatDate';
-import { v4 as uuidv4 } from 'uuid';
-import DialogWithForm from '../Forms/DialogForm';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import CardComponent from '../CardComponent/CardComponent';
+import {
+  AutocompleteVirtualizedProps,
+  CustomDialog,
+  DynamicForm,
+  FieldConfig,
+  useDialogContext,
+} from '@my-workspace/react-components';
+import {
+  Transaction,
+  TransactionSchema,
+  TransactionType,
+} from '@my-workspace/common';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface PlannedTransactionsProps {
   transactions: Transaction[];
@@ -37,6 +48,40 @@ const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
   setTransactions,
 }) => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const dialogContext = useDialogContext();
+
+  const fields: FieldConfig<Transaction>[] = [
+    {
+      name: 'amount',
+      label: 'Amount',
+      type: 'input',
+      componentProps: {
+        type: 'number',
+      },
+    },
+    {
+      name: 'description',
+      label: 'Description',
+      type: 'input',
+    },
+    {
+      name: 'type',
+      label: 'Transaction Type',
+      type: 'select',
+      isRequired: true,
+      componentProps: {
+        options: [
+          { label: 'Income', value: 'income' },
+          { label: 'Expense', value: 'expense' },
+        ],
+      } as AutocompleteVirtualizedProps<string, false>,
+    },
+    {
+      name: 'completedAt',
+      label: 'Scheduled at',
+      type: 'date',
+    },
+  ];
 
   const planTransaction = async (
     formData: {
@@ -49,7 +94,7 @@ const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
     if (formData) {
       const plannedTransaction = {
         amount: parseFloat(formData.amountValue),
-        type: formData.selectValue,
+        type: formData.selectValue as TransactionType,
         description: formData.textValue,
         completedAt: formData.dateValue,
       };
@@ -65,18 +110,33 @@ const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
       (tran) => tran.id == transactionId
     );
     if (foundTransation) {
+      const todaysDate = new Date();
       const { id, ...data } = foundTransation;
-      const updatedTran = { ...data, completedAt: new Date() };
+      const updatedTran = { ...data, completedAt: todaysDate };
       const updatedTransaction = await updateTransaction(id, updatedTran);
       // Update the balance based on the transaction type
       const newBalance = await updateBalance(
         updatedTransaction.type,
-        updatedTransaction.amount
+        updatedTransaction.amount,
+        todaysDate
       );
       setBalance(newBalance.amount);
       // Fetch updated transactions after adding the new one
       const updatedTransactions = await fetchTransactions();
       setTransactions(updatedTransactions); // Update the transactions state
+    }
+  };
+
+  const onClickDelete = async (e: unknown, transactionId: string) => {
+    if (!transactionId) return;
+    if (
+      await dialogContext.getConfirmation({
+        type: 'confirm',
+        title: 'Confirm delete',
+        message: `Are you sure you want to delete this transaction?`,
+      })
+    ) {
+      deleteTransaction(transactionId);
     }
   };
 
@@ -111,15 +171,27 @@ const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
               >
                 <TaskAltIcon />
               </IconButton>
+              <IconButton
+                onClick={(e) => onClickDelete(e, transaction.id)}
+                sx={{ color: 'inherit', mr: 0.5 }}
+              >
+                <DeleteIcon />
+              </IconButton>
             </ListItem>
           ))}
         </List>
       </CardComponent>
-      <DialogWithForm
+      <CustomDialog
         open={openDialog}
-        hasOptions={true}
-        onClose={planTransaction}
-      />
+        title="Transaction Form"
+        onClose={() => setOpenDialog(false)}
+      >
+        <DynamicForm
+          fields={fields}
+          schema={TransactionSchema.omit({ id: true })}
+          onSubmit={planTransaction}
+        />
+      </CustomDialog>
     </>
   );
 };

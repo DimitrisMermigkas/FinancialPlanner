@@ -45,6 +45,7 @@ export function App() {
   const PlannerPage = withLazyLoad(() => import('../pages/Planner/Planner'));
   const DepositPage = withLazyLoad(() => import('../pages/Deposit/Deposit'));
   const InfoPage = withLazyLoad(() => import('../pages/Info/Info'));
+  const SettingsPage = withLazyLoad(() => import('../pages/Settings/Settings'));
 
   const drawerItems = [
     {
@@ -84,57 +85,11 @@ export function App() {
         { path: 'plan', element: <PlannerPage /> },
         { path: 'deposit', element: <DepositPage /> },
         { path: 'info', element: <InfoPage /> },
+        { path: 'settings', element: <SettingsPage /> },
       ],
     },
   ]);
   return <RouterProvider router={router} />;
-  // return (
-  //   <Loading isLoading={loading}>
-  //     <div
-  //       style={{
-  //         display: 'flex',
-  //         flexDirection: drawerAnchor === 'left' ? 'row' : 'row-reverse',
-  //         height: '100%',
-  //         backgroundColor: '#30323dff',
-  //       }}
-  //     >
-  //       <CustomAppBar
-  //         title="MainPage"
-  //         style={{
-  //           background:
-  //             'linear-gradient(180deg, rgba(92,128,188,1) 0%, rgba(77,80,97,1) 100%)',
-  //           height: appBarHeight,
-  //           display: 'flex',
-  //           justifyContent: 'center',
-  //         }}
-  //         drawerDirection={drawerAnchor}
-  //         drawerVariant={drawerVariant}
-  //         onOpenDrawer={handleDrawerOpen}
-  //         open={openDrawer}
-  //       />
-
-  //       {/* <CustomDrawer
-  //         variant={drawerVariant}
-  //         anchor={drawerAnchor}
-  //         open={openDrawer}
-  //         onCloseDrawer={handleDrawerClose}
-  //         paperStyle={{ top: appBarHeight }}
-  //       ></CustomDrawer> */}
-  //       <PageLayout
-  //         title="Current Balance"
-  //         style={{
-  //           color: '#f2f4f7ff',
-  //           display: 'flex',
-  //           flexDirection: 'column',
-  //           marginTop: appBarHeight,
-  //           height: `calc(100% - ${appBarHeight})`,
-  //         }}
-  //       >
-  //         <Dashboard />
-  //       </PageLayout>
-  //     </div>
-  //   </Loading>
-  // );
 }
 
 export default App;

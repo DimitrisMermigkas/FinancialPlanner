@@ -14,23 +14,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import CircleIcon from '@mui/icons-material/Circle';
 import CardComponent from '../CardComponent/CardComponent';
 
-interface Goal {
-  description: string;
-  amount: number;
-}
-
-const mockGoals: Goal[] = [
-  { description: 'Achieve a balance of 10,000€', amount: 10000 },
-  { description: 'Deposit 300€ to buy a monitor', amount: 300 },
-  { description: 'Save 1,500€ for vacation', amount: 1500 },
-  { description: 'Contribute 500€ towards emergency fund', amount: 500 },
-];
-
 const Goals: React.FC = () => {
   return (
     <CardComponent title="Goals" buttonText="Add Goal">
       <List>
-        {mockGoals.map((goal, index) => (
+        {/* {mockGoals.map((goal, index) => (
           <ListItem
             key={index}
             sx={{
@@ -55,7 +43,7 @@ const Goals: React.FC = () => {
               sx={{ marginBottom: 0, marginTop: 0 }}
             />
           </ListItem>
-        ))}
+        ))} */}
       </List>
     </CardComponent>
   );

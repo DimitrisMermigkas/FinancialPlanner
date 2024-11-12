@@ -4,29 +4,28 @@ import {
   addReason,
   addTransaction,
   fetchFunds,
-  Fund,
-  Reason,
   updateBalance,
 } from '../services/api';
 import { Option } from '@my-workspace/react-components';
+import { Funds, Reason, TransactionType } from '@my-workspace/common';
 
 interface FundsCardProps {
-  funds: Fund[];
+  funds: Funds[];
   reasons: Reason[];
   setBalance: React.Dispatch<React.SetStateAction<number>>;
 }
+type ReasonWithoutTimestamps = Omit<Reason, 'createdAt' | 'updatedAt'>;
 
 const useFundsHandlers = ({ funds, reasons, setBalance }: FundsCardProps) => {
   const [openInsertDialog, setOpenInsertDialog] = useState(false);
   const [openLogsDialog, setOpenLogsDialog] = useState(false);
   const [fundAmount, setFundAmount] = useState<number>(0);
-  const [selectedReason, setSelectedReason] = useState<{
-    id?: string;
-    title: string;
-    description: string;
-  }>({ title: '', description: '' });
+  const [selectedReason, setSelectedReason] = useState<ReasonWithoutTimestamps>(
+    { id: '', title: '', description: '' }
+  );
+
   const [reasonOptions, setReasonOptions] = useState<Option[]>([]);
-  const [logs, setLogs] = useState<Fund[]>([]); // Logs for deposits
+  const [logs, setLogs] = useState<Funds[]>([]); // Logs for deposits
 
   useEffect(() => {
     if (reasons.length > 0) {
@@ -64,7 +63,7 @@ const useFundsHandlers = ({ funds, reasons, setBalance }: FundsCardProps) => {
   const handleCloseInsert = () => {
     setOpenInsertDialog(false);
     setFundAmount(0);
-    setSelectedReason({ title: '', description: '' });
+    setSelectedReason({ id: '', title: '', description: '' });
   };
 
   const handleUpdateReason = (name: 'description' | 'title', newValue: any) => {
@@ -84,22 +83,34 @@ const useFundsHandlers = ({ funds, reasons, setBalance }: FundsCardProps) => {
   };
   const handleAddFund = async () => {
     if (selectedReason) {
+      const todaysDate = new Date();
       const reasonExists = reasons.find(
         (reason) => reason.title == selectedReason.title
       );
       if (reasonExists) {
-        addFunds({ amount: fundAmount, reasonId: reasonExists.id });
+        addFunds({
+          amount: fundAmount,
+          reasonId: reasonExists.id,
+          createdAt: todaysDate,
+        });
       } else {
-        const newReason = await addReason(selectedReason);
-        await addFunds({ amount: fundAmount, reasonId: newReason.id });
+        const newReason = await addReason({
+          ...selectedReason,
+          createdAt: todaysDate,
+        });
+        await addFunds({
+          amount: fundAmount,
+          reasonId: newReason.id,
+          createdAt: todaysDate,
+        });
       }
       await addTransaction({
         amount: fundAmount,
-        type: 'fund',
+        type: 'fund' as TransactionType,
         description: `Funds for ${selectedReason.title}`,
-        completedAt: new Date(),
+        completedAt: todaysDate,
       });
-      await updateBalance('expense', fundAmount);
+      await updateBalance('expense', fundAmount, todaysDate);
       handleCloseInsert();
     }
   };
@@ -117,9 +128,14 @@ const useFundsHandlers = ({ funds, reasons, setBalance }: FundsCardProps) => {
 
   const handleWithdraw = async (value: number) => {
     if (selectedReason && selectedReason.id) {
+      const todaysDate = new Date();
       // Here you would typically call your API to update the balance and funds
-      await addFunds({ amount: value, reasonId: selectedReason.id });
-      const updatedBalance = await updateBalance('income', -value);
+      await addFunds({
+        amount: value,
+        reasonId: selectedReason.id,
+        createdAt: todaysDate,
+      });
+      const updatedBalance = await updateBalance('income', -value, todaysDate);
       setBalance(updatedBalance.amount);
       // Close the dialog after withdrawing
       setOpenLogsDialog(false);

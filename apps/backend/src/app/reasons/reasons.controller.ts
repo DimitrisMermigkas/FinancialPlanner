@@ -9,7 +9,8 @@ import {
 } from '@nestjs/common';
 import { ReasonsService } from './reasons.service';
 import { CreateReason, Reason } from 'libs/common/src';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Reasons') // Tag for grouping in Swagger
 @Controller('reasons')
 export class ReasonsController {
   constructor(private readonly reasonsService: ReasonsService) {}

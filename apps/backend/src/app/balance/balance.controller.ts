@@ -9,7 +9,7 @@ import {
 import { BalanceService } from './balance.service';
 import { ApiTags, ApiBody } from '@nestjs/swagger';
 import { CreateBalance } from 'libs/common/src/index';
-@ApiTags('balance') // Tag for grouping in Swagger
+@ApiTags('Balance') // Tag for grouping in Swagger
 @Controller('balance')
 export class BalanceController {
   constructor(private readonly balanceService: BalanceService) {}

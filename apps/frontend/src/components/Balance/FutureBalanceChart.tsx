@@ -7,7 +7,6 @@ import {
   Typography,
 } from '@mui/material';
 import useBalanceHandlers from '../../handlers/Balance.handlers';
-import { Balance, Fund, Transaction } from '../../services/api';
 import { useEffect } from 'react';
 import { format } from 'date-fns';
 import {
@@ -19,10 +18,12 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import CardComponent from '../CardComponent/CardComponent';
+import { Balance, Funds, Transaction } from '@my-workspace/common';
 
 interface FutureBalanceChartProps {
   monthlyBalances: Balance[];
-  funds: Fund[];
+  funds: Funds[];
   futureTransactions: Transaction[];
 }
 
@@ -86,57 +87,45 @@ const FutureBalanceChart: React.FC<FutureBalanceChartProps> = ({
   // updatedProjectedData now contains both amountA and amountB keys
 
   return (
-    <Card
-      sx={{
-        flex: 1,
-        borderRadius: '16px',
-        background: '#c5d2e7ff',
-        padding: '16px',
-      }}
-    >
-      <CardContent
-        style={{ display: 'flex', flexDirection: 'column', rowGap: '16px' }}
+    <CardComponent>
+      <Select
+        value={monthsAhead} // Use monthsAhead for value
+        onChange={handleMonthsChange}
       >
-        <Typography variant="h6">Select Months to Forecast:</Typography>
-        <Select
-          value={monthsAhead} // Use monthsAhead for value
-          onChange={handleMonthsChange}
+        {[1, 2, 3, 4, 5, 6].map((month) => (
+          <MenuItem key={month} value={month}>
+            {month} {month === 1 ? 'Month' : 'Months'}
+          </MenuItem>
+        ))}
+      </Select>
+      <ResponsiveContainer width="100%" height={500}>
+        <LineChart
+          height={200}
+          data={updatedProjectedData}
+          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
         >
-          {[1, 2, 3, 4, 5, 6].map((month) => (
-            <MenuItem key={month} value={month}>
-              {month} {month === 1 ? 'Month' : 'Months'}
-            </MenuItem>
-          ))}
-        </Select>
-        <ResponsiveContainer width="100%" height={500}>
-          <LineChart
-            height={200}
-            data={updatedProjectedData}
-            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey="amountA"
-              stroke="#8884d8"
-              connectNulls
-              isAnimationActive={false}
-            />
-            <Line
-              type="monotone"
-              dataKey="amountB"
-              stroke="#8884d8"
-              connectNulls
-              strokeDasharray="3 3" // Dashed line for the rest
-              isAnimationActive={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </CardContent>
-    </Card>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <Line
+            type="monotone"
+            dataKey="amountA"
+            stroke="#8884d8"
+            connectNulls
+            isAnimationActive={false}
+          />
+          <Line
+            type="monotone"
+            dataKey="amountB"
+            stroke="#8884d8"
+            connectNulls
+            strokeDasharray="3 3" // Dashed line for the rest
+            isAnimationActive={false}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </CardComponent>
   );
 };
 

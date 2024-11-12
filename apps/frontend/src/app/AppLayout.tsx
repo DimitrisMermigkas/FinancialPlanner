@@ -4,7 +4,9 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Theme,
   Typography,
+  useTheme,
 } from '@mui/material';
 import {
   CustomAppBar,
@@ -18,6 +20,7 @@ type DrawerListItemProps = {
   link: string;
   text: string;
   icon: ReactNode;
+  theme?: Theme;
 };
 
 const Root = styled.div`
@@ -32,7 +35,6 @@ const AppFrame = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
-  background: #b7d7e8;
 `;
 
 const AppMain = styled.main<{ $appBarHeight: number; $drawerWidth: number }>`
@@ -42,13 +44,17 @@ const AppMain = styled.main<{ $appBarHeight: number; $drawerWidth: number }>`
   height: calc(100% - ${(props) => props.$appBarHeight}px);
 `;
 
-const DrawerListItem: FC<DrawerListItemProps> = ({ link, text, icon }) => {
+const DrawerListItem: FC<DrawerListItemProps> = ({
+  link,
+  text,
+  icon,
+  theme,
+}) => {
   return (
-    <NavLink to={link}>
-      <ListItemButton>
-        <ListItemText primary={text} />
-        <ListItemIcon>{icon}</ListItemIcon>
-      </ListItemButton>
+    <NavLink to={link} style={{ display: 'flex', flexDirection: 'column' }}>
+      <CustomButton color="primary" variant="outlined">
+        {text}
+      </CustomButton>
     </NavLink>
   );
 };
@@ -83,15 +89,16 @@ export default function AppLayout({ drawerItems }: AppLayoutProps) {
   const navigate = useNavigate();
 
   const openSettings = () => {
-    navigate('/info');
+    navigate('/settings');
   };
+  const theme = useTheme();
   return (
     <Root>
-      <AppFrame>
+      <AppFrame style={{ background: theme.palette.background.default }}>
         <CustomAppBar
           title="MainPage"
           style={{
-            background: 'linear-gradient(to bottom, #87bdd8 15%, #daebe8 100%)',
+            background: theme.palette.background.gradient,
             height: appBarHeight,
             display: 'flex',
             justifyContent: 'center',
@@ -108,7 +115,7 @@ export default function AppLayout({ drawerItems }: AppLayoutProps) {
           onCloseDrawer={handleDrawerClose}
           paperStyle={{
             top: appBarHeight,
-            background: '#daebe8',
+            background: theme.palette.background.paper,
             height: 'calc(100% - 64px)',
           }}
         >
@@ -131,17 +138,24 @@ export default function AppLayout({ drawerItems }: AppLayoutProps) {
                 height: '100%',
               }}
             >
-              <List>
+              <List
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  rowGap: '8px',
+                }}
+              >
                 {drawerItems.map((item) => (
                   <DrawerListItem
                     key={item.key}
                     link={item.link}
                     text={item.text}
                     icon={item.icon}
+                    theme={theme}
                   />
                 ))}
               </List>
-              <CustomButton variant="outlined" onClick={openSettings}>
+              <CustomButton variant="contained" onClick={openSettings}>
                 Settings
               </CustomButton>
             </div>

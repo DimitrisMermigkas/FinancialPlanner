@@ -1,4 +1,5 @@
-import { Button, Card, CardContent, Typography } from '@mui/material';
+import { Button, Card, CardContent, Typography, useTheme } from '@mui/material';
+import { CustomButton } from '@my-workspace/react-components';
 import { CSSProperties, FC, ReactNode } from 'react';
 
 interface CardComponentProps {
@@ -17,14 +18,16 @@ const CardComponent: FC<CardComponentProps> = ({
   onClick,
   children,
 }) => {
+  const theme = useTheme();
   return (
     <Card
       sx={{
         flex: 1,
         borderRadius: '16px',
-        background: '#c5d2e7ff',
+        background: theme.palette.background.paper,
         padding: '16px',
         boxSizing: 'border-box',
+        boxShadow: '5px 5px 8px 0px #2b2d32',
         ...cardStyle,
       }}
     >
@@ -46,9 +49,9 @@ const CardComponent: FC<CardComponentProps> = ({
         >
           {title && <Typography variant="h6">{title}</Typography>}
           {buttonText && (
-            <Button variant="contained" color="primary" onClick={onClick}>
+            <CustomButton variant="contained" onClick={onClick}>
               {buttonText}
-            </Button>
+            </CustomButton>
           )}
         </div>
         {children}

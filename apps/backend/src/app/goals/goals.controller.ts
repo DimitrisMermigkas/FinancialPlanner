@@ -9,7 +9,8 @@ import {
 } from '@nestjs/common';
 import { GoalService } from './goals.service';
 import { CreateGoals } from 'libs/common/src';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Goals') // Tag for grouping in Swagger
 @Controller('goals')
 export class GoalController {
   constructor(private readonly goalService: GoalService) {}

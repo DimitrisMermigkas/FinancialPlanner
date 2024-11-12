@@ -1,36 +1,25 @@
+import {
+  Balance,
+  CreateTransaction,
+  Funds,
+  Goals,
+  Reason,
+  Transaction,
+} from '@my-workspace/common';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:4000'; // Update with your server address if necessary
 
-// Define the types for the expected data structures
-export interface Transaction {
-  id: string;
-  description: string;
-  amount: number;
-  completedAt: Date; // or string, depending on how the date is formatted
-  type: 'expense' | 'income' | 'fund'; // Adjust this type based on your enum or string literals for TransactionType
-}
+/* Delete APIs
+ ********************************************************************
+ */
 
-export interface Fund {
-  id: string;
-  amount: number;
-  description?: string; // Optional if it may not always be provided
-  createdAt?: string; // or string
-  updatedAt?: string; // or string
-  reasonId: string;
-}
-
-export interface Balance {
-  id: string;
-  amount: number;
-  updatedAt: string;
-}
-
-export interface Reason {
-  id: string;
-  title: string;
-  description: string;
-}
+export const deleteTransaction = async (transactionId: string) => {
+  const response = await axios.delete(
+    `${API_URL}/transaction/${transactionId}`
+  );
+  return response.data as Transaction; // Return deleted Transaction
+};
 
 /* Patch APIs
  ********************************************************************
@@ -60,24 +49,20 @@ export const addReason = async (reason: Omit<Reason, 'id'>) => {
   return response.data as Reason; // Return added Reason
 };
 
-export const addFunds = async (fund: Omit<Fund, 'id'>) => {
+export const addFunds = async (fund: Omit<Funds, 'id'>) => {
   const response = await axios.post(`${API_URL}/funds`, fund);
-  return response.data; // Return the added transaction data
+  return response.data as Funds; // Return the added transaction data
 };
 
-export const addTransaction = async (transaction: {
-  amount: number;
-  type: 'expense' | 'income' | 'fund';
-  description: string;
-  completedAt: Date;
-}) => {
+export const addTransaction = async (transaction: CreateTransaction) => {
   const response = await axios.post(`${API_URL}/transaction`, transaction);
-  return response.data; // Return the added transaction data
+  return response.data as Transaction; // Return the added transaction data
 };
 
 export const updateBalance = async (
   type: 'expense' | 'income' | 'fund',
-  amount: number
+  amount: number,
+  completedAt: Date
 ) => {
   try {
     const currentBalance = await fetchCurrentBalance();
@@ -93,6 +78,7 @@ export const updateBalance = async (
 
     const response = await axios.post(`${API_URL}/balance`, {
       amount: newBalance,
+      updatedAt: completedAt,
     });
 
     return response.data as Balance; // Return updated balance data
@@ -114,12 +100,12 @@ export const fetchTransactions = async (): Promise<Transaction[]> => {
 // Fetch funds from the API with generic filtering options
 export const fetchFunds = async (
   filters: Record<string, any> = {}
-): Promise<Fund[]> => {
+): Promise<Funds[]> => {
   // Use the filters object to add query parameters dynamically
   const response = await axios.get(`${API_URL}/funds`, {
     params: filters,
   });
-  return response.data as Fund[];
+  return response.data as Funds[];
 };
 
 // Fetch the current balance from the API
@@ -135,6 +121,11 @@ export const fetchBalanceHistory = async (): Promise<Balance[]> => {
 export const fetchReasons = async (): Promise<Reason[]> => {
   const response = await axios.get(`${API_URL}/reasons`); // Adjust the endpoint as needed
   return response.data as Reason[];
+};
+// Fetch the goals list from the API
+export const fetchGoals = async (): Promise<Goals[]> => {
+  const response = await axios.get(`${API_URL}/goals`); // Adjust the endpoint as needed
+  return response.data as Goals[];
 };
 
 export const fetchFundsForReason = async (id: number) => {};

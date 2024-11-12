@@ -10,7 +10,9 @@ import {
 } from '@nestjs/common';
 import { FundsService } from './funds.service';
 import { CreateFunds } from 'libs/common/src';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Funds') // Tag for grouping in Swagger
 @Controller('funds')
 export class FundsController {
   constructor(private readonly fundsService: FundsService) {}

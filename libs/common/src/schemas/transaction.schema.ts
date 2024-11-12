@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 export enum TransactionType {
-  income = "income", // Money coming in
-  expense = "expense", // Money going out
-  fund = "fund", // Money set aside in Funds (not considered an expense)
+  income = 'income', // Money coming in
+  expense = 'expense', // Money going out
+  fund = 'fund', // Money set aside in Funds (not considered an expense)
 }
 
 // Transaction Schema
@@ -11,7 +11,7 @@ export const TransactionSchema = z.object({
   id: z.string().uuid(),
   type: z.nativeEnum(TransactionType), // Using native enum for validation
   description: z.string().optional(),
-  amount: z.number().nonnegative(), // Ensuring it's a positive number
+  amount: z.coerce.number().nonnegative().min(1, 'Amount should not be 0'), // Ensuring it's a positive number
   completedAt: z.date(),
   fundsId: z.string().uuid().optional(),
 });
@@ -26,7 +26,7 @@ export type Transaction = z.infer<typeof TransactionSchema>;
 export const CreateTransactionDto = z.object({
   type: z.nativeEnum(TransactionType),
   description: z.string().optional(),
-  amount: z.number().nonnegative(), // Ensuring it's a positive number
+  amount: z.coerce.number().nonnegative().min(1, 'Amount should not be 0'), // Ensuring it's a positive number
   completedAt: z.date(),
   fundsId: z.string().uuid().optional(),
 });
