@@ -48,6 +48,7 @@ const Dashboard: React.FC = () => {
             transactions={transactions}
             setTransactions={setTransactions}
             setBalance={setBalance}
+            getBalanceHistory={getBalanceHistory}
           />
           <BalanceChart monthlyBalances={monthlyBalances} />
         </div>

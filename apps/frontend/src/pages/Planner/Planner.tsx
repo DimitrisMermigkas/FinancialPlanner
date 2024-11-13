@@ -1,14 +1,21 @@
 import React from 'react';
 import { Card, CardContent, Typography } from '@mui/material';
 import PlannedTransactions from '../../components/Transactions/PlannedTransactions';
-import Goals from '../../components/Goals/Goals';
+import Goals from '../../components/Goals/GoalsCard';
 import useDashboardHandlers from '../../handlers/Dashboard.handlers';
 import { PageLayout } from '@my-workspace/react-components';
 import FutureBalanceChart from '../../components/Balance/FutureBalanceChart';
 
 const Planner: React.FC = () => {
-  const { transactions, monthlyBalances, funds, setTransactions, setBalance } =
-    useDashboardHandlers();
+  const {
+    transactions,
+    monthlyBalances,
+    funds,
+    goals,
+    setTransactions,
+    setBalance,
+    setGoals,
+  } = useDashboardHandlers();
 
   const today = new Date();
   const futureTransactions = transactions.filter(
@@ -40,7 +47,7 @@ const Planner: React.FC = () => {
           setTransactions={setTransactions}
           setBalance={setBalance}
         />
-        <Goals />
+        <Goals goals={goals} setGoals={setGoals} />
       </div>
 
       {monthlyBalances && (

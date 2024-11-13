@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Funds Schema
 export const FundsSchema = z.object({
   id: z.string().uuid(),
-  amount: z.number(),
+  amount: z.coerce.number(),
   description: z.string().optional(),
   createdAt: z.date().default(() => new Date()),
   updatedAt: z.date().optional(),
@@ -18,7 +18,7 @@ export type Funds = z.infer<typeof FundsSchema>;
 
 // DTOs
 export const CreateFundsDto = z.object({
-  amount: z.number().nonnegative(), // Ensuring it's a positive number
+  amount: z.coerce.number().nonnegative(), // Ensuring it's a positive number
   reasonId: z.string().uuid(),
   description: z.string().optional(),
 });

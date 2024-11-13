@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Balance Schema
 export const BalanceSchema = z.object({
   id: z.string().uuid(),
-  amount: z.number(), // Current balance in the main account
+  amount: z.coerce.number(), // Current balance in the main account
   updatedAt: z.date().optional(),
 });
 
@@ -15,7 +15,7 @@ export type Balance = z.infer<typeof BalanceSchema>;
 
 // DTOs
 export const CreateBalanceDto = z.object({
-  amount: z.number(), // Ensuring it's a positive number
+  amount: z.coerce.number(), // Ensuring it's a positive number
 });
 
 // Exporting inferred type for DTO

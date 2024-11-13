@@ -28,6 +28,7 @@ import {
   useDialogContext,
 } from '@my-workspace/react-components';
 import {
+  CreateTransaction,
   Transaction,
   TransactionSchema,
   TransactionType,
@@ -83,22 +84,9 @@ const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
     },
   ];
 
-  const planTransaction = async (
-    formData: {
-      textValue: string;
-      selectValue: 'income' | 'expense';
-      dateValue: Date;
-      amountValue: string;
-    } | null
-  ) => {
-    if (formData) {
-      const plannedTransaction = {
-        amount: parseFloat(formData.amountValue),
-        type: formData.selectValue as TransactionType,
-        description: formData.textValue,
-        completedAt: formData.dateValue,
-      };
-      await addTransaction(plannedTransaction);
+  const planTransaction = async (data: CreateTransaction) => {
+    if (data) {
+      await addTransaction(data);
       const updatedTransactions = await fetchTransactions();
       setTransactions(updatedTransactions); // Update the transactions state
     }

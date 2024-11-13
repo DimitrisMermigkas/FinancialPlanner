@@ -34,12 +34,14 @@ interface TransactionsCardProps {
   transactions: Transaction[];
   setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>; // Add this prop
   setBalance: React.Dispatch<React.SetStateAction<number>>; // Add this prop
+  getBalanceHistory: () => void;
 }
 
 const TransactionsCard: React.FC<TransactionsCardProps> = ({
   transactions,
   setTransactions,
   setBalance,
+  getBalanceHistory,
 }) => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
@@ -97,6 +99,7 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
       // Fetch updated transactions after adding the new one
       const updatedTransactions = await fetchTransactions();
       setTransactions(updatedTransactions); // Update the transactions state
+      getBalanceHistory();
       handleClose(); // Close the dialog
     } catch (error) {
       console.error('Error adding transaction:', error);

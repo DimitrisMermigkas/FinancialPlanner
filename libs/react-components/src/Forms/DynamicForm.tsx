@@ -114,38 +114,26 @@ export const DynamicForm: React.FC<DynamicFormProps<ZodType>> = ({
         case 'input':
           const props = fieldConfig.componentProps as CustomTextFieldProps;
           const isTypeNumber = props?.type == 'number';
-          if (isTypeNumber) {
-            fieldComponent = (
-              <Controller
-                key={fieldConfig.name}
-                control={control}
-                name={fieldConfig.name}
-                rules={{ required: fieldConfig.isRequired }}
-                render={({ field }) => (
-                  <CustomTextField
-                    type="number"
-                    label={fieldConfig.label}
-                    error={!!errorMessage}
-                    helperText={errorMessage as string}
-                    {...field}
-                    {...(fieldConfig.componentProps as CustomTextFieldProps)} // Explicitly casting to CustomTextFieldProps
-                  />
-                )}
-              />
-            );
-          } else
-            fieldComponent = (
-              <CustomTextField
-                key={fieldConfig.name}
-                label={fieldConfig.label}
-                {...register(fieldConfig.name, {
-                  valueAsNumber: isTypeNumber,
-                })}
-                error={!!errorMessage}
-                helperText={errorMessage as string}
-                {...(fieldConfig.componentProps as CustomTextFieldProps)} // Explicitly casting to CustomTextFieldProps
-              />
-            );
+
+          fieldComponent = (
+            <Controller
+              key={fieldConfig.name}
+              control={control}
+              name={fieldConfig.name}
+              rules={{ required: fieldConfig.isRequired }}
+              render={({ field }) => (
+                <CustomTextField
+                  type={isTypeNumber ? 'number' : 'text'}
+                  label={fieldConfig.label}
+                  error={!!errorMessage}
+                  helperText={errorMessage as string}
+                  {...field}
+                  {...(fieldConfig.componentProps as CustomTextFieldProps)} // Explicitly casting to CustomTextFieldProps
+                />
+              )}
+            />
+          );
+
           break;
 
         case 'date':
