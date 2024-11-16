@@ -1,14 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Card,
-  CardContent,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Button,
   Dialog,
   DialogActions,
@@ -126,7 +117,7 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
       width: 125,
       renderCell: (params: GridRenderCellParams) => {
         const color =
-          params.row.type == 'expense'
+          params.row.type === 'expense'
             ? '#910707'
             : params.row.type === 'income'
             ? '#087d00'

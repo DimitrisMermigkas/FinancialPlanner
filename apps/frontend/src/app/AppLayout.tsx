@@ -1,20 +1,12 @@
 import styled from '@emotion/styled';
-import {
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Theme,
-  Typography,
-  useTheme,
-} from '@mui/material';
+import { List, Theme, Typography, useTheme } from '@mui/material';
 import {
   CustomAppBar,
   CustomButton,
   CustomDrawer,
 } from '@my-workspace/react-components';
 import { FC, ReactNode, useState } from 'react';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import ataman from '../icons/ataman.png';
 type DrawerListItemProps = {
   link: string;

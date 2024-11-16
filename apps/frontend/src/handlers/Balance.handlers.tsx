@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { eachDayOfInterval, format, subDays } from 'date-fns';
+import { format } from 'date-fns';
 import { Balance, Funds, Transaction } from '@my-workspace/common';
 
 interface MonthlyData {
@@ -29,7 +29,7 @@ const useBalanceHandlers = () => {
         if (
           !acc[monthKey] ||
           (acc[monthKey].updatedAt &&
-            new Date(entry.updatedAt) > new Date(acc[monthKey].updatedAt!))
+            new Date(entry.updatedAt) > new Date(acc[monthKey].updatedAt))
         ) {
           acc[monthKey] = entry;
         }
@@ -95,7 +95,7 @@ const useBalanceHandlers = () => {
 
         // Add the future transaction amount to the month's total
         monthlyTotals[monthKey] +=
-          future.type == 'expense' ? -future.amount : future.amount;
+          future.type === 'expense' ? -future.amount : future.amount;
       }
     });
 
@@ -166,9 +166,9 @@ const useBalanceHandlers = () => {
     const currentDate = format(new Date(), 'MMM yy');
 
     for (let i = 1; i < currentData.length; i++) {
-      const previousDateObj = new Date(
-        currentData[i - 1].date + ' 20' + currentData[i - 1].date.split(' ')[1]
-      );
+      // const previousDateObj = new Date(
+      //   currentData[i - 1].date + ' 20' + currentData[i - 1].date.split(' ')[1]
+      // );
       const currentEntry = currentData[i];
       const currentEntryDate = new Date(
         currentEntry.date + ' 20' + currentEntry.date.split(' ')[1]
@@ -196,7 +196,7 @@ const useBalanceHandlers = () => {
       monthlyDifferences.reduce((sum, expense) => sum + expense, 0) /
       (monthlyDifferences.length || 1); // Handle division by zero if no expenses
     // Get the last known month and amount
-    let lastDate = new Date();
+    const lastDate = new Date();
     const currentMMMYY = format(lastDate, 'MMM yy');
 
     let lastAmount = forecastData.find(

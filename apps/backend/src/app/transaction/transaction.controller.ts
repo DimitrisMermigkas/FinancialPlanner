@@ -8,8 +8,8 @@ import {
   Patch,
 } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
-import { CreateTransaction } from 'libs/common/src';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateTransaction } from '@my-workspace/common';
 @ApiTags('Transaction') // Tag for grouping in Swagger
 @Controller('transaction')
 export class TransactionController {

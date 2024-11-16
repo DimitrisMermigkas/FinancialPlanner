@@ -1,5 +1,5 @@
 // theme.ts
-import { createTheme, TypeBackground } from '@mui/material/';
+import { createTheme } from '@mui/material/';
 
 declare module '@mui/material/styles' {
   interface Palette {

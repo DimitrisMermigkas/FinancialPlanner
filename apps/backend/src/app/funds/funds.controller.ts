@@ -9,8 +9,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { FundsService } from './funds.service';
-import { CreateFunds } from 'libs/common/src';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateFunds } from '@my-workspace/common';
 
 @ApiTags('Funds') // Tag for grouping in Swagger
 @Controller('funds')

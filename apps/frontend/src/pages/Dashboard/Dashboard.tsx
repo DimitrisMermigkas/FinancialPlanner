@@ -9,13 +9,10 @@ const Dashboard: React.FC = () => {
   const {
     getBalanceHistory,
     monthlyBalances,
-    balanceHistory,
     transactions,
     balance,
-    showChart,
     setTransactions,
     setBalance,
-    setShowChart,
   } = useDashboardHandlers();
 
   return (

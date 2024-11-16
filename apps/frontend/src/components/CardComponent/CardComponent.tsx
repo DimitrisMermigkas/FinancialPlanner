@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, Typography, useTheme } from '@mui/material';
+import { Card, CardContent, Typography, useTheme } from '@mui/material';
 import { CustomButton } from '@my-workspace/react-components';
 import { CSSProperties, FC, ReactNode } from 'react';
 

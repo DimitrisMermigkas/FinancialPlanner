@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Card,
-  CardContent,
   Avatar,
   Typography,
   IconButton,
@@ -102,13 +100,10 @@ const SettingsPage: React.FC = () => {
               key={index}
             >
               <ListItemText primary={expense} />
-              <>
-                <IconButton
-                  onClick={() => console.log(`Edit expense ${index}`)}
-                >
-                  <EditIcon />
-                </IconButton>
-              </>
+
+              <IconButton onClick={() => console.log(`Edit expense ${index}`)}>
+                <EditIcon />
+              </IconButton>
             </ListItem>
           ))}
         </List>

@@ -1,11 +1,4 @@
-import {
-  Card,
-  CardContent,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  Typography,
-} from '@mui/material';
+import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import useBalanceHandlers from '../../handlers/Balance.handlers';
 import { useEffect } from 'react';
 import { format } from 'date-fns';
@@ -38,7 +31,6 @@ const FutureBalanceChart: React.FC<FutureBalanceChartProps> = ({
     calculateMonthlyFutureTransactions,
     addFundsToMonthlyBalance,
     myIncome,
-    setMyIncome,
     projectedData,
     setProjectedData,
     monthsAhead,

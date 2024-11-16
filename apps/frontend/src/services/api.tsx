@@ -136,4 +136,4 @@ export const fetchGoals = async (): Promise<Goals[]> => {
   return response.data as Goals[];
 };
 
-export const fetchFundsForReason = async (id: number) => {};
+// export const fetchFundsForReason = async (id: number) => {};

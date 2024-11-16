@@ -1,31 +1,12 @@
 import React, { useState } from 'react';
-import {
-  Card,
-  CardContent,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  IconButton,
-  ListItemIcon,
-  Button,
-} from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import CircleIcon from '@mui/icons-material/Circle';
 import CardComponent from '../CardComponent/CardComponent';
 import {
   AutocompleteVirtualizedProps,
   CustomDialog,
   DynamicForm,
   FieldConfig,
-  useDialogContext,
 } from '@my-workspace/react-components';
-import {
-  CreateGoals,
-  CreateGoalsDto,
-  Goals,
-  GoalsSchema,
-} from '@my-workspace/common';
+import { CreateGoals, CreateGoalsDto, Goals } from '@my-workspace/common';
 import { addGoal } from '../../services/api';
 import GoalsTabs from './GoalsTab';
 
@@ -35,7 +16,6 @@ interface GoalsCardProps {
 }
 const GoalsCard: React.FC<GoalsCardProps> = ({ goals, setGoals }) => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
-  const dialogContext = useDialogContext();
 
   const fields: FieldConfig<Goals>[] = [
     {

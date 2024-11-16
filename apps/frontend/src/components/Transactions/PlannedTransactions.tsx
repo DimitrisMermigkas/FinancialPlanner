@@ -1,15 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Card,
-  CardContent,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Box,
-  Button,
-  IconButton,
-} from '@mui/material';
+import { List, ListItem, ListItemText, Box, IconButton } from '@mui/material';
 import {
   addTransaction,
   deleteTransaction,
@@ -31,7 +21,6 @@ import {
   CreateTransaction,
   Transaction,
   TransactionSchema,
-  TransactionType,
 } from '@my-workspace/common';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -95,7 +84,7 @@ const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
 
   const markAsPaid = async (transactionId: string) => {
     const foundTransation = transactions.find(
-      (tran) => tran.id == transactionId
+      (tran) => tran.id === transactionId
     );
     if (foundTransation) {
       const todaysDate = new Date();

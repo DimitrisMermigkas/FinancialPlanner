@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
-  Autocomplete,
   Button,
-  Card,
-  CardContent,
   Dialog,
   DialogActions,
   DialogContent,
@@ -11,19 +8,13 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { PieChart, PieSeriesType } from '@mui/x-charts'; // Updated import
+import { PieChart } from '@mui/x-charts'; // Updated import
 
-import { formatTimestamp } from '../../utils/formatDate';
 import { VirtualizedSelect } from '@my-workspace/react-components';
-import useFundsHandlers from 'apps/frontend/src/handlers/Funds.handlers';
 import FundsLogs from './FundsLogs';
 import CardComponent from '../CardComponent/CardComponent';
 import { Funds, Reason } from '@my-workspace/common';
-
-interface Option {
-  value: string | number;
-  label: string;
-}
+import useFundsHandlers from '../../handlers/Funds.handlers';
 
 interface FundsCardProps {
   funds: Funds[];
@@ -41,8 +32,6 @@ const FundsCard: React.FC<FundsCardProps> = ({
   const {
     // State variables
     openInsertDialog,
-    openLogsDialog,
-    setOpenLogsDialog,
     fundAmount,
     setFundAmount,
     selectedReason,

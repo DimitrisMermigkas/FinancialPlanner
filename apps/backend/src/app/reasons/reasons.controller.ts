@@ -8,8 +8,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import { ReasonsService } from './reasons.service';
-import { CreateReason, Reason } from 'libs/common/src';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateReason, Reason } from '@my-workspace/common';
 @ApiTags('Reasons') // Tag for grouping in Swagger
 @Controller('reasons')
 export class ReasonsController {

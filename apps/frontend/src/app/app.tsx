@@ -1,12 +1,3 @@
-import {
-  CustomAppBar,
-  CustomButton,
-  CustomDrawer,
-  Loading,
-  PageLayout,
-} from '@my-workspace/react-components';
-import { useState } from 'react';
-import { useTheme } from '@mui/material';
 import AppLayout from './AppLayout';
 import {
   createBrowserRouter,
@@ -15,29 +6,28 @@ import {
 } from 'react-router-dom';
 import withLazyLoad from '../hocs/withLazyLoad';
 
-const drawerVariant = 'persistent';
-const drawerAnchor = 'left';
-const appBarHeight = '64px';
+// const drawerVariant = 'persistent';
+// const drawerAnchor = 'left';
+// const appBarHeight = '64px';
 
 export function App() {
-  const theme = useTheme();
   /*                            Loader Handling Area
    *************************************************************************************************
    */
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   /*                            Drawer Handling Area
    *************************************************************************************************
    */
-  const [openDrawer, setOpenDrawer] = useState(true);
+  // const [openDrawer, setOpenDrawer] = useState(true);
 
-  const handleDrawerOpen = () => {
-    setOpenDrawer(true);
-  };
+  // const handleDrawerOpen = () => {
+  //   setOpenDrawer(true);
+  // };
 
-  const handleDrawerClose = () => {
-    setOpenDrawer(false);
-  };
+  // const handleDrawerClose = () => {
+  //   setOpenDrawer(false);
+  // };
 
   const DashboardPage = withLazyLoad(
     () => import('../pages/Dashboard/Dashboard')

@@ -1,5 +1,4 @@
 import React from 'react';
-import { CardContent, Card } from '@mui/material';
 import {
   LineChart,
   Line,

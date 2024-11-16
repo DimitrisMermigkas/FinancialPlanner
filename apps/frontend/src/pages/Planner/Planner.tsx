@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card, CardContent, Typography } from '@mui/material';
 import PlannedTransactions from '../../components/Transactions/PlannedTransactions';
 import Goals from '../../components/Goals/GoalsCard';
 import useDashboardHandlers from '../../handlers/Dashboard.handlers';

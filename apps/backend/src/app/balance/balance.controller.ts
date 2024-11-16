@@ -7,8 +7,8 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { BalanceService } from './balance.service';
-import { ApiTags, ApiBody } from '@nestjs/swagger';
-import { CreateBalance } from 'libs/common/src/index';
+import { ApiTags } from '@nestjs/swagger';
+import { CreateBalance } from '@my-workspace/common';
 @ApiTags('Balance') // Tag for grouping in Swagger
 @Controller('balance')
 export class BalanceController {
