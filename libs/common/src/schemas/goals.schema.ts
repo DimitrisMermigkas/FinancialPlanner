@@ -3,8 +3,8 @@ import { z } from 'zod';
 // Goals Schema
 export const GoalsSchema = z.object({
   id: z.string().uuid(),
-  amount: z.number(),
-  description: z.string(),
+  amount: z.coerce.number(),
+  description: z.string().optional(),
   createdAt: z.date().default(() => new Date()),
   type: z.enum(['LIMIT', 'SAVINGS']),
   status: z.enum(['PENDING', 'IN_PROGRESS', 'ACHIEVED', 'FAILED']),
@@ -18,8 +18,8 @@ export type Goals = z.infer<typeof GoalsSchema>;
 
 // DTOs
 export const CreateGoalsDto = z.object({
-  amount: z.number().nonnegative(), // Ensuring it's a positive number
-  description: z.string(),
+  amount: z.coerce.number().nonnegative(), // Ensuring it's a positive number
+  description: z.string().trim(),
   type: z.enum(['LIMIT', 'SAVINGS']),
   status: z.enum(['PENDING', 'IN_PROGRESS', 'ACHIEVED', 'FAILED']),
 });

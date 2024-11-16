@@ -20,6 +20,10 @@ export const deleteTransaction = async (transactionId: string) => {
   );
   return response.data as Transaction; // Return deleted Transaction
 };
+export const deleteGoal = async (goalsId: string) => {
+  const response = await axios.delete(`${API_URL}/goals/${goalsId}`);
+  return response.data as Goals; // Return deleted Transaction
+};
 
 /* Patch APIs
  ********************************************************************
@@ -44,6 +48,10 @@ export const updateTransaction = async (
 /* Post APIs
  ********************************************************************
  */
+export const addGoal = async (goal: Omit<Goals, 'id'>) => {
+  const response = await axios.post(`${API_URL}/goals`, goal);
+  return response.data as Goals; // Return added goal
+};
 export const addReason = async (reason: Omit<Reason, 'id'>) => {
   const response = await axios.post(`${API_URL}/reasons`, reason);
   return response.data as Reason; // Return added Reason
