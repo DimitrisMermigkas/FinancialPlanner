@@ -1,9 +1,10 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import InfoDialog from '../InfoDialog';
+import customRender from '../../ThemeProvider/test-utils';
 
 describe('InfoDialog Component', () => {
   it('should render with default OK button', () => {
-    render(
+    customRender(
       <InfoDialog
         open={true}
         title="Test Info Dialog"
@@ -16,13 +17,13 @@ describe('InfoDialog Component', () => {
   });
 
   it('uses custom button text when provided', () => {
-    render(<InfoDialog open={true} btnTxt="Got it!" />);
+    customRender(<InfoDialog open={true} btnTxt="Got it!" />);
     expect(screen.getByRole('button', { name: 'Got it!' })).toBeInTheDocument();
   });
 
   it('calls onClose when button is clicked', async () => {
     const handleClose = jest.fn();
-    render(<InfoDialog open={true} onClose={handleClose} />);
+    customRender(<InfoDialog open={true} onClose={handleClose} />);
     fireEvent.click(screen.getByRole('button', { name: 'OK' }));
     expect(handleClose).toHaveBeenCalled();
   });

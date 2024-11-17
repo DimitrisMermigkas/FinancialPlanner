@@ -1,11 +1,12 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { CustomTooltip } from './CustomTooltip';
 import { Box, Button, Typography } from '@mui/material';
+import customRender from '../ThemeProvider/test-utils';
 
 describe('CustomTooltip', () => {
   it('renders without crashing', () => {
-    render(
+    customRender(
       <CustomTooltip title="Tooltip Text">
         <span>Hover me</span>
       </CustomTooltip>
@@ -14,7 +15,7 @@ describe('CustomTooltip', () => {
   });
 
   it('displays the correct tooltip text', async () => {
-    render(
+    customRender(
       <CustomTooltip title="Tooltip Text">
         <span>Hover me</span>
       </CustomTooltip>
@@ -31,7 +32,7 @@ describe('CustomTooltip', () => {
     const customTooltipStyle = { backgroundColor: 'black', color: 'white' };
     const customArrowStyle = { color: 'black' };
 
-    render(
+    customRender(
       <CustomTooltip
         title="Styled Tooltip"
         tooltipStyles={customTooltipStyle}
@@ -52,7 +53,7 @@ describe('CustomTooltip', () => {
   it('displays complex content in the tooltip', async () => {
     const handleOpenDialog = jest.fn(); // Mock function for dialog open
 
-    render(
+    customRender(
       <CustomTooltip
         title={
           <Box display="flex" flexDirection="column" alignItems="center">
@@ -119,7 +120,7 @@ describe('CustomTooltip', () => {
   });
 
   it('displays the arrow with custom styles', async () => {
-    render(
+    customRender(
       <CustomTooltip
         title="Tooltip with Arrow"
         arrow

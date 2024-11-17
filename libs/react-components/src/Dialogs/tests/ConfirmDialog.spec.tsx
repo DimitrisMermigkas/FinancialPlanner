@@ -1,9 +1,10 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import ConfirmDialog from '../ConfirmDialog';
+import customRender from '../../ThemeProvider/test-utils';
 
 describe('ConfirmDialog Component', () => {
   it('renders confirm and cancel buttons with default text', () => {
-    render(
+    customRender(
       <ConfirmDialog open={true} okFunc={jest.fn()} cancelFunc={jest.fn()} />
     );
     expect(screen.getByRole('button', { name: 'Confirm' })).toBeInTheDocument();
@@ -11,7 +12,7 @@ describe('ConfirmDialog Component', () => {
   });
 
   it('uses custom button text when provided', () => {
-    render(
+    customRender(
       <ConfirmDialog
         open={true}
         okFunc={jest.fn()}
@@ -26,20 +27,20 @@ describe('ConfirmDialog Component', () => {
 
   it('calls okFunc when confirm button is clicked', async () => {
     const handleOk = jest.fn();
-    render(<ConfirmDialog open={true} okFunc={handleOk} />);
+    customRender(<ConfirmDialog open={true} okFunc={handleOk} />);
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
     expect(handleOk).toHaveBeenCalledTimes(1);
   });
 
   it('calls cancelFunc when cancel button is clicked', async () => {
     const handleCancel = jest.fn();
-    render(<ConfirmDialog open={true} cancelFunc={handleCancel} />);
+    customRender(<ConfirmDialog open={true} cancelFunc={handleCancel} />);
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(handleCancel).toHaveBeenCalledTimes(1);
   });
 
   it('only renders confirm button when cancelFunc is not provided', () => {
-    render(<ConfirmDialog open={true} okFunc={jest.fn()} />);
+    customRender(<ConfirmDialog open={true} okFunc={jest.fn()} />);
     expect(screen.getByRole('button', { name: 'Confirm' })).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Cancel' })
@@ -47,7 +48,7 @@ describe('ConfirmDialog Component', () => {
   });
 
   it('only renders cancel button when okFunc is not provided', () => {
-    render(<ConfirmDialog open={true} cancelFunc={jest.fn()} />);
+    customRender(<ConfirmDialog open={true} cancelFunc={jest.fn()} />);
     expect(
       screen.queryByRole('button', { name: 'Confirm' })
     ).not.toBeInTheDocument();

@@ -111,9 +111,9 @@ export const DynamicForm: React.FC<DynamicFormProps<ZodType>> = ({
 
       let fieldComponent: JSX.Element | null = null;
       switch (fieldConfig.type) {
-        case 'input':
+        case 'input': {
           const props = fieldConfig.componentProps as CustomTextFieldProps;
-          const isTypeNumber = props?.type == 'number';
+          const isTypeNumber = props?.type === 'number';
 
           fieldComponent = (
             <Controller
@@ -135,6 +135,7 @@ export const DynamicForm: React.FC<DynamicFormProps<ZodType>> = ({
           );
 
           break;
+        }
 
         case 'date':
           fieldComponent = (

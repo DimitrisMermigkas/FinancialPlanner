@@ -1,21 +1,23 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+// Adjust the import path
 import CustomButton from './CustomButton'; // Adjust the import path as necessary
-
+import { fireEvent, screen } from '@testing-library/react';
+import { customRender } from '../ThemeProvider/test-utils';
+// import theme from 'apps/frontend/src/app/theme';
 describe('CustomButton', () => {
   it('renders without crashing', () => {
-    render(<CustomButton>Click Me</CustomButton>);
+    customRender(<CustomButton>Click Me</CustomButton>);
     expect(screen.getByText('Click Me')).toBeInTheDocument();
   });
 
   it('displays the correct text', () => {
-    render(<CustomButton>Submit</CustomButton>);
+    customRender(<CustomButton>Submit</CustomButton>);
     expect(screen.getByText('Submit')).toBeTruthy();
   });
 
   it('applies custom styles correctly', () => {
     const customStyle = { backgroundColor: 'blue', color: 'white' };
-    const { container } = render(
+    const { container } = customRender(
       <CustomButton style={customStyle}>Styled Button</CustomButton>
     );
 
@@ -26,7 +28,7 @@ describe('CustomButton', () => {
 
   it('handles click events', () => {
     const handleClick = jest.fn();
-    render(<CustomButton onClick={handleClick}>Click Me</CustomButton>);
+    customRender(<CustomButton onClick={handleClick}>Click Me</CustomButton>);
 
     // Simulate a click event
     fireEvent.click(screen.getByText('Click Me'));

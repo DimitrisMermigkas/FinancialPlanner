@@ -1,10 +1,7 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import {
-  DialogCtxProvider,
-  DialogTypeKey,
-  useDialogContext,
-} from '../DialogCtxProvider';
-import { FC, ReactNode, useState } from 'react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { DialogTypeKey, useDialogContext } from '../DialogCtxProvider';
+import { useState } from 'react';
+import customRender from '../../ThemeProvider/test-utils';
 
 const TestComponent = ({ type = 'info' }: { type?: DialogTypeKey }) => {
   const title = `Title ${type}`;
@@ -35,32 +32,28 @@ const TestComponentWithJSX = () => {
   return <button onClick={handleClick}>Click</button>;
 };
 
-const ProviderWrapper: FC<{ children: ReactNode }> = ({ children }) => (
-  <DialogCtxProvider>{children}</DialogCtxProvider>
-);
-
 describe('DialogProvider', () => {
   it('should render the children components', () => {
-    render(<TestComponent />, { wrapper: ProviderWrapper });
+    customRender(<TestComponent />);
     expect(screen.getByText('Click')).toBeInTheDocument();
   });
 
   it('should open info dialog when button is clicked', () => {
-    render(<TestComponent />, { wrapper: ProviderWrapper });
+    customRender(<TestComponent />);
     const button = screen.getByText('Click');
     fireEvent.click(button);
     expect(screen.getByText('Title info')).toBeInTheDocument();
   });
 
   it('should open confirm dialog when button is clicked', () => {
-    render(<TestComponent type="confirm" />, { wrapper: ProviderWrapper });
+    customRender(<TestComponent type="confirm" />);
     const button = screen.getByText('Click');
     fireEvent.click(button);
     expect(screen.getByText('Title confirm')).toBeInTheDocument();
   });
 
   it('should resolve promise with true on confirm and close the confirm dialog', async () => {
-    render(<TestComponent type="confirm" />, { wrapper: ProviderWrapper });
+    customRender(<TestComponent type="confirm" />);
     const button = screen.getByText('Click');
     fireEvent.click(button);
     const confirmButton = screen.getByText('Confirm');
@@ -72,7 +65,7 @@ describe('DialogProvider', () => {
   });
 
   it('should resolve promise with false on cancel and close the confirm dialog', async () => {
-    render(<TestComponent type="confirm" />, { wrapper: ProviderWrapper });
+    customRender(<TestComponent type="confirm" />);
     const button = screen.getByText('Click');
     fireEvent.click(button);
     const cancelButton = screen.getByText('Cancel');
@@ -84,7 +77,7 @@ describe('DialogProvider', () => {
   });
 
   it('should close the info dialog on Close', async () => {
-    render(<TestComponent />, { wrapper: ProviderWrapper });
+    customRender(<TestComponent />);
     const button = screen.getByText('Click');
     fireEvent.click(button);
     const okButton = screen.getByText('OK');
@@ -95,7 +88,7 @@ describe('DialogProvider', () => {
   });
 
   it('should render JSX element as content', () => {
-    render(<TestComponentWithJSX />, { wrapper: ProviderWrapper });
+    customRender(<TestComponentWithJSX />);
     const button = screen.getByText('Click');
     fireEvent.click(button);
     expect(screen.getByText('JSX')).toBeInTheDocument();

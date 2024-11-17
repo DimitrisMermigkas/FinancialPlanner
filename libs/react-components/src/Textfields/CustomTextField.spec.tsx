@@ -1,22 +1,23 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import CustomTextField from './CustomTextField'; // Adjust the import path as necessary
+import customRender from '../ThemeProvider/test-utils';
 
 describe('CustomTextField', () => {
   it('renders without crashing', () => {
-    render(<CustomTextField label="Test Label" />);
+    customRender(<CustomTextField label="Test Label" />);
     expect(screen.getByLabelText('Test Label')).toBeInTheDocument();
   });
 
   it('displays the correct label', () => {
-    render(<CustomTextField label="Username" />);
+    customRender(<CustomTextField label="Username" />);
     expect(screen.getByLabelText('Username')).toBeTruthy();
   });
 
   it('applies custom styles correctly', () => {
     const customInputStyle = { backgroundColor: 'lightgrey', color: 'cyan' };
     const customLabelStyle = { color: 'red' };
-    const { container } = render(
+    const { container } = customRender(
       <CustomTextField
         label="Test"
         value={'george'}

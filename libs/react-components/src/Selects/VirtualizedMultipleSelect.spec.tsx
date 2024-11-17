@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  render,
   screen,
   fireEvent,
   waitFor,
@@ -10,6 +9,7 @@ import {
 import { VirtualizedMultipleSelect } from './VirtualizedMultipleSelect';
 import { Avatar } from '@mui/material';
 import DoneIcon from '@mui/icons-material/Done';
+import customRender from '../ThemeProvider/test-utils';
 
 describe('VirtualizedMultipleSelect', () => {
   const mockOptions = [
@@ -20,7 +20,7 @@ describe('VirtualizedMultipleSelect', () => {
 
   it('renders without crashing', () => {
     const handleChange = jest.fn();
-    render(
+    customRender(
       <VirtualizedMultipleSelect
         options={mockOptions}
         label="Select Options"
@@ -34,7 +34,7 @@ describe('VirtualizedMultipleSelect', () => {
   it('displays the dropdown when clicked', async () => {
     const handleChange = jest.fn();
 
-    render(
+    customRender(
       <div data-testid="container">
         <VirtualizedMultipleSelect
           data-testid="autocomplete"
@@ -47,7 +47,7 @@ describe('VirtualizedMultipleSelect', () => {
             deleteIcon: <DoneIcon />,
             avatar: <Avatar>F</Avatar>,
           }}
-          textfieldProps={{
+          textFieldProps={{
             label: 'Select an Option',
             variant: 'outlined',
           }}

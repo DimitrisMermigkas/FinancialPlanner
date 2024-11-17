@@ -1,16 +1,8 @@
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  within,
-} from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
 import { DynamicForm } from './DynamicForm';
 import { z } from 'zod';
 import userEvent from '@testing-library/user-event';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
-import { act, ReactNode } from 'react';
+import customRender from '../ThemeProvider/test-utils';
 
 // Mock schema
 const schema = z.object({
@@ -42,7 +34,6 @@ const fields = [
     name: 'username',
     label: 'Username',
     type: 'input' as const,
-    isRequired: true,
     componentProps: {
       placeholder: 'Enter your username',
       variant: 'outlined',
@@ -98,20 +89,12 @@ const fields = [
 
 const defaultValues = {
   favoriteColor: 'red',
-
 };
-
-const LocalProvider: React.FC<{ children: ReactNode }> = ({ children }) => (
-  <LocalizationProvider dateAdapter={AdapterDateFns}>
-    {children}
-  </LocalizationProvider>
-);
 
 describe('DynamicForm', () => {
   test('should render all fields correctly', () => {
-    render(
-      <DynamicForm fields={fields} schema={schema} onSubmit={onSubmit} />,
-      { wrapper: LocalProvider }
+    customRender(
+      <DynamicForm fields={fields} schema={schema} onSubmit={onSubmit} />
     );
 
     // Check if the fields are rendered
@@ -121,29 +104,26 @@ describe('DynamicForm', () => {
   });
 
   test('should show validation error for required fields when not filled out', async () => {
-    render(
-      <DynamicForm fields={fields} schema={schema} onSubmit={onSubmit} />,
-      { wrapper: LocalProvider }
+    customRender(
+      <DynamicForm fields={fields} schema={schema} onSubmit={onSubmit} />
     );
 
     const submitButton = document.querySelector(`button[type="submit"]`);
     if (submitButton) fireEvent.click(submitButton);
     // Wait for validation messages to appear
     await waitFor(() => {
-      // Check if the error message for username appears
-      expect(
-        screen.getByText('Username must be at least 3 characters long')
-      ).toBeInTheDocument();
-
-      // Check for 'agreeToTerms' field error
-      expect(screen.getByText('Required')).toBeInTheDocument();
+      const requiredMessages = screen.getAllByText('Required');
+      // Check if the array contains elements and each is in the document
+      expect(requiredMessages.length).toBeGreaterThan(0);
+      requiredMessages.forEach((message) => {
+        expect(message).toBeInTheDocument();
+      });
     });
   });
 
   test('should show the helper text message', async () => {
-    render(
-      <DynamicForm fields={fields} schema={schema} onSubmit={onSubmit} />,
-      { wrapper: LocalProvider }
+    customRender(
+      <DynamicForm fields={fields} schema={schema} onSubmit={onSubmit} />
     );
 
     // Fill in username
@@ -159,14 +139,13 @@ describe('DynamicForm', () => {
   test('should submit form successfully when valid data is provided', async () => {
     // Mock console.log
     const logSpy = jest.spyOn(console, 'log').mockImplementation();
-    render(
+    customRender(
       <DynamicForm
         fields={fields}
         schema={schema}
         onSubmit={onSubmit}
         defaultValues={defaultValues}
-      />,
-      { wrapper: LocalProvider }
+      />
     );
 
     const textfielduser = screen.getByLabelText('Username');

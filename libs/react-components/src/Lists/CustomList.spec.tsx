@@ -1,8 +1,9 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import CustomList from './CustomList'; // Adjust the import path as necessary
 import ConfirmDialog from '../Dialogs/ConfirmDialog';
 import DeleteIcon from '@mui/icons-material/Delete';
+import customRender from '../ThemeProvider/test-utils';
 
 describe('CustomList', () => {
   const items = [
@@ -11,23 +12,23 @@ describe('CustomList', () => {
   ];
 
   it('renders the title', () => {
-    render(<CustomList title="Test List" items={items} />);
+    customRender(<CustomList title="Test List" items={items} />);
     expect(screen.getByText('Test List')).toBeTruthy();
   });
 
   it('renders list items', () => {
-    render(<CustomList items={items} />);
+    customRender(<CustomList items={items} />);
     expect(screen.getByText('Item 1')).toBeTruthy();
     expect(screen.getByText('Item 2')).toBeTruthy();
   });
 
   it('renders icons when provided', () => {
-    render(<CustomList items={items} iconPosition="start" />);
+    customRender(<CustomList items={items} iconPosition="start" />);
     expect(screen.getByText('Icon 2')).toBeTruthy();
   });
 
   it('renders the button icon', () => {
-    render(
+    customRender(
       <CustomList
         items={items}
         buttonIcon={<div data-testid="delete-icon">Delete</div>}
@@ -39,7 +40,7 @@ describe('CustomList', () => {
 
   it('does not render icons if not provided', () => {
     const noIconItems = [{ primary: 'Item 1' }];
-    render(<CustomList items={noIconItems} />);
+    customRender(<CustomList items={noIconItems} />);
     expect(screen.queryByText('Icon 2')).toBeNull();
   });
   it('click on 1st delete button and open confirmation dialog', () => {
@@ -53,7 +54,7 @@ describe('CustomList', () => {
       cancelBtnTxt: 'Cancel',
       cancelFunc: mockCancelFunc,
     };
-    render(
+    customRender(
       <div id="testRender">
         <CustomList
           items={items}

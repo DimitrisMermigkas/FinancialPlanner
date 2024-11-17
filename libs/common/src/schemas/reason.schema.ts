@@ -4,7 +4,7 @@ import { z } from 'zod';
 export const ReasonSchema = z.object({
   id: z.string().uuid(),
   title: z.string().min(1), // Ensuring title is not empty
-  description: z.string().optional(),
+  description: z.string().optional().nullable(),
   createdAt: z.date().default(() => new Date()),
   updatedAt: z.date().optional(),
 });

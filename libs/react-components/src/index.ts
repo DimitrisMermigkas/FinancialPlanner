@@ -21,3 +21,5 @@ export * from './Pickers/CustomTimePicker';
 
 export * from './Forms/DynamicForm';
 export * from './Checkboxes/CustomCheckbox';
+
+export * from './ThemeProvider/test-utils';

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service'; // Update with your actual Prisma service path
-import { Reason } from '@prisma/client';
-import { CreateReason } from '@my-workspace/common';
+import { CreateReason, Reason } from '@my-workspace/common';
 
 @Injectable()
 export class ReasonsService {

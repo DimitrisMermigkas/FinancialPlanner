@@ -5,12 +5,12 @@
     "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "jsxImportSource": "@emotion/react"
+    "jsxImportSource": "@emotion/react",
+    "types": ["jest", "node"]
   },
   "files": [],
   "include": [],
   "references": [
-    //@ts-ignore
     {
       "path": "./tsconfig.lib.json"
     },
