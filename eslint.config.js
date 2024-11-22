@@ -26,8 +26,33 @@ module.exports = [
     },
   },
   {
-    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
-    // Override or add rules here
-    rules: {},
+    files: ['**/*.ts'],
+    rules: {
+      '@typescript-eslint/naming-convention': [
+        'warn',
+        {
+          selector: 'objectLiteralProperty',
+          format: ['PascalCase', 'camelCase'],
+        },
+      ],
+    },
+  },
+  {
+    files: ['**/*.tsx'],
+    rules: {
+      '@typescript-eslint/naming-convention': [
+        'warn',
+        {
+          selector: 'function',
+          format: ['PascalCase', 'camelCase'],
+        },
+      ],
+    },
+  },
+  {
+    files: ['**/*.config.ts'], // Add file patterns to exclude
+    rules: {
+      '@typescript-eslint/naming-convention': 'off', // Disable naming convention for these files
+    },
   },
 ];

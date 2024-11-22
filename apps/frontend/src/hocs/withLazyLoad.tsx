@@ -1,10 +1,8 @@
-import React, {
-  Suspense,
-  ComponentType,
-  lazy,
-  PropsWithRef,
-  forwardRef,
-} from 'react';
+import React, { ComponentType, lazy, Suspense } from 'react';
+
+interface LazyLoadOptions {
+  fallback?: React.ReactNode; // Optional fallback element during loading
+}
 
 interface LoadingProps {
   isLoading: boolean;
@@ -17,16 +15,20 @@ const DefaultLoading: React.FC<LoadingProps> = ({ isLoading, error }) =>
   ) : isLoading ? (
     <div>Loading...</div>
   ) : null;
-
-export default function withLazyLoad<P extends object>(
-  importCallback: () => Promise<{ default: ComponentType<P> }>,
+export default function withLazyLoad(
+  importCallback: () => Promise<{ default: React.ComponentType<any> }>,
+  options?: LazyLoadOptions,
   LoadingComponent: ComponentType<LoadingProps> = DefaultLoading
 ) {
   const LazyComponent = lazy(importCallback);
 
-  return forwardRef<unknown, PropsWithRef<P>>((props, ref) => (
-    <Suspense fallback={<LoadingComponent isLoading={true} error={null} />}>
-      <LazyComponent {...props} ref={ref} />
-    </Suspense>
-  ));
+  return function LazyWrapper(
+    props: React.ComponentProps<typeof LazyComponent>
+  ) {
+    return (
+      <Suspense fallback={options?.fallback || <div>Loading...</div>}>
+        <LazyComponent {...props} />
+      </Suspense>
+    );
+  };
 }
