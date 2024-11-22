@@ -8,7 +8,7 @@ describe('BalanceService', () => {
   let prisma: PrismaService;
 
   const mockPrismaService = {
-    reason: {
+    balance: {
       create: jest.fn(),
       findMany: jest.fn(),
       findUnique: jest.fn(),

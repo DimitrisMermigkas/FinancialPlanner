@@ -8,7 +8,7 @@ describe('TransactionService', () => {
   let prisma: PrismaService;
 
   const mockPrismaService = {
-    reason: {
+    transactions: {
       create: jest.fn(),
       findMany: jest.fn(),
       findUnique: jest.fn(),
