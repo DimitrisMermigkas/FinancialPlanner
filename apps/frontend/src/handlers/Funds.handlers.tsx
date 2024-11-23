@@ -71,15 +71,9 @@ const useFundsHandlers = ({ funds, reasons, setBalance }: FundsCardProps) => {
     setSelectedReason(updatedReason);
   };
   const createNewReason = (newValue: any) => {
-    const updatedOptions = [
-      ...reasonOptions,
-      {
-        value: newValue,
-        label: newValue,
-      },
-    ];
+    const updatedOptions = [...reasonOptions, newValue];
     setReasonOptions(updatedOptions);
-    handleUpdateReason('title', newValue);
+    handleUpdateReason('title', newValue.value);
   };
   const handleAddFund = async () => {
     if (selectedReason) {
@@ -94,8 +88,9 @@ const useFundsHandlers = ({ funds, reasons, setBalance }: FundsCardProps) => {
           createdAt: todaysDate,
         });
       } else {
+        const { id, ...rest } = selectedReason;
         const newReason = await addReason({
-          ...selectedReason,
+          ...rest,
           createdAt: todaysDate,
         });
         await addFunds({
