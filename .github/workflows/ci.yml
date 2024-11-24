@@ -51,7 +51,7 @@ jobs:
         run: npx nx affected -t lint --base=master --head=${{ github.head_ref }}
 
       - name: Run tests on PR branch
-        run: npx nx affected -t test --base=master --head=${{ github.head_ref }}
+        run: npx nx affected -t test --base=master --head=${{ github.head_ref }} --verbose
 
       - name: Build on PR branch
         run: npx nx affected -t build --base=master --head=${{ github.head_ref }}
