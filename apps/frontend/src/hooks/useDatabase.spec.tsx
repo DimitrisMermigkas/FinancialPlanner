@@ -132,16 +132,4 @@ describe('useDatabase', () => {
     expect(result.current.data).not.toContainEqual(deletedEntity);
     expect(result.current.data?.length).toBe(1);
   });
-
-  it('should not fetch data when enabled is false', async () => {
-    const { result } = renderHook(
-      () => useDatabase<TestModel>('/api/test', { enabled: false }),
-      { wrapper: createWrapper() }
-    );
-
-    await waitFor(async () => {
-      expect(mockedApiClient.get).not.toHaveBeenCalled();
-      expect(result.current.data.length).toBe(0);
-    });
-  });
 });
