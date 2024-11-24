@@ -23,7 +23,7 @@ jobs:
       - name: Checkout master
         run: git checkout master
 
-      - name: Install dependencies
+      - name: Install dependencies for master
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -43,6 +43,9 @@ jobs:
       # Checkout the PR branch and run lint, test, and build
       - name: Checkout PR branch
         run: git checkout ${{ github.head_ref }}
+
+      - name: Install dependencies for PR branch
+        run: npm ci --legacy-peer-deps
 
       - name: Run lint on PR branch
         run: npx nx affected -t lint --base=master --head=${{ github.head_ref }}
