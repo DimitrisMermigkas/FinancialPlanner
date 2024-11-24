@@ -1,10 +1,11 @@
-import { z } from 'zod';
+import { optional, z } from 'zod';
 
 // Balance Schema
 export const BalanceSchema = z.object({
   id: z.string().uuid(),
   amount: z.coerce.number(), // Current balance in the main account
   updatedAt: z.date().optional(),
+  createdAt: z.date().optional(),
 });
 
 // Array Schema for Balances

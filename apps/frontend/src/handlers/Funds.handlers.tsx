@@ -1,22 +1,17 @@
 import { useEffect, useState } from 'react';
-import {
-  addFunds,
-  addReason,
-  addTransaction,
-  fetchFunds,
-  updateBalance,
-} from '../services/api';
+import { fetchFunds } from '../services/api';
 import { Option } from '@my-workspace/react-components';
 import { Funds, Reason, TransactionType } from '@my-workspace/common';
+import {
+  useBalances,
+  useFunds,
+  useReasons,
+  useTransactions,
+} from '../api/apiHooks';
 
-interface FundsCardProps {
-  funds: Funds[];
-  reasons: Reason[];
-  setBalance: React.Dispatch<React.SetStateAction<number>>;
-}
 type ReasonWithoutTimestamps = Omit<Reason, 'createdAt' | 'updatedAt'>;
 
-const useFundsHandlers = ({ funds, reasons, setBalance }: FundsCardProps) => {
+const useFundsHandlers = () => {
   const [openInsertDialog, setOpenInsertDialog] = useState(false);
   const [openLogsDialog, setOpenLogsDialog] = useState(false);
   const [fundAmount, setFundAmount] = useState<number>(0);
@@ -26,6 +21,11 @@ const useFundsHandlers = ({ funds, reasons, setBalance }: FundsCardProps) => {
 
   const [reasonOptions, setReasonOptions] = useState<Option[]>([]);
   const [logs, setLogs] = useState<Funds[]>([]); // Logs for deposits
+
+  const { data: funds, create: createFund } = useFunds();
+  const { data: reasons, create: createReason } = useReasons();
+  const { create: createTransaction } = useTransactions();
+  const { create: createBalance } = useBalances();
 
   useEffect(() => {
     if (reasons.length > 0) {
@@ -66,7 +66,10 @@ const useFundsHandlers = ({ funds, reasons, setBalance }: FundsCardProps) => {
     setSelectedReason({ id: '', title: '', description: '' });
   };
 
-  const handleUpdateReason = (name: 'description' | 'title', newValue: any) => {
+  const handleUpdateReason = (
+    name: 'description' | 'title',
+    newValue: unknown
+  ) => {
     const updatedReason = { ...selectedReason, [name]: newValue };
     setSelectedReason(updatedReason);
   };
@@ -82,30 +85,34 @@ const useFundsHandlers = ({ funds, reasons, setBalance }: FundsCardProps) => {
         (reason) => reason.title == selectedReason.title
       );
       if (reasonExists) {
-        addFunds({
+        createFund.mutate({
           amount: fundAmount,
           reasonId: reasonExists.id,
-          createdAt: todaysDate,
+          updatedAt: todaysDate,
         });
       } else {
         const { id, ...rest } = selectedReason;
-        const newReason = await addReason({
+        const newReason = await createReason.mutateAsync({
           ...rest,
-          createdAt: todaysDate,
+          updatedAt: todaysDate,
         });
-        await addFunds({
+        createFund.mutate({
           amount: fundAmount,
           reasonId: newReason.id,
-          createdAt: todaysDate,
+          updatedAt: todaysDate,
         });
       }
-      await addTransaction({
+      createTransaction.mutate({
         amount: fundAmount,
         type: 'fund' as TransactionType,
         description: `Funds for ${selectedReason.title}`,
         completedAt: todaysDate,
       });
-      await updateBalance('expense', fundAmount, todaysDate);
+      createBalance.mutate({
+        type: 'expense',
+        amount: fundAmount,
+        completedAt: todaysDate,
+      });
       handleCloseInsert();
     }
   };
@@ -125,19 +132,24 @@ const useFundsHandlers = ({ funds, reasons, setBalance }: FundsCardProps) => {
     if (selectedReason && selectedReason.id) {
       const todaysDate = new Date();
       // Here you would typically call your API to update the balance and funds
-      await addFunds({
+      createFund.mutate({
         amount: value,
         reasonId: selectedReason.id,
-        createdAt: todaysDate,
+        updatedAt: todaysDate,
       });
-      const updatedBalance = await updateBalance('income', -value, todaysDate);
-      setBalance(updatedBalance.amount);
+
+      createBalance.mutate({
+        type: 'income',
+        amount: -value,
+        completedAt: todaysDate,
+      });
       // Close the dialog after withdrawing
       setOpenLogsDialog(false);
     }
   };
 
   return {
+    funds,
     // State variables
     openInsertDialog,
     openLogsDialog,

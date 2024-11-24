@@ -18,7 +18,8 @@ export type Reason = z.infer<typeof ReasonSchema>;
 // DTOs
 export const CreateReasonDto = z.object({
   title: z.string().min(1), // Ensuring title is not empty
-  description: z.string().optional(),
+  description: z.string().optional().nullable(),
+  updatedAt: z.date(),
 });
 
 // Exporting inferred type for DTO

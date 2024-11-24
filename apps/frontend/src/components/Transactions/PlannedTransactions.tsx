@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
 import { List, ListItem, ListItemText, Box, IconButton } from '@mui/material';
-import {
-  addTransaction,
-  deleteTransaction,
-  fetchTransactions,
-  updateBalance,
-  updateTransaction,
-} from '../../services/api';
 import { formatTimestamp } from '../../utils/formatDate';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
 import CardComponent from '../CardComponent/CardComponent';
@@ -23,20 +16,24 @@ import {
   TransactionSchema,
 } from '@my-workspace/common';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useBalances, useTransactions } from '../../api/apiHooks';
 
 interface PlannedTransactionsProps {
   transactions: Transaction[];
   futureTransactions: Transaction[];
-  setBalance: React.Dispatch<React.SetStateAction<number>>;
-  setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
 }
 
 const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
   transactions,
   futureTransactions,
-  setBalance,
-  setTransactions,
 }) => {
+  const { create: updateBalance } = useBalances();
+  const {
+    create: createTransaction,
+    update: updateTransaction,
+    del: deleteTransaction,
+  } = useTransactions();
+
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const dialogContext = useDialogContext();
 
@@ -75,9 +72,7 @@ const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
 
   const planTransaction = async (data: CreateTransaction) => {
     if (data) {
-      await addTransaction(data);
-      const updatedTransactions = await fetchTransactions();
-      setTransactions(updatedTransactions); // Update the transactions state
+      createTransaction.mutate(data);
     }
     setOpenDialog(false);
   };
@@ -90,17 +85,16 @@ const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
       const todaysDate = new Date();
       const { id, ...data } = foundTransation;
       const updatedTran = { ...data, completedAt: todaysDate };
-      const updatedTransaction = await updateTransaction(id, updatedTran);
+      const updatedTransaction = await updateTransaction.mutateAsync({
+        id: id,
+        data: updatedTran,
+      });
       // Update the balance based on the transaction type
-      const newBalance = await updateBalance(
-        updatedTransaction.type,
-        updatedTransaction.amount,
-        todaysDate
-      );
-      setBalance(newBalance.amount);
-      // Fetch updated transactions after adding the new one
-      const updatedTransactions = await fetchTransactions();
-      setTransactions(updatedTransactions); // Update the transactions state
+      await updateBalance.mutateAsync({
+        type: updatedTransaction.type,
+        amount: updatedTransaction.amount,
+        completedAt: todaysDate,
+      });
     }
   };
 
@@ -113,7 +107,7 @@ const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
         message: `Are you sure you want to delete this transaction?`,
       })
     ) {
-      deleteTransaction(transactionId);
+      deleteTransaction.mutate({ id: transactionId });
     }
   };
 

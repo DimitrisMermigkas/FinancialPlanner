@@ -6,11 +6,17 @@ interface MonthlyData {
   date: string;
   amount: number;
 }
-
-const useBalanceHandlers = () => {
-  const [showProjected, setShowProjected] = useState(false);
+interface FutureBalanceProps {
+  funds: Funds[];
+  monthlyBalances: Balance[];
+  futureTransactions: Transaction[];
+}
+const useFutureBalanceHandlers = ({
+  funds,
+  monthlyBalances,
+  futureTransactions,
+}: FutureBalanceProps) => {
   const [monthsAhead, setMonthsAhead] = useState(4); // Default months ahead to forecast
-  const [projectedData, setProjectedData] = useState<MonthlyData[]>([]);
   const [myIncome, setMyIncome] = useState<number>(1450);
 
   // Function to get the latest entry for each month
@@ -203,7 +209,7 @@ const useBalanceHandlers = () => {
       (dat) => dat.date === currentMMMYY
     )?.amount;
     if (!lastAmount) {
-      lastAmount = forecastData[forecastData.length - 1].amount;
+      lastAmount = forecastData[forecastData.length - 1]?.amount;
     }
 
     // Iterate to add future months
@@ -253,21 +259,44 @@ const useBalanceHandlers = () => {
     return adjustedForecastData;
   };
 
-  return {
-    getMonthlyBalanceData,
-    calculateMonthlyFunds,
-    calculateMonthlyFutureTransactions,
-    addFundsToMonthlyBalance,
-    forecastMonthlyData,
-    showProjected,
-    setShowProjected,
-    projectedData,
-    setProjectedData,
+  const monthlyData = getMonthlyBalanceData(monthlyBalances);
+  const monthlyFunds = calculateMonthlyFunds(funds);
+  const monthlyFutureTransactions =
+    calculateMonthlyFutureTransactions(futureTransactions);
+  // Pre-compute the fullMonthlyBalance outside of the useEffect dependency
+  const fullMonthlyBalance = addFundsToMonthlyBalance(
+    monthlyData,
+    monthlyFunds
+  );
+
+  // Set the projected data only when necessary dependencies change
+  const updatedProjectedData = forecastMonthlyData(
+    fullMonthlyBalance,
+    monthlyFutureTransactions,
     myIncome,
-    setMyIncome,
+    monthsAhead
+  );
+
+  // Split projectedData based on the current date "Nov 24"
+  const currentDate = format(new Date(), 'MMM yy'); // Define the current date
+  const splitIndex = updatedProjectedData.findIndex(
+    (data) => data.date === currentDate
+  );
+
+  // Map over the projectedData to create a new array with amountA and amountB
+  const chartData = updatedProjectedData.map((data, index) => ({
+    date: data.date,
+    amountA: index <= splitIndex ? data.amount : null, // amountA is the amount if index is less than or equal to splitIndex
+    amountB: index >= splitIndex ? data.amount : null, // amountB is the amount if index is greater than splitIndex
+  }));
+
+  // updatedProjectedData now contains both amountA and amountB keys
+
+  return {
+    chartData,
     monthsAhead,
     setMonthsAhead,
   };
 };
 
-export default useBalanceHandlers;
+export default useFutureBalanceHandlers;

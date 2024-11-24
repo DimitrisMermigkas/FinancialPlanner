@@ -1,26 +1,20 @@
 import React from 'react';
 import PlannedTransactions from '../../components/Transactions/PlannedTransactions';
 import Goals from '../../components/Goals/GoalsCard';
-import useDashboardHandlers from '../../handlers/Dashboard.handlers';
 import { PageLayout } from '@my-workspace/react-components';
 import FutureBalanceChart from '../../components/Balance/FutureBalanceChart';
+import { useBalances, useFunds, useTransactions } from '../../api/apiHooks';
 
 const Planner: React.FC = () => {
-  const {
-    transactions,
-    monthlyBalances,
-    funds,
-    goals,
-    setTransactions,
-    setBalance,
-    setGoals,
-  } = useDashboardHandlers();
-
   const today = new Date();
+  const { data: balances } = useBalances();
+  const { data: funds } = useFunds();
+
+  const { data: transactions } = useTransactions();
+
   const futureTransactions = transactions.filter(
     (transaction) => new Date(transaction.completedAt) > today
   );
-
   return (
     <PageLayout
       title="Future Planning & Milestones"
@@ -43,19 +37,15 @@ const Planner: React.FC = () => {
         <PlannedTransactions
           transactions={transactions}
           futureTransactions={futureTransactions}
-          setTransactions={setTransactions}
-          setBalance={setBalance}
         />
-        <Goals goals={goals} setGoals={setGoals} />
+        <Goals />
       </div>
 
-      {monthlyBalances && (
-        <FutureBalanceChart
-          monthlyBalances={monthlyBalances}
-          funds={funds}
-          futureTransactions={futureTransactions}
-        />
-      )}
+      <FutureBalanceChart
+        balances={balances}
+        funds={funds}
+        futureTransactions={futureTransactions}
+      />
     </PageLayout>
   );
 };

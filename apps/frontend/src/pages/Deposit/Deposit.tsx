@@ -1,10 +1,8 @@
 import { PageLayout } from '@my-workspace/react-components';
 import FundsCard from '../../components/Funds/FundsCard';
-import useDashboardHandlers from '../../handlers/Dashboard.handlers';
+import { useFunds, useReasons } from '../../api/apiHooks';
 
 const DepositAndFunds: React.FC = () => {
-  const { funds, reasons, setReasons, setBalance } = useDashboardHandlers();
-
   return (
     <PageLayout
       title="Deposit and Funds"
@@ -15,12 +13,7 @@ const DepositAndFunds: React.FC = () => {
         height: '100%',
       }}
     >
-      <FundsCard
-        funds={funds}
-        reasons={reasons}
-        setReasons={setReasons}
-        setBalance={setBalance}
-      />
+      <FundsCard />
     </PageLayout>
   );
 };

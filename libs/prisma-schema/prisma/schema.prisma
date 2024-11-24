@@ -54,7 +54,8 @@ model Funds {
 model Balance {
   id        String   @id @default(uuid()) @db.Uuid
   amount    Float // Current balance in the main account
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // Timestamp of when this balance was created
+  updatedAt DateTime @updatedAt // Timestamp of the most recent update to this balance
 }
 
 model Goal {
