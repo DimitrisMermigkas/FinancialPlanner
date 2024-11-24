@@ -10,16 +10,15 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Goals } from '@my-workspace/common';
-import { deleteGoal } from '../../services/api';
 import { useDialogContext } from '@my-workspace/react-components';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 interface GoalsTabsProps {
   goals: Goals[];
-  setGoals: React.Dispatch<React.SetStateAction<Goals[]>>;
+  deleteGoal: (id: string) => void;
 }
 
-const GoalsTabs: React.FC<GoalsTabsProps> = ({ goals, setGoals }) => {
+const GoalsTabs: React.FC<GoalsTabsProps> = ({ goals, deleteGoal }) => {
   const [selectedTab, setSelectedTab] = React.useState(0);
   const dialogContext = useDialogContext();
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {

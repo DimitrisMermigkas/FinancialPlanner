@@ -1,5 +1,5 @@
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import useBalanceHandlers from '../../handlers/Balance.handlers';
+import useFutureBalanceHandlers from '../../handlers/FutureBalance.handlers';
 import { useEffect } from 'react';
 import { format } from 'date-fns';
 import {
@@ -13,70 +13,30 @@ import {
 } from 'recharts';
 import CardComponent from '../CardComponent/CardComponent';
 import { Balance, Funds, Transaction } from '@my-workspace/common';
+import useDashboardHandlers from '../../handlers/Dashboard.handlers';
 
 interface FutureBalanceChartProps {
-  monthlyBalances: Balance[];
+  balances: Balance[];
   funds: Funds[];
   futureTransactions: Transaction[];
 }
 
 const FutureBalanceChart: React.FC<FutureBalanceChartProps> = ({
-  monthlyBalances,
+  balances,
   funds,
   futureTransactions,
 }) => {
-  const {
-    getMonthlyBalanceData,
-    calculateMonthlyFunds,
-    calculateMonthlyFutureTransactions,
-    addFundsToMonthlyBalance,
-    myIncome,
-    projectedData,
-    setProjectedData,
-    monthsAhead,
-    setMonthsAhead,
-    forecastMonthlyData,
-  } = useBalanceHandlers();
-
-  const monthlyData = getMonthlyBalanceData(monthlyBalances);
-  const monthlyFunds = calculateMonthlyFunds(funds);
-  const monthlyFutureTransactions =
-    calculateMonthlyFutureTransactions(futureTransactions);
-  // Pre-compute the fullMonthlyBalance outside of the useEffect dependency
-  const fullMonthlyBalance = addFundsToMonthlyBalance(
-    monthlyData,
-    monthlyFunds
-  );
+  const { getMonthlyBalances } = useDashboardHandlers();
+  const monthlyBalances = getMonthlyBalances(balances);
+  const { monthsAhead, setMonthsAhead, chartData } = useFutureBalanceHandlers({
+    funds,
+    monthlyBalances,
+    futureTransactions,
+  });
 
   const handleMonthsChange = (event: SelectChangeEvent<number>) => {
     setMonthsAhead(event.target.value as number);
   };
-
-  useEffect(() => {
-    // Set the projected data only when necessary dependencies change
-    const updatedProjectedData = forecastMonthlyData(
-      fullMonthlyBalance,
-      monthlyFutureTransactions,
-      myIncome,
-      monthsAhead
-    );
-    setProjectedData(updatedProjectedData);
-  }, [myIncome, monthsAhead]); // Only trigger when myIncome or monthsAhead change
-
-  // Split projectedData based on the current date "Nov 24"
-  const currentDate = format(new Date(), 'MMM yy'); // Define the current date
-  const splitIndex = projectedData.findIndex(
-    (data) => data.date === currentDate
-  );
-
-  // Map over the projectedData to create a new array with amountA and amountB
-  const updatedProjectedData = projectedData.map((data, index) => ({
-    date: data.date,
-    amountA: index <= splitIndex ? data.amount : null, // amountA is the amount if index is less than or equal to splitIndex
-    amountB: index >= splitIndex ? data.amount : null, // amountB is the amount if index is greater than splitIndex
-  }));
-
-  // updatedProjectedData now contains both amountA and amountB keys
 
   return (
     <CardComponent>
@@ -93,7 +53,7 @@ const FutureBalanceChart: React.FC<FutureBalanceChartProps> = ({
       <ResponsiveContainer width="100%" height={500}>
         <LineChart
           height={200}
-          data={updatedProjectedData}
+          data={chartData}
           margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
         >
           <CartesianGrid strokeDasharray="3 3" />

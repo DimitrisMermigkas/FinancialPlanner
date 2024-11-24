@@ -13,24 +13,12 @@ import { PieChart } from '@mui/x-charts'; // Updated import
 import { VirtualizedSelect } from '@my-workspace/react-components';
 import FundsLogs from './FundsLogs';
 import CardComponent from '../CardComponent/CardComponent';
-import { Funds, Reason } from '@my-workspace/common';
 import useFundsHandlers from '../../handlers/Funds.handlers';
 
-interface FundsCardProps {
-  funds: Funds[];
-  reasons: Reason[];
-  setReasons: React.Dispatch<React.SetStateAction<Reason[]>>;
-  setBalance: React.Dispatch<React.SetStateAction<number>>;
-}
-
-const FundsCard: React.FC<FundsCardProps> = ({
-  funds,
-  reasons,
-  setReasons,
-  setBalance,
-}) => {
+const FundsCard: React.FC = () => {
   const {
     // State variables
+    funds,
     openInsertDialog,
     fundAmount,
     setFundAmount,
@@ -46,11 +34,7 @@ const FundsCard: React.FC<FundsCardProps> = ({
     handleAddFund,
     handlePieChartClick,
     handleWithdraw,
-  } = useFundsHandlers({
-    funds: funds,
-    reasons: reasons,
-    setBalance: setBalance,
-  });
+  } = useFundsHandlers();
 
   return (
     <>
@@ -70,7 +54,6 @@ const FundsCard: React.FC<FundsCardProps> = ({
         >
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <PieChart
-              colors={['#FF6384', '#36A2EB', '#FFCE56']}
               series={[
                 {
                   data: fundsDataChart,

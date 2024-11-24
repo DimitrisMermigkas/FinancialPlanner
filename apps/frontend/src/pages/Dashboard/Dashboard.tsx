@@ -2,19 +2,20 @@ import React from 'react';
 import TransactionsCard from '../../components/Transactions/TransactionCard';
 import BalanceDisplay from '../../components/Balance/BalanceDisplay';
 import BalanceChart from '../../components/Balance/BalanceChart';
-import useDashboardHandlers from '../../handlers/Dashboard.handlers';
 import { PageLayout } from '@my-workspace/react-components';
+import { useBalances } from '../../api/apiHooks';
+import useDashboardHandlers from '../../handlers/Dashboard.handlers';
 
 const Dashboard: React.FC = () => {
-  const {
-    getBalanceHistory,
-    monthlyBalances,
-    transactions,
-    balance,
-    setTransactions,
-    setBalance,
-  } = useDashboardHandlers();
+  const { data: balances } = useBalances();
+  const { getMonthlyBalances } = useDashboardHandlers();
+  const monthlyBalances = getMonthlyBalances(balances);
 
+  const currectBalance = balances.sort((a, b) => {
+    const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return dateB - dateA;
+  })[0];
   return (
     <PageLayout
       title="Current Balance"
@@ -33,7 +34,7 @@ const Dashboard: React.FC = () => {
           flexDirection: 'column',
         }}
       >
-        <BalanceDisplay balance={balance} />
+        <BalanceDisplay balance={currectBalance} />
         <div
           style={{
             display: 'flex',
@@ -41,12 +42,7 @@ const Dashboard: React.FC = () => {
             height: '100%',
           }}
         >
-          <TransactionsCard
-            transactions={transactions}
-            setTransactions={setTransactions}
-            setBalance={setBalance}
-            getBalanceHistory={getBalanceHistory}
-          />
+          <TransactionsCard />
           <BalanceChart monthlyBalances={monthlyBalances} />
         </div>
       </div>

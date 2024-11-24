@@ -7,15 +7,18 @@ import {
   FieldConfig,
 } from '@my-workspace/react-components';
 import { CreateGoals, CreateGoalsDto, Goals } from '@my-workspace/common';
-import { addGoal } from '../../services/api';
 import GoalsTabs from './GoalsTab';
+import { useGoals } from '../../api/apiHooks';
 
-interface GoalsCardProps {
-  goals: Goals[];
-  setGoals: React.Dispatch<React.SetStateAction<Goals[]>>;
-}
-const GoalsCard: React.FC<GoalsCardProps> = ({ goals, setGoals }) => {
+const GoalsCard: React.FC = () => {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
+
+  const {
+    data: goals,
+    create: createGoal,
+    del: deleteGoal,
+    refetch,
+  } = useGoals();
 
   const fields: FieldConfig<Goals>[] = [
     {
@@ -56,17 +59,21 @@ const GoalsCard: React.FC<GoalsCardProps> = ({ goals, setGoals }) => {
       description: '',
       createdAt: todaysDate,
     };
-    const newGoalUpdated = await addGoal(newGoal);
-    setGoals([...goals, newGoalUpdated]);
+    createGoal.mutate(newGoal);
     setOpenDialog(false);
   };
+  const onDeleteGoal = async (goalId: string) => {
+    await deleteGoal.mutateAsync({ id: goalId });
+    await refetch();
+  };
+
   return (
     <CardComponent
       title="Goals"
       buttonText="Add Goal"
       onClick={() => setOpenDialog(true)}
     >
-      <GoalsTabs goals={goals} setGoals={setGoals} />
+      <GoalsTabs goals={goals} deleteGoal={onDeleteGoal} />
       <CustomDialog
         open={openDialog}
         title="Set a balance goal"

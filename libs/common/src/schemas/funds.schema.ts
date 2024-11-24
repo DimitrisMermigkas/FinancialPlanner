@@ -21,6 +21,7 @@ export const CreateFundsDto = z.object({
   amount: z.coerce.number().nonnegative(), // Ensuring it's a positive number
   reasonId: z.string().uuid(),
   description: z.string().optional(),
+  updatedAt: z.date(),
 });
 
 // Exporting inferred type for DTO

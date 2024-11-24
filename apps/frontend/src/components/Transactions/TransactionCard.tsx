@@ -11,29 +11,13 @@ import {
   useTheme,
 } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import {
-  addTransaction,
-  fetchTransactions,
-  updateBalance,
-} from '../../services/api';
 import { formatTimestamp } from '../../utils/formatDate';
 import { DatePicker } from '@mui/x-date-pickers';
 import CardComponent from '../CardComponent/CardComponent';
 import { Transaction, TransactionType } from '@my-workspace/common';
+import { useBalances, useTransactions } from '../../api/apiHooks';
 
-interface TransactionsCardProps {
-  transactions: Transaction[];
-  setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>; // Add this prop
-  setBalance: React.Dispatch<React.SetStateAction<number>>; // Add this prop
-  getBalanceHistory: () => void;
-}
-
-const TransactionsCard: React.FC<TransactionsCardProps> = ({
-  transactions,
-  setTransactions,
-  setBalance,
-  getBalanceHistory,
-}) => {
+const TransactionsCard: React.FC = () => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [newTransaction, setNewTransaction] = useState<Omit<Transaction, 'id'>>(
@@ -44,10 +28,18 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
       completedAt: new Date(),
     }
   );
+  const { data: transactions, create: createTransaction } = useTransactions();
+  const { create: createBalance, refetch } = useBalances();
   const today = new Date();
-  const paidTransactions = transactions.filter(
-    (tran) => new Date(tran.completedAt) <= today
-  );
+  const paidTransactions = transactions
+    .filter((tran) => new Date(tran.completedAt) <= today)
+    .sort((a, b) => {
+      const dateA = a.completedAt ? new Date(a.completedAt).getTime() : 0;
+      const dateB = b.completedAt ? new Date(b.completedAt).getTime() : 0;
+      return dateB - dateA; // Descending order
+    });
+
+  console.log('🚀 ~ transactions:', transactions);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -77,20 +69,18 @@ const TransactionsCard: React.FC<TransactionsCardProps> = ({
   const handleSubmit = async () => {
     try {
       // Call your API to add the transaction
-      const addedTransaction = await addTransaction(newTransaction);
+      const addedTransaction = await createTransaction.mutateAsync(
+        newTransaction
+      );
       console.log('Transaction added:', addedTransaction);
 
       // Update the balance based on the transaction type
-      const newBalance = await updateBalance(
-        newTransaction.type,
-        newTransaction.amount,
-        newTransaction.completedAt
-      );
-      setBalance(newBalance.amount);
-      // Fetch updated transactions after adding the new one
-      const updatedTransactions = await fetchTransactions();
-      setTransactions(updatedTransactions); // Update the transactions state
-      getBalanceHistory();
+      const newBalance = await createBalance.mutateAsync({
+        type: newTransaction.type,
+        amount: newTransaction.amount,
+        completedAt: newTransaction.completedAt,
+      });
+      await refetch();
       handleClose(); // Close the dialog
     } catch (error) {
       console.error('Error adding transaction:', error);

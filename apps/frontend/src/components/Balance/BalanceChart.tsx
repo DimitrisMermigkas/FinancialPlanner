@@ -18,11 +18,11 @@ interface BalanceChartProps {
 
 const BalanceChart: React.FC<BalanceChartProps> = ({ monthlyBalances }) => {
   const calculateBalanceDataSet = (balances: Balance[]) => {
-    // Sort data by date, ensuring `updatedAt` is defined
+    // Sort data by `updatedAt` in descending order (most recent first)
     const sortedData = balances.sort((a, b) => {
       const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
       const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-      return dateA - dateB;
+      return dateB - dateA; // Descending order
     });
 
     // Define the date range and initialize arrays
@@ -30,19 +30,24 @@ const BalanceChart: React.FC<BalanceChartProps> = ({ monthlyBalances }) => {
     const startDate = subDays(endDate, 33);
     const dateRange = eachDayOfInterval({ start: startDate, end: endDate });
 
-    // Map sortedData amounts to corresponding dates or set to `null` if no data exists for that date
+    // Use a map to track the most recent balance for each date
+    const balanceMap: Record<string, number | null> = {};
+
+    sortedData.forEach((item) => {
+      if (!item.updatedAt) return;
+      const dateString = format(new Date(item.updatedAt), 'yyyy-MM-dd');
+      // Store the first occurrence (most recent due to sorted order)
+      if (!(dateString in balanceMap)) {
+        balanceMap[dateString] = item.amount;
+      }
+    });
+
+    // Map over the date range to construct the dataset
     const dataset = dateRange.map((date) => {
       const dateString = format(date, 'yyyy-MM-dd');
-
-      // Find the record safely checking for `updatedAt`
-      const record = sortedData.find((item) => {
-        if (!item.updatedAt) return false; // Skip items with undefined `updatedAt`
-        return format(new Date(item.updatedAt), 'yyyy-MM-dd') === dateString;
-      });
-
       return {
         date: format(date, 'MMM-dd'),
-        amount: record ? record.amount : null,
+        amount: balanceMap[dateString] || null,
       };
     });
 
