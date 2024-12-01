@@ -1,12 +1,12 @@
 // balance/balance.module.ts
 import { Module } from '@nestjs/common';
-import { BalanceService } from './balance.service';
-import { BalanceController } from './balance.controller';
+import { HistoryController } from './history.controller';
 import { PrismaModule } from '../prisma/prisma.module'; // Import PrismaModule
+import { HistoryService } from './history.service';
 
 @Module({
   imports: [PrismaModule], // Add PrismaModule here
-  providers: [BalanceService],
-  controllers: [BalanceController],
+  providers: [HistoryService],
+  controllers: [HistoryController],
 })
-export class BalanceModule {}
+export class HistoryModule {}

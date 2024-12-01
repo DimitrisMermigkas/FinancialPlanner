@@ -1,7 +1,7 @@
-import { optional, z } from 'zod';
+import { z } from 'zod';
 
-// Balance Schema
-export const BalanceSchema = z.object({
+// History Schema
+export const HistorySchema = z.object({
   id: z.string().uuid(),
   amount: z.coerce.number(), // Current balance in the main account
   updatedAt: z.date().optional(),
@@ -9,15 +9,15 @@ export const BalanceSchema = z.object({
 });
 
 // Array Schema for Balances
-export const BalanceArraySchema = z.array(BalanceSchema);
+export const HistoryArraySchema = z.array(HistorySchema);
 
 // Exporting inferred type
-export type Balance = z.infer<typeof BalanceSchema>;
+export type History = z.infer<typeof HistorySchema>;
 
 // DTOs
-export const CreateBalanceDto = z.object({
+export const HistoryDto = z.object({
   amount: z.coerce.number(), // Ensuring it's a positive number
 });
 
 // Exporting inferred type for DTO
-export type CreateBalance = z.infer<typeof CreateBalanceDto>;
+export type CreateHistory = z.infer<typeof HistoryDto>;
