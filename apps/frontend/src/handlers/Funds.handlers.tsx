@@ -3,8 +3,8 @@ import { fetchFunds } from '../services/api';
 import { Option } from '@my-workspace/react-components';
 import { Funds, Reason, TransactionType } from '@my-workspace/common';
 import {
-  useBalances,
   useFunds,
+  useHistory,
   useReasons,
   useTransactions,
 } from '../api/apiHooks';
@@ -25,7 +25,7 @@ const useFundsHandlers = () => {
   const { data: funds, create: createFund } = useFunds();
   const { data: reasons, create: createReason } = useReasons();
   const { create: createTransaction } = useTransactions();
-  const { create: createBalance } = useBalances();
+  const { create: createHistory } = useHistory();
 
   useEffect(() => {
     if (reasons.length > 0) {
@@ -108,7 +108,7 @@ const useFundsHandlers = () => {
         description: `Funds for ${selectedReason.title}`,
         completedAt: todaysDate,
       });
-      createBalance.mutate({
+      createHistory.mutate({
         type: 'expense',
         amount: fundAmount,
         completedAt: todaysDate,
@@ -118,7 +118,10 @@ const useFundsHandlers = () => {
   };
   const handlePieChartClick = async (event: any, params: any) => {
     const index = params.dataIndex;
-    const reasonPie = reasons[index];
+    const selectedFundLabel = fundsDataChart[index].label;
+    const reasonPie = reasons.find(
+      (reason) => reason.title === selectedFundLabel
+    );
     if (reasonPie) {
       setSelectedReason(reasonPie);
       // Fetch logs for the selected fund (dummy data for example)
@@ -138,7 +141,7 @@ const useFundsHandlers = () => {
         updatedAt: todaysDate,
       });
 
-      createBalance.mutate({
+      createHistory.mutate({
         type: 'income',
         amount: -value,
         completedAt: todaysDate,

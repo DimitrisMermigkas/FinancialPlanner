@@ -3,8 +3,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { UpdateCurrentBalance } from '@my-workspace/common';
 import { CurrentBalanceService } from './currentbalance.service';
 
-@ApiTags('Funds') // Tag for grouping in Swagger
-@Controller('funds')
+@ApiTags('CurrentBalance') // Tag for grouping in Swagger
+@Controller('currentbalance')
 export class CurrentBalanceController {
   constructor(private readonly currentBalanceService: CurrentBalanceService) {}
 

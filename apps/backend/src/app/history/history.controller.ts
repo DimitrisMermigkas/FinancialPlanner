@@ -11,8 +11,8 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { HistoryService } from './history.service';
 import { CreateHistory } from '@my-workspace/common';
-@ApiTags('Balance') // Tag for grouping in Swagger
-@Controller('balance')
+@ApiTags('History') // Tag for grouping in Swagger
+@Controller('history')
 export class HistoryController {
   constructor(private readonly historyService: HistoryService) {}
 

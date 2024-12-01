@@ -1,4 +1,4 @@
-import { Balance, Funds } from '@my-workspace/common';
+import { CurrentBalance, Funds, History } from '@my-workspace/common';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:4000'; // Update with your server address if necessary
@@ -18,11 +18,12 @@ export const fetchFunds = async (
 };
 
 // Fetch the current balance from the API
-export const fetchCurrentBalance = async (): Promise<Balance> => {
-  const response = await axios.get(`${API_URL}/balance`); // Adjust the endpoint as needed
-  return response.data as Balance;
+export const fetchCurrentBalance = async (): Promise<CurrentBalance> => {
+  const response = await axios.get(`${API_URL}/currentbalance`); // Adjust the endpoint as needed
+  if (response.data.length > 0) return response.data[0] as CurrentBalance;
+  else return response.data as CurrentBalance;
 };
-export const fetchBalanceHistory = async (): Promise<Balance[]> => {
-  const response = await axios.get(`${API_URL}/balance/all`); // Adjust the endpoint as needed
-  return response.data as Balance[];
+export const fetchBalanceHistory = async (): Promise<History[]> => {
+  const response = await axios.get(`${API_URL}/history`); // Adjust the endpoint as needed
+  return response.data as History[];
 };

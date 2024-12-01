@@ -15,7 +15,7 @@ import { formatTimestamp } from '../../utils/formatDate';
 import { DatePicker } from '@mui/x-date-pickers';
 import CardComponent from '../CardComponent/CardComponent';
 import { Transaction, TransactionType } from '@my-workspace/common';
-import { useBalances, useTransactions } from '../../api/apiHooks';
+import { useHistory, useTransactions } from '../../api/apiHooks';
 
 const TransactionsCard: React.FC = () => {
   const theme = useTheme();
@@ -29,7 +29,7 @@ const TransactionsCard: React.FC = () => {
     }
   );
   const { data: transactions, create: createTransaction } = useTransactions();
-  const { create: createBalance, refetch } = useBalances();
+  const { create: createHistory, refetch } = useHistory();
   const today = new Date();
   const paidTransactions = transactions
     .filter((tran) => new Date(tran.completedAt) <= today)
@@ -75,7 +75,7 @@ const TransactionsCard: React.FC = () => {
       console.log('Transaction added:', addedTransaction);
 
       // Update the balance based on the transaction type
-      const newBalance = await createBalance.mutateAsync({
+      const newBalance = await createHistory.mutateAsync({
         type: newTransaction.type,
         amount: newTransaction.amount,
         completedAt: newTransaction.completedAt,

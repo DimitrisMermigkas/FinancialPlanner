@@ -12,11 +12,11 @@ import {
   YAxis,
 } from 'recharts';
 import CardComponent from '../CardComponent/CardComponent';
-import { Balance, Funds, Transaction } from '@my-workspace/common';
+import { History, Funds, Transaction } from '@my-workspace/common';
 import useDashboardHandlers from '../../handlers/Dashboard.handlers';
 
 interface FutureBalanceChartProps {
-  balances: Balance[];
+  balances: History[];
   funds: Funds[];
   futureTransactions: Transaction[];
 }

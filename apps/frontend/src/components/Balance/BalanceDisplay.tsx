@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { Balance } from '@my-workspace/common';
+import { CurrentBalance } from '@my-workspace/common';
 
 interface BalanceDisplayProps {
-  balance: Balance;
+  balance: CurrentBalance;
 }
 
 const BalanceDisplay: React.FC<BalanceDisplayProps> = ({ balance }) => {

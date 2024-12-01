@@ -3,19 +3,15 @@ import TransactionsCard from '../../components/Transactions/TransactionCard';
 import BalanceDisplay from '../../components/Balance/BalanceDisplay';
 import BalanceChart from '../../components/Balance/BalanceChart';
 import { PageLayout } from '@my-workspace/react-components';
-import { useBalances } from '../../api/apiHooks';
+import { useCurrentBalance, useHistory } from '../../api/apiHooks';
 import useDashboardHandlers from '../../handlers/Dashboard.handlers';
 
 const Dashboard: React.FC = () => {
-  const { data: balances } = useBalances();
+  const { data: balanceHistory } = useHistory();
   const { getMonthlyBalances } = useDashboardHandlers();
-  const monthlyBalances = getMonthlyBalances(balances);
+  const monthlyBalances = getMonthlyBalances(balanceHistory);
 
-  const currectBalance = balances.sort((a, b) => {
-    const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-    const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-    return dateB - dateA;
-  })[0];
+  const { data: currectBalance } = useCurrentBalance();
   return (
     <PageLayout
       title="Current Balance"
@@ -34,7 +30,7 @@ const Dashboard: React.FC = () => {
           flexDirection: 'column',
         }}
       >
-        <BalanceDisplay balance={currectBalance} />
+        <BalanceDisplay balance={currectBalance[0]} />
         <div
           style={{
             display: 'flex',

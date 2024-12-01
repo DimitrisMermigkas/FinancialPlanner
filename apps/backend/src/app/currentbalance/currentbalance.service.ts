@@ -7,13 +7,13 @@ export class CurrentBalanceService {
   constructor(private prisma: PrismaService) {}
 
   findAll(filter: Partial<{ [key: string]: any }> = {}) {
-    return this.prisma.funds.findMany({
+    return this.prisma.currentBalance.findMany({
       where: filter, // Use the filter object as dynamic where clause
     });
   }
 
   update(id: string, updateCurrentBalance: UpdateCurrentBalance) {
-    return this.prisma.funds.update({
+    return this.prisma.currentBalance.update({
       where: { id },
       data: updateCurrentBalance,
     });
