@@ -1,20 +1,23 @@
 import React from 'react';
 import PlannedTransactions from '../../components/Transactions/PlannedTransactions';
 import Goals from '../../components/Goals/GoalsCard';
-import { PageLayout } from '@my-workspace/react-components';
+import { Loading, PageLayout } from '@my-workspace/react-components';
 import FutureBalanceChart from '../../components/Balance/FutureBalanceChart';
-import { useBalances, useFunds, useTransactions } from '../../api/apiHooks';
+import { useHistory, useFunds, useTransactions } from '../../api/apiHooks';
 
 const Planner: React.FC = () => {
   const today = new Date();
-  const { data: balances } = useBalances();
-  const { data: funds } = useFunds();
+  const { data: balanceHistory, isBalancesLoading } = useHistory();
+  const { data: funds, loading: isFundsLoading } = useFunds();
 
-  const { data: transactions } = useTransactions();
+  const { data: transactions, loading: isTransactionsLoading } =
+    useTransactions();
 
   const futureTransactions = transactions.filter(
     (transaction) => new Date(transaction.completedAt) > today
   );
+  const loadingData =
+    isBalancesLoading || isFundsLoading || isTransactionsLoading;
   return (
     <PageLayout
       title="Future Planning & Milestones"
@@ -40,12 +43,18 @@ const Planner: React.FC = () => {
         />
         <Goals />
       </div>
-
-      <FutureBalanceChart
-        balances={balances}
-        funds={funds}
-        futureTransactions={futureTransactions}
-      />
+      <Loading
+        isLoading={loadingData}
+        style={{ width: '100%', height: '100%' }}
+      >
+        {!loadingData && (
+          <FutureBalanceChart
+            balances={balanceHistory}
+            funds={funds}
+            futureTransactions={futureTransactions}
+          />
+        )}
+      </Loading>
     </PageLayout>
   );
 };

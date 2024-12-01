@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,19 +7,13 @@ datasource db {
   url      = "postgresql://postgres:mitchigun15@localhost:5432/mydb?schema=jimmys"
 }
 
-enum TransactionType {
-  income // Money coming in
-  expense // Money going out
-  fund // Money set aside in Funds (not considered an expense)
-}
-
 model Transaction {
   id          String          @id @default(uuid()) @db.Uuid
-  type        TransactionType // "income", "expense", or "fund"
-  description String? // Description of the transaction (e.g., "Salary", "Groceries", "Savings")
-  amount      Float // Amount of the transaction
-  completedAt DateTime // Date of the transaction
-  fundsId     String?         @db.Uuid // Optional link to Funds if this is a "fund" transaction
+  type        TransactionType
+  description String?
+  amount      Float
+  completedAt DateTime
+  fundsId     String?         @db.Uuid
   funds       Funds?          @relation(fields: [fundsId], references: [id])
 
   @@index([type])
@@ -46,25 +34,50 @@ model Funds {
   description  String?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-  reasonId     String        @db.Uuid // Foreign key to Reason
-  reason       Reason?       @relation(fields: [reasonId], references: [id])
+  reasonId     String        @db.Uuid
+  reason       Reason        @relation(fields: [reasonId], references: [id])
   transactions Transaction[]
 }
 
-model Balance {
+model History {
+  id        String   @id @default(uuid()) @db.Uuid
+  amount    Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CurrentBalance {
   id        String   @id @default(uuid()) @db.Uuid
   amount    Float // Current balance in the main account
-  createdAt DateTime @default(now()) // Timestamp of when this balance was created
   updatedAt DateTime @updatedAt // Timestamp of the most recent update to this balance
 }
 
 model Goal {
   id          String     @id @default(uuid()) @db.Uuid
-  description String // Reason/description for the goal
-  amount      Float // The target amount for the goal (could be a limit or deposit)
-  type        GoalType // Enum to define the type of goal (deposit, limit, etc.)
-  status      GoalStatus // Enum to define the status of the goal
+  description String
+  amount      Float
+  type        GoalType
+  status      GoalStatus
   createdAt   DateTime   @default(now())
+}
+
+model BalanceHistory {
+  id        String   @id @db.Uuid
+  amount    Float
+  updatedAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Balance {
+  id        String   @id @db.Uuid
+  amount    Float
+  updatedAt DateTime
+}
+
+enum TransactionType {
+  income
+  expense
+  fund
 }
 
 enum GoalType {
@@ -73,8 +86,8 @@ enum GoalType {
 }
 
 enum GoalStatus {
-  PENDING // Goal has not been achieved yet
-  IN_PROGRESS // Goal is currently being worked on
-  ACHIEVED // Goal has been reached
-  FAILED // Goal could not be reached
+  PENDING
+  IN_PROGRESS
+  ACHIEVED
+  FAILED
 }

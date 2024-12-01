@@ -20,7 +20,7 @@ const createApiRequest = <T>(method: ApiMethod) => {
 };
 
 type ApiMethod = keyof typeof API_METHODS;
-type BaseModel = { create: object; update: object; response: { id: string } };
+type BaseModel = { create?: object; update?: object; response: { id: string } };
 type Response<T extends BaseModel> = T['response'];
 
 export const getAllQueryFn = <T>() => createApiRequest<T[]>('GET');

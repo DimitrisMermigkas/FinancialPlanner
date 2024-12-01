@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useDatabase, createMutationFn } from '../hooks/useDatabase';
+import { useDatabase } from '../hooks/useDatabase';
 import * as Dto from '@my-workspace/common';
 import axios from 'axios';
 import { fetchBalanceHistory, fetchCurrentBalance } from '../services/api';
@@ -13,13 +13,12 @@ export const useTransactions = () => {
   }>('/transaction');
 };
 
-// export const useBalances = () => {
-//   return useDatabase<{
-//     create: Dto.CreateBalance;
-//     update: object;
-//     response: Dto.Balance;
-//   }>('/balance');
-// };
+export const useCurrentBalance = () => {
+  return useDatabase<{
+    update: Dto.UpdateCurrentBalance;
+    response: Dto.CurrentBalance;
+  }>('/currentbalance');
+};
 
 export const useFunds = () => {
   return useDatabase<{
@@ -45,7 +44,7 @@ export const useGoals = () => {
   }>('/goals');
 };
 
-export const useBalances = () => {
+export const useHistory = () => {
   const queryClient = useQueryClient();
 
   // Query for fetching all balances
@@ -54,7 +53,7 @@ export const useBalances = () => {
     isLoading: isBalancesLoading,
     refetch,
   } = useQuery({
-    queryKey: ['balances'],
+    queryKey: ['history'],
     queryFn: fetchBalanceHistory,
   });
 
@@ -80,16 +79,28 @@ export const useBalances = () => {
           ? currentBalance.amount - amount
           : currentBalance.amount + amount;
 
-      const response = await axios.post(`${API_URL}/balance`, {
+      const responseCreate = await axios.post(`${API_URL}/history`, {
         amount: newBalance,
-        updatedAt: completedAt,
+        createdAt: completedAt,
+        updatedAt: new Date(),
       });
 
-      return response.data;
+      const responseUpdate = await axios.patch(
+        `${API_URL}/currentbalance/${currentBalance.id}`,
+        {
+          amount: responseCreate.data.amount,
+          updatedAt: new Date(),
+        }
+      );
+
+      return responseUpdate.data;
     },
     onSuccess: (newBalance) => {
       // Update the current balance in cache
-      queryClient.setQueryData<{ amount: number }>(['balance'], newBalance);
+      queryClient.setQueryData<{ amount: number }>(
+        ['currentbalance'],
+        newBalance
+      );
     },
   });
 
@@ -100,19 +111,3 @@ export const useBalances = () => {
     refetch,
   };
 };
-
-// export const useScreens = () => {
-//   return useDatabase<{
-//     create: Dto.CreateScreenDto;
-//     update: Dto.UpdateScreenDto;
-//     response: Dto.Screen;
-//   }>('/screens');
-// };
-
-// export const useStores = () => {
-//   return useDatabase<{
-//     create: Dto.CreateStoreDto;
-//     update: Dto.UpdateStoreDto;
-//     response: Dto.Store;
-//   }>('/stores');
-// };

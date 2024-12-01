@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { format } from 'date-fns';
-import { Balance, Funds, Transaction } from '@my-workspace/common';
+import { format, parse } from 'date-fns';
+import { History, Funds, Transaction } from '@my-workspace/common';
 
 interface MonthlyData {
   date: string;
@@ -8,7 +8,7 @@ interface MonthlyData {
 }
 interface FutureBalanceProps {
   funds: Funds[];
-  monthlyBalances: Balance[];
+  monthlyBalances: History[];
   futureTransactions: Transaction[];
 }
 const useFutureBalanceHandlers = ({
@@ -16,17 +16,17 @@ const useFutureBalanceHandlers = ({
   monthlyBalances,
   futureTransactions,
 }: FutureBalanceProps) => {
-  const [monthsAhead, setMonthsAhead] = useState(4); // Default months ahead to forecast
+  const [monthsAhead, setMonthsAhead] = useState(1); // Default months ahead to forecast
   const [myIncome, setMyIncome] = useState<number>(1450);
 
   // Function to get the latest entry for each month
-  const getMonthlyBalanceData = (data: Balance[]) => {
+  const getMonthlyBalanceData = (data: History[]) => {
     const latestEntriesByMonth = Object.entries(
-      data.reduce((acc: { [key: string]: Balance }, entry: Balance) => {
-        // Ensure that updatedAt is defined before processing
-        if (!entry.updatedAt) return acc;
+      data.reduce((acc: { [key: string]: History }, entry: History) => {
+        // Ensure that createdAt is defined before processing
+        if (!entry.createdAt) return acc;
 
-        const date = new Date(entry.updatedAt);
+        const date = new Date(entry.createdAt);
         const monthKey = `${date.toLocaleString('default', {
           month: 'short',
         })} ${date.getFullYear().toString().slice(-2)}`; // e.g., "Oct 24"
@@ -34,8 +34,8 @@ const useFutureBalanceHandlers = ({
         // If no entry for the month or if this entry is more recent, update the record for the month
         if (
           !acc[monthKey] ||
-          (acc[monthKey].updatedAt &&
-            new Date(entry.updatedAt) > new Date(acc[monthKey].updatedAt))
+          (acc[monthKey].createdAt &&
+            new Date(entry.createdAt) > new Date(acc[monthKey].createdAt))
         ) {
           acc[monthKey] = entry;
         }
@@ -199,21 +199,26 @@ const useFutureBalanceHandlers = ({
     }
 
     const averageExpense =
-      monthlyDifferences.reduce((sum, expense) => sum + expense, 0) /
-      (monthlyDifferences.length || 1); // Handle division by zero if no expenses
+      monthlyDifferences.reduce(
+        (sum, difference) => sum + (myIncome - difference),
+        0
+      ) / (monthlyDifferences.length || 1); // Handle division by zero if no expenses
     // Get the last known month and amount
-    const lastDate = new Date();
-    const currentMMMYY = format(lastDate, 'MMM yy');
 
-    let lastAmount = forecastData.find(
-      (dat) => dat.date === currentMMMYY
-    )?.amount;
+    const lastDate = parse(
+      currentData[currentData.length - 1].date,
+      'MMM yy',
+      new Date()
+    );
+    const currentMMMYY = format(new Date(), 'MMM yy');
+
+    let lastAmount = currentData[currentData.length - 1].amount;
     if (!lastAmount) {
       lastAmount = forecastData[forecastData.length - 1]?.amount;
     }
 
     // Iterate to add future months
-    for (let i = 0; i < monthsAhead; i++) {
+    for (let i = 0; i <= monthsAhead; i++) {
       // Increment the month
       lastDate.setMonth(lastDate.getMonth() + 1);
       const monthString = lastDate.toLocaleString('default', {

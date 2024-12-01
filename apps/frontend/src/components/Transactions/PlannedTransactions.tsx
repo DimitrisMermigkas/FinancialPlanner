@@ -16,7 +16,7 @@ import {
   TransactionSchema,
 } from '@my-workspace/common';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useBalances, useTransactions } from '../../api/apiHooks';
+import { useHistory, useTransactions } from '../../api/apiHooks';
 
 interface PlannedTransactionsProps {
   transactions: Transaction[];
@@ -27,7 +27,7 @@ const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
   transactions,
   futureTransactions,
 }) => {
-  const { create: updateBalance } = useBalances();
+  const { create: createHistory } = useHistory();
   const {
     create: createTransaction,
     update: updateTransaction,
@@ -90,7 +90,7 @@ const PlannedTransactions: React.FC<PlannedTransactionsProps> = ({
         data: updatedTran,
       });
       // Update the balance based on the transaction type
-      await updateBalance.mutateAsync({
+      await createHistory.mutateAsync({
         type: updatedTransaction.type,
         amount: updatedTransaction.amount,
         completedAt: todaysDate,

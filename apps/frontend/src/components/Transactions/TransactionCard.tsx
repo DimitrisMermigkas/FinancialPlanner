@@ -15,9 +15,19 @@ import { formatTimestamp } from '../../utils/formatDate';
 import { DatePicker } from '@mui/x-date-pickers';
 import CardComponent from '../CardComponent/CardComponent';
 import { Transaction, TransactionType } from '@my-workspace/common';
-import { useBalances, useTransactions } from '../../api/apiHooks';
+import {
+  useCurrentBalance,
+  useHistory,
+  useTransactions,
+} from '../../api/apiHooks';
 
-const TransactionsCard: React.FC = () => {
+interface TransactionCardProps {
+  calculateMonthlyExpenses: (transactions: Transaction[]) => number;
+}
+
+const TransactionsCard: React.FC<TransactionCardProps> = ({
+  calculateMonthlyExpenses,
+}) => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [newTransaction, setNewTransaction] = useState<Omit<Transaction, 'id'>>(
@@ -29,7 +39,8 @@ const TransactionsCard: React.FC = () => {
     }
   );
   const { data: transactions, create: createTransaction } = useTransactions();
-  const { create: createBalance, refetch } = useBalances();
+  const { create: createHistory, refetch: refetchHistory } = useHistory();
+  const { refetch: refetchBalance } = useCurrentBalance();
   const today = new Date();
   const paidTransactions = transactions
     .filter((tran) => new Date(tran.completedAt) <= today)
@@ -39,7 +50,8 @@ const TransactionsCard: React.FC = () => {
       return dateB - dateA; // Descending order
     });
 
-  console.log('🚀 ~ transactions:', transactions);
+  const cardExpenses = calculateMonthlyExpenses(transactions);
+  console.log('🚀 ~ cardExpenses:', cardExpenses);
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -75,12 +87,13 @@ const TransactionsCard: React.FC = () => {
       console.log('Transaction added:', addedTransaction);
 
       // Update the balance based on the transaction type
-      const newBalance = await createBalance.mutateAsync({
+      await createHistory.mutateAsync({
         type: newTransaction.type,
         amount: newTransaction.amount,
         completedAt: newTransaction.completedAt,
       });
-      await refetch();
+      await refetchHistory();
+      await refetchBalance();
       handleClose(); // Close the dialog
     } catch (error) {
       console.error('Error adding transaction:', error);

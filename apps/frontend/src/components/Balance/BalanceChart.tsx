@@ -10,18 +10,19 @@ import {
 } from 'recharts';
 import { eachDayOfInterval, format, subDays } from 'date-fns';
 import CardComponent from '../CardComponent/CardComponent';
-import { Balance } from '@my-workspace/common';
+import { History } from '@my-workspace/common';
 
 interface BalanceChartProps {
-  monthlyBalances: Balance[] | undefined;
+  monthlyBalances: History[] | undefined;
 }
 
-const BalanceChart: React.FC<BalanceChartProps> = ({ monthlyBalances }) => {
-  const calculateBalanceDataSet = (balances: Balance[]) => {
-    // Sort data by `updatedAt` in descending order (most recent first)
+const BalanceChart: React.FC<BalanceChartProps> = ({
+  monthlyBalances = [],
+}) => {
+  const calculateBalanceDataSet = (balances: History[]) => {
     const sortedData = balances.sort((a, b) => {
-      const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-      const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       return dateB - dateA; // Descending order
     });
 
@@ -34,8 +35,8 @@ const BalanceChart: React.FC<BalanceChartProps> = ({ monthlyBalances }) => {
     const balanceMap: Record<string, number | null> = {};
 
     sortedData.forEach((item) => {
-      if (!item.updatedAt) return;
-      const dateString = format(new Date(item.updatedAt), 'yyyy-MM-dd');
+      if (!item.createdAt) return;
+      const dateString = format(new Date(item.createdAt), 'yyyy-MM-dd');
       // Store the first occurrence (most recent due to sorted order)
       if (!(dateString in balanceMap)) {
         balanceMap[dateString] = item.amount;
