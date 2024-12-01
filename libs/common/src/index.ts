@@ -1,3 +1,4 @@
+export * from './schemas/currentbalance.schema';
 export * from './schemas/history.schema';
 export * from './schemas/reason.schema';
 export * from './schemas/funds.schema';

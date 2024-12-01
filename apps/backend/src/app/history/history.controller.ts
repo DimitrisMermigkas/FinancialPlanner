@@ -5,6 +5,8 @@ import {
   Body,
   HttpException,
   HttpStatus,
+  Delete,
+  Param,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { HistoryService } from './history.service';
@@ -29,5 +31,9 @@ export class HistoryController {
         HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
+  }
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.historyService.remove(id);
   }
 }

@@ -21,4 +21,8 @@ export class HistoryService {
       throw new Error('Could not create history');
     }
   }
+
+  remove(id: string) {
+    return this.prisma.history.delete({ where: { id } });
+  }
 }

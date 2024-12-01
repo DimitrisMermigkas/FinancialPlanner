@@ -3,7 +3,7 @@ import { z } from 'zod';
 // History Schema
 export const HistorySchema = z.object({
   id: z.string().uuid(),
-  amount: z.coerce.number(), // Current balance in the main account
+  amount: z.coerce.number(),
   updatedAt: z.date().optional(),
   createdAt: z.date().optional(),
 });
