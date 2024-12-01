@@ -43,12 +43,12 @@ CREATE TABLE "Funds" (
 );
 
 -- CreateTable
-CREATE TABLE "Balance" (
+CREATE TABLE "BalanceHistory" (
     "id" UUID NOT NULL,
     "amount" DOUBLE PRECISION NOT NULL,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Balance_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "BalanceHistory_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
