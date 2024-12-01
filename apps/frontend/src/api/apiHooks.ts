@@ -79,15 +79,21 @@ export const useHistory = () => {
           ? currentBalance.amount - amount
           : currentBalance.amount + amount;
 
-      const response = await axios.patch(
+      const responseCreate = await axios.post(`${API_URL}/history`, {
+        amount: newBalance,
+        createdAt: completedAt,
+        updatedAt: new Date(),
+      });
+
+      const responseUpdate = await axios.patch(
         `${API_URL}/currentbalance/${currentBalance.id}`,
         {
-          amount: newBalance,
-          updatedAt: completedAt,
+          amount: responseCreate.data.amount,
+          updatedAt: new Date(),
         }
       );
 
-      return response.data;
+      return responseUpdate.data;
     },
     onSuccess: (newBalance) => {
       // Update the current balance in cache

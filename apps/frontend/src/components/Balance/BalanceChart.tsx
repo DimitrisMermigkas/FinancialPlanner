@@ -20,6 +20,12 @@ const BalanceChart: React.FC<BalanceChartProps> = ({
   monthlyBalances = [],
 }) => {
   const calculateBalanceDataSet = (balances: History[]) => {
+    const sortedData = balances.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA; // Descending order
+    });
+
     // Define the date range and initialize arrays
     const endDate = new Date();
     const startDate = subDays(endDate, 33);
@@ -28,7 +34,7 @@ const BalanceChart: React.FC<BalanceChartProps> = ({
     // Use a map to track the most recent balance for each date
     const balanceMap: Record<string, number | null> = {};
 
-    monthlyBalances.forEach((item) => {
+    sortedData.forEach((item) => {
       if (!item.createdAt) return;
       const dateString = format(new Date(item.createdAt), 'yyyy-MM-dd');
       // Store the first occurrence (most recent due to sorted order)

@@ -1,4 +1,4 @@
-import { History } from '@my-workspace/common';
+import { History, Transaction } from '@my-workspace/common';
 
 const useDashboardHandlers = () => {
   const getMonthlyBalances = (balances: History[]) => {
@@ -35,8 +35,33 @@ const useDashboardHandlers = () => {
     return result;
   };
 
+  const calculateMonthlyExpenses = (transactions: Transaction[]) => {
+    // Create a map to store monthly totals
+    const monthlyExpenses: any = {};
+    const today = new Date();
+    const completedTransactions = transactions.filter(
+      (transaction) => new Date(transaction.completedAt) <= today
+    );
+    completedTransactions.forEach((transaction) => {
+      if (transaction.amount && transaction.type === 'expense') {
+        const date = new Date(transaction.completedAt);
+        const monthKey = `${date.getFullYear()}-${String(
+          date.getMonth() + 1
+        ).padStart(2, '0')}`; // Format: YYYY-MM
+
+        // Add the expense amount to the corresponding month
+        if (!monthlyExpenses[monthKey]) {
+          monthlyExpenses[monthKey] = 0;
+        }
+        monthlyExpenses[monthKey] += transaction.amount;
+      }
+    });
+
+    return monthlyExpenses;
+  };
   return {
     getMonthlyBalances,
+    calculateMonthlyExpenses,
   };
 };
 

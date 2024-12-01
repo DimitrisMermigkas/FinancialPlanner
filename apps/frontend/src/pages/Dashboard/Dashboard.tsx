@@ -8,7 +8,8 @@ import useDashboardHandlers from '../../handlers/Dashboard.handlers';
 
 const Dashboard: React.FC = () => {
   const { data: balanceHistory } = useHistory();
-  const { getMonthlyBalances } = useDashboardHandlers();
+  const { getMonthlyBalances, calculateMonthlyExpenses } =
+    useDashboardHandlers();
   const monthlyBalances = getMonthlyBalances(balanceHistory);
 
   const { data: currectBalance } = useCurrentBalance();
@@ -38,7 +39,9 @@ const Dashboard: React.FC = () => {
             height: '100%',
           }}
         >
-          <TransactionsCard />
+          <TransactionsCard
+            calculateMonthlyExpenses={calculateMonthlyExpenses}
+          />
           <BalanceChart monthlyBalances={monthlyBalances} />
         </div>
       </div>
