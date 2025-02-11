@@ -6,13 +6,13 @@ import { CreateReason, Reason } from '@my-workspace/common';
 export class ReasonsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(reasonData: CreateReason): Promise<Reason> {
+  create(reasonData: CreateReason) {
     return this.prisma.reason.create({
       data: reasonData,
     });
   }
 
-  async findAll(): Promise<Reason[]> {
+  findAll() {
     return this.prisma.reason.findMany();
   }
 
@@ -20,16 +20,14 @@ export class ReasonsService {
     return this.prisma.reason.findUnique({ where: { id } });
   }
 
-  async update(id: string, reasonData: Partial<Reason>): Promise<Reason> {
+  update(id: string, reasonData: Partial<Reason>) {
     return this.prisma.reason.update({
       where: { id },
       data: reasonData,
     });
   }
 
-  async remove(id: string): Promise<Reason> {
-    return this.prisma.reason.delete({
-      where: { id },
-    });
+  remove(id: string) {
+    return this.prisma.reason.delete({ where: { id } });
   }
 }

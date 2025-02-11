@@ -23,7 +23,11 @@ const useFundsHandlers = () => {
   const [logs, setLogs] = useState<Funds[]>([]); // Logs for deposits
 
   const { data: funds, create: createFund } = useFunds();
-  const { data: reasons, create: createReason } = useReasons();
+  const {
+    data: reasons,
+    create: createReason,
+    del: removeReason,
+  } = useReasons();
   const { create: createTransaction } = useTransactions();
   const { create: createHistory } = useHistory();
 
@@ -82,7 +86,7 @@ const useFundsHandlers = () => {
     if (selectedReason) {
       const todaysDate = new Date();
       const reasonExists = reasons.find(
-        (reason) => reason.title == selectedReason.title
+        (reason) => reason.title === selectedReason.title
       );
       if (reasonExists) {
         createFund.mutate({
@@ -134,9 +138,21 @@ const useFundsHandlers = () => {
   const handleWithdraw = async (value: number) => {
     if (selectedReason && selectedReason.id) {
       const todaysDate = new Date();
-      // Here you would typically call your API to update the balance and funds
+
+      // Calculate total funds for this reason
+      const totalFunds = funds
+        .filter((fund) => fund.reasonId === selectedReason.id)
+        .reduce((sum, fund) => sum + fund.amount, 0);
+
+      // Check if withdrawing all funds
+      if (totalFunds + value === 0) {
+        // Delete the reason if withdrawing all funds
+        await removeReason.mutateAsync({ id: selectedReason.id });
+      }
+
+      // Create the withdrawal fund entry (negative amount)
       createFund.mutate({
-        amount: value,
+        amount: -value,
         reasonId: selectedReason.id,
         updatedAt: todaysDate,
       });
@@ -146,7 +162,7 @@ const useFundsHandlers = () => {
         amount: -value,
         completedAt: todaysDate,
       });
-      // Close the dialog after withdrawing
+
       setOpenLogsDialog(false);
     }
   };
