@@ -72,51 +72,63 @@ async function main() {
   await prisma.balance.createMany({
     data: [
       {
+        id: uuidv4(),
         amount: 3660,
         updatedAt: new Date('2024-09-30T19:21:04.189Z'),
       },
       {
+        id: uuidv4(),
         amount: 2146.31,
         updatedAt: new Date('2024-10-26T13:32:22.551Z'),
       },
       {
+        id: uuidv4(),
         amount: 2099.31,
         updatedAt: new Date('2024-10-27T13:41:02.481Z'),
       },
       {
+        id: uuidv4(),
         amount: 3449.31,
         updatedAt: new Date('2024-10-28T13:58:36.829Z'),
       },
       {
+        id: uuidv4(),
         amount: 3676.93,
         updatedAt: new Date('2024-10-28T16:57:11.164Z'),
       },
       {
+        id: uuidv4(),
         amount: 3449.31,
         updatedAt: new Date('2024-10-28T16:59:28.024Z'),
       },
       {
+        id: uuidv4(),
         amount: 2949.31,
         updatedAt: new Date('2024-10-28T21:08:30.539Z'),
       },
 
       {
+        id: uuidv4(),
         amount: 3370.46,
         updatedAt: new Date('2024-10-30T18:35:57.927Z'),
       },
       {
+        id: uuidv4(),
         amount: 2945.76,
         updatedAt: new Date('2024-10-30T18:37:47.691Z'),
       },
       {
+        id: uuidv4(),
         amount: 2938.56,
         updatedAt: new Date('2024-10-30T19:13:35.827Z'),
       },
       {
+        id: uuidv4(),
         amount: 2960.56,
         updatedAt: new Date('2024-10-31T19:50:12.152Z'),
       },
       {
+        id: uuidv4(),
         amount: 2938.56,
         updatedAt: new Date('2024-10-31T19:51:15.152Z'),
       },

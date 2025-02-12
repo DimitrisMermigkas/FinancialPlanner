@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { fetchFunds } from '../services/api';
 import { Option } from '@my-workspace/react-components';
 import { Funds, Reason, TransactionType } from '@my-workspace/common';
@@ -23,13 +23,43 @@ const useFundsHandlers = () => {
   const [logs, setLogs] = useState<Funds[]>([]); // Logs for deposits
 
   const { data: funds, create: createFund } = useFunds();
-  const {
-    data: reasons,
-    create: createReason,
-    del: removeReason,
-  } = useReasons();
+  const { data: reasons, create: createReason } = useReasons();
   const { create: createTransaction } = useTransactions();
   const { create: createHistory } = useHistory();
+
+  const groupedFunds = useMemo(() => {
+    return funds.reduce((acc, fund) => {
+      const { reasonId, amount } = fund;
+
+      if (!acc[reasonId]) {
+        const reason = reasons.find((reason) => reason.id === reasonId);
+        const label = reason ? reason.title : 'Unknown';
+
+        acc[reasonId] = { reasonId, label, totalAmount: 0 };
+      }
+
+      acc[reasonId].totalAmount += amount;
+      return acc;
+    }, {} as Record<string, { reasonId: string; label: string; totalAmount: number }>);
+  }, [funds, reasons]);
+
+  const groupedFundsArray = useMemo(
+    () => Object.values(groupedFunds),
+    [groupedFunds]
+  );
+  const fundsDataChart = useMemo(
+    () =>
+      groupedFundsArray.map((fund) => {
+        if (fund.totalAmount > 0) {
+          return {
+            id: fund.reasonId,
+            value: fund.totalAmount,
+            label: fund.label,
+          };
+        }
+      }),
+    [groupedFundsArray]
+  );
 
   useEffect(() => {
     if (reasons.length > 0) {
@@ -40,25 +70,6 @@ const useFundsHandlers = () => {
       setReasonOptions(options);
     }
   }, [reasons]);
-
-  const groupedFunds = funds.reduce((acc, fund) => {
-    const { reasonId, amount } = fund;
-
-    if (!acc[reasonId]) {
-      const reason = reasons.find((reason) => reason.id === reasonId);
-      const label = reason ? reason.title : 'Unknown'; // Default to "Unknown" if not found
-
-      acc[reasonId] = { reasonId, label, totalAmount: 0 };
-    }
-
-    acc[reasonId].totalAmount += amount;
-    return acc;
-  }, {} as Record<string, { reasonId: string; label: string; totalAmount: number }>);
-
-  const groupedFundsArray = Object.values(groupedFunds);
-  const fundsDataChart = groupedFundsArray.map((fund) => {
-    return { id: fund.reasonId, value: fund.totalAmount, label: fund.label };
-  });
 
   const handleClickOpenInsert = () => {
     setOpenInsertDialog(true);
@@ -122,7 +133,7 @@ const useFundsHandlers = () => {
   };
   const handlePieChartClick = async (event: any, params: any) => {
     const index = params.dataIndex;
-    const selectedFundLabel = fundsDataChart[index].label;
+    const selectedFundLabel = fundsDataChart[index]?.label;
     const reasonPie = reasons.find(
       (reason) => reason.title === selectedFundLabel
     );
@@ -139,20 +150,9 @@ const useFundsHandlers = () => {
     if (selectedReason && selectedReason.id) {
       const todaysDate = new Date();
 
-      // Calculate total funds for this reason
-      const totalFunds = funds
-        .filter((fund) => fund.reasonId === selectedReason.id)
-        .reduce((sum, fund) => sum + fund.amount, 0);
-
-      // Check if withdrawing all funds
-      if (totalFunds + value === 0) {
-        // Delete the reason if withdrawing all funds
-        await removeReason.mutateAsync({ id: selectedReason.id });
-      }
-
       // Create the withdrawal fund entry (negative amount)
       createFund.mutate({
-        amount: -value,
+        amount: value,
         reasonId: selectedReason.id,
         updatedAt: todaysDate,
       });
@@ -162,8 +162,6 @@ const useFundsHandlers = () => {
         amount: -value,
         completedAt: todaysDate,
       });
-
-      setOpenLogsDialog(false);
     }
   };
 

@@ -56,7 +56,12 @@ const FundsCard: React.FC = () => {
             <PieChart
               series={[
                 {
-                  data: fundsDataChart,
+                  data: (fundsDataChart || []).filter(
+                    (
+                      item
+                    ): item is { id: string; value: number; label: string } =>
+                      item !== undefined
+                  ),
                   highlightScope: { fade: 'global', highlight: 'item' },
                   faded: {
                     innerRadius: 30,
