@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:pass@localhost:5433/mydb?schema=jimmys"
+  url      = "postgresql://postgres:pass@localhost:5432/mydb?schema=jimmys"
 }
 
 model Transaction {

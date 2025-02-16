@@ -77,6 +77,28 @@ export const useHistory = () => {
 
       const difference = type === 'expense' ? -amount : amount;
 
+      // Find the last balance before completedAt
+      const lastBalanceBeforeDate = allBalances
+        .filter(
+          (balance) =>
+            new Date(balance.createdAt as Date).getTime() <
+            new Date(new Date(completedAt).toISOString()).getTime()
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt as Date).getTime() -
+            new Date(a.createdAt as Date).getTime()
+        )[0];
+
+      const baseAmount = lastBalanceBeforeDate?.amount ?? currentBalance.amount;
+
+      // Create the new balance entry
+      const responseCreate = await axios.post(`${API_URL}/history`, {
+        amount: baseAmount + difference,
+        createdAt: completedAt,
+        updatedAt: new Date(),
+      });
+
       // Find all balances that need to be updated (including completedAt date)
       const balancesToUpdate = allBalances.filter(
         (balance) =>
@@ -84,13 +106,6 @@ export const useHistory = () => {
           new Date(balance.createdAt).toISOString().split('T')[0] >=
             new Date(completedAt).toISOString().split('T')[0]
       );
-
-      // Create the new balance entry
-      const responseCreate = await axios.post(`${API_URL}/history`, {
-        amount: currentBalance.amount + difference,
-        createdAt: completedAt,
-        updatedAt: new Date(),
-      });
 
       // Update all subsequent balances
       const updatePromises = balancesToUpdate.map((balance) =>

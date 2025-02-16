@@ -276,7 +276,7 @@ async function main() {
   await prisma.currentBalance.create({
     data: {
       id: uuidv4(),
-      amount: 1920.54,
+      amount: 3100.11,
       updatedAt: new Date('2025-02-12T19:21:04.189Z'),
     },
   });
