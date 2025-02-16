@@ -1,5 +1,4 @@
-ALTER TABLE "Balance" RENAME TO "BalanceHistory";
-
+-- CreateTable
 CREATE TABLE "Balance" (
     "id" UUID NOT NULL,
     "amount" DOUBLE PRECISION NOT NULL,

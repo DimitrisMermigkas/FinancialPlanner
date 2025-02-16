@@ -69,33 +69,69 @@ export const useHistory = () => {
       completedAt: Date;
     }) => {
       const currentBalance = await fetchCurrentBalance();
+      const allBalances = await fetchBalanceHistory();
 
       if (!currentBalance) {
         throw new Error('Could not fetch current balance.');
       }
 
-      const newBalance =
-        type === 'expense'
-          ? currentBalance.amount - amount
-          : currentBalance.amount + amount;
+      const difference = type === 'expense' ? -amount : amount;
 
+      // Find the last balance before completedAt
+      const lastBalanceBeforeDate = allBalances
+        .filter(
+          (balance) =>
+            new Date(balance.createdAt as Date).getTime() <
+            new Date(new Date(completedAt).toISOString()).getTime()
+        )
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt as Date).getTime() -
+            new Date(a.createdAt as Date).getTime()
+        )[0];
+
+      const baseAmount = lastBalanceBeforeDate?.amount ?? currentBalance.amount;
+
+      // Create the new balance entry
       const responseCreate = await axios.post(`${API_URL}/history`, {
-        amount: newBalance,
+        amount: baseAmount + difference,
         createdAt: completedAt,
         updatedAt: new Date(),
       });
 
+      // Find all balances that need to be updated (including completedAt date)
+      const balancesToUpdate = allBalances.filter(
+        (balance) =>
+          balance.createdAt &&
+          new Date(balance.createdAt).toISOString().split('T')[0] >=
+            new Date(completedAt).toISOString().split('T')[0]
+      );
+
+      // Update all subsequent balances
+      const updatePromises = balancesToUpdate.map((balance) =>
+        axios.patch(`${API_URL}/history/${balance.id}`, {
+          amount: balance.amount + difference,
+          updatedAt: new Date(),
+        })
+      );
+
+      // Update the current balance
       const responseUpdate = await axios.patch(
         `${API_URL}/currentbalance/${currentBalance.id}`,
         {
-          amount: responseCreate.data.amount,
+          amount: currentBalance.amount + difference,
           updatedAt: new Date(),
         }
       );
 
+      // Wait for all updates to complete
+      await Promise.all(updatePromises);
+
       return responseUpdate.data;
     },
     onSuccess: (newBalance) => {
+      // Invalidate history query to refetch updated data
+      queryClient.invalidateQueries({ queryKey: ['history'] });
       // Update the current balance in cache
       queryClient.setQueryData<{ amount: number }>(
         ['currentbalance'],

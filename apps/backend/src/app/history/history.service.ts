@@ -25,4 +25,16 @@ export class HistoryService {
   remove(id: string) {
     return this.prisma.history.delete({ where: { id } });
   }
+
+  async update(id: string, updateHistory: CreateHistory) {
+    try {
+      return await this.prisma.history.update({
+        where: { id },
+        data: updateHistory,
+      });
+    } catch (error) {
+      console.error('Error updating history:', error);
+      throw new Error('Could not update history');
+    }
+  }
 }

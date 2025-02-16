@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Delete,
   Param,
+  Patch,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { HistoryService } from './history.service';
@@ -35,5 +36,9 @@ export class HistoryController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.historyService.remove(id);
+  }
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updateHistory: CreateHistory) {
+    return this.historyService.update(id, updateHistory);
   }
 }

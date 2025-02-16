@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://postgres:pass@localhost:5432/mydb?schema=jimmys"
 }
 
 model Transaction {
@@ -59,13 +59,6 @@ model Goal {
   type        GoalType
   status      GoalStatus
   createdAt   DateTime   @default(now())
-}
-
-model BalanceHistory {
-  id        String   @id @db.Uuid
-  amount    Float
-  updatedAt DateTime
-  createdAt DateTime @default(now())
 }
 
 model Balance {
