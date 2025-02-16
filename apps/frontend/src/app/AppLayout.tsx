@@ -7,7 +7,6 @@ import {
 } from '@my-workspace/react-components';
 import { FC, ReactNode, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import ataman from '../icons/ataman.png';
 type DrawerListItemProps = {
   link: string;
   text: string;
@@ -51,70 +50,46 @@ const DrawerListItem: FC<DrawerListItemProps> = ({
   );
 };
 
-interface IDrawerItem {
-  key: number;
-  link: string;
-  text: string;
-  icon: ReactNode;
-}
-
 type AppLayoutProps = {
-  drawerItems: IDrawerItem[];
+  menuItems: {
+    main: Array<{
+      icon: React.ReactNode;
+      label: string;
+      path: string;
+    }>;
+    account: Array<{
+      icon: React.ReactNode;
+      label: string;
+      path: string;
+    }>;
+  };
 };
 
-const drawerVariant = 'persistent';
-const drawerAnchor = 'left';
+const drawerWidth = 240;
 const appBarHeight = 64;
 
-export default function AppLayout({ drawerItems }: AppLayoutProps) {
-  const [openDrawer, setOpenDrawer] = useState(true);
-
-  const drawerWidth = openDrawer ? 240 : 0;
-
-  const handleDrawerOpen = () => {
-    setOpenDrawer(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpenDrawer(false);
-  };
+export default function AppLayout({ menuItems }: AppLayoutProps) {
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const openSettings = () => {
     navigate('/settings');
   };
-  const theme = useTheme();
+
   return (
     <Root>
-      <AppFrame style={{ background: theme.palette.background.default }}>
-        <CustomAppBar
-          title="MainPage"
-          style={{
-            background: theme.palette.background.gradient,
-            height: appBarHeight,
-            display: 'flex',
-            justifyContent: 'center',
-          }}
-          drawerDirection={drawerAnchor}
-          drawerVariant={drawerVariant}
-          onOpenDrawer={handleDrawerOpen}
-          open={openDrawer}
-        ></CustomAppBar>
+      <AppFrame>
         <CustomDrawer
-          variant={drawerVariant}
-          anchor={drawerAnchor}
-          open={openDrawer}
-          onCloseDrawer={handleDrawerClose}
+          menuItems={menuItems}
+          variant="permanent"
+          anchor="left"
           paperStyle={{
-            top: appBarHeight,
-            background: theme.palette.background.paper,
-            height: 'calc(100% - 64px)',
+            height: '100%',
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <img
-                src={ataman}
                 alt="profilePic"
                 width={130}
                 style={{ border: '1px solid #121a2b2f' }}
@@ -137,11 +112,11 @@ export default function AppLayout({ drawerItems }: AppLayoutProps) {
                   rowGap: '8px',
                 }}
               >
-                {drawerItems.map((item) => (
+                {menuItems.main.map((item) => (
                   <DrawerListItem
-                    key={item.key}
-                    link={item.link}
-                    text={item.text}
+                    key={item.path}
+                    link={item.path}
+                    text={item.label}
                     icon={item.icon}
                     theme={theme}
                   />
