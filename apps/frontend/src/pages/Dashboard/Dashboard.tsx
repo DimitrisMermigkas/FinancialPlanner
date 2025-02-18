@@ -8,6 +8,7 @@ import FundsTile from '../../components/DashboardTiles/FundsTile';
 import ExpensesTile from '../../components/DashboardTiles/ExpensesTile';
 import IncomeTile from '../../components/DashboardTiles/IncomeTile';
 import BalanceChart from '../../components/Balance/BalanceChart';
+import GoalsTile from '../../components/DashboardTiles/GoalsTile';
 
 const Dashboard: React.FC = () => {
   const { data: balanceHistory } = useHistory();
@@ -87,16 +88,8 @@ const Dashboard: React.FC = () => {
         >
           {/* First Row - 50% */}
           <Grid2 size={{ xs: 12, md: 12 }} sx={{ height: '50%' }}>
-            <Box
-              sx={{
-                backgroundColor: '#1A1F2E',
-                borderRadius: '20px',
-                padding: '20px',
-                height: '100%',
-              }}
-            >
-              {/* Goals Component */}
-            </Box>
+            {/* Goals Component */}
+            <GoalsTile />
           </Grid2>
 
           {/* Second Row - 50% */}

@@ -9,7 +9,7 @@ import {
   AreaChart,
 } from 'recharts';
 import { format } from 'date-fns';
-import CardComponent from '../CardComponent/CardComponent';
+import CardComponent from '../common/CardComponent';
 import { History } from '@my-workspace/common';
 
 interface BalanceChartProps {

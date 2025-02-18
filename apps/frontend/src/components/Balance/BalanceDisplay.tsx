@@ -13,6 +13,8 @@ const BalanceCard = styled(Card)(({ theme }) => ({
   borderRadius: '20px',
   padding: theme.spacing(1.5),
   color: theme.palette.common.white,
+  height: '100%',
+  boxSizing: 'border-box',
 }));
 
 const TransactionItem = styled(Box)(({ theme }) => ({

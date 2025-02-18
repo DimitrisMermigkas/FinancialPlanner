@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { List, ListItem, ListItemText, Box, IconButton } from '@mui/material';
 import { formatTimestamp } from '../../utils/formatDate';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
-import CardComponent from '../CardComponent/CardComponent';
+import CardComponent from '../common/CardComponent';
 import {
   AutocompleteVirtualizedProps,
   CustomDialog,

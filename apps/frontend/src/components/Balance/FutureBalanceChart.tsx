@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import CardComponent from '../CardComponent/CardComponent';
+import CardComponent from '../common/CardComponent';
 import { History, Funds, Transaction } from '@my-workspace/common';
 import useDashboardHandlers from '../../handlers/Dashboard.handlers';
 

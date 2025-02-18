@@ -9,7 +9,7 @@ import {
   Button,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import CardComponent from '../../components/CardComponent/CardComponent';
+import CardComponent from '../../components/common/CardComponent';
 import { PageLayout } from '@my-workspace/react-components';
 
 const userSettings = {

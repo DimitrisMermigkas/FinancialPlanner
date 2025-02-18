@@ -12,7 +12,7 @@ import { PieChart } from '@mui/x-charts'; // Updated import
 
 import { VirtualizedSelect } from '@my-workspace/react-components';
 import FundsLogs from './FundsLogs';
-import CardComponent from '../CardComponent/CardComponent';
+import CardComponent from '../common/CardComponent';
 import useFundsHandlers from '../../handlers/Funds.handlers';
 
 const FundsCard: React.FC = () => {

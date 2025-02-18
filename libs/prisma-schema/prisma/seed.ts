@@ -206,15 +206,30 @@ async function main() {
     ],
   });
 
-  // Add the Goal
+  // Add the Goal connected to Japan Trip reason
   await prisma.goal.create({
     data: {
       id: uuidv4(),
       description: 'Japan Trip Savings',
       amount: 3000,
+      dueDate: new Date('2025-03-29T10:00:00.000Z'),
       type: 'SAVINGS',
       status: 'IN_PROGRESS',
       createdAt: new Date('2025-01-15T10:00:00.000Z'),
+      reasonId: japanReason.id, // Connect to Japan Trip reason
+    },
+  });
+
+  // Optional: Add a goal for investments reason
+  await prisma.goal.create({
+    data: {
+      id: uuidv4(),
+      description: 'Investment Savings Target',
+      amount: 5000,
+      type: 'SAVINGS',
+      status: 'IN_PROGRESS',
+      createdAt: new Date('2025-01-15T10:00:00.000Z'),
+      reasonId: investmentsReason.id, // Connect to Investments reason
     },
   });
 

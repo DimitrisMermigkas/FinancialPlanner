@@ -13,7 +13,7 @@ import {
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { formatTimestamp } from '../../utils/formatDate';
 import { DatePicker } from '@mui/x-date-pickers';
-import CardComponent from '../CardComponent/CardComponent';
+import CardComponent from '../common/CardComponent';
 import { Transaction, TransactionType } from '@my-workspace/common';
 import {
   useCurrentBalance,
