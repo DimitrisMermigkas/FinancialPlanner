@@ -1,11 +1,7 @@
 import styled from '@emotion/styled';
 import { List, Theme, Typography, useTheme } from '@mui/material';
-import {
-  CustomAppBar,
-  CustomButton,
-  CustomDrawer,
-} from '@my-workspace/react-components';
-import { FC, ReactNode, useState } from 'react';
+import { CustomButton, CustomDrawer } from '@my-workspace/react-components';
+import { FC, ReactNode } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 type DrawerListItemProps = {
   link: string;
@@ -28,11 +24,10 @@ const AppFrame = styled.div`
   height: 100%;
 `;
 
-const AppMain = styled.main<{ $appBarHeight: number; $drawerWidth: number }>`
+const AppMain = styled.main<{ $drawerWidth: number }>`
   background-repeat: no-repeat;
   width: calc(100% - ${(props) => props.$drawerWidth}px);
-  margin-top: ${(props) => props.$appBarHeight}px;
-  height: calc(100% - ${(props) => props.$appBarHeight}px);
+  height: 100%;
 `;
 
 const DrawerListItem: FC<DrawerListItemProps> = ({
@@ -66,16 +61,8 @@ type AppLayoutProps = {
 };
 
 const drawerWidth = 240;
-const appBarHeight = 64;
 
 export default function AppLayout({ menuItems }: AppLayoutProps) {
-  const navigate = useNavigate();
-  const theme = useTheme();
-
-  const openSettings = () => {
-    navigate('/settings');
-  };
-
   return (
     <Root>
       <AppFrame>
@@ -86,49 +73,8 @@ export default function AppLayout({ menuItems }: AppLayoutProps) {
           paperStyle={{
             height: '100%',
           }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <img
-                alt="profilePic"
-                width={130}
-                style={{ border: '1px solid #121a2b2f' }}
-              />
-              <Typography variant="h5">Dimitris Mer</Typography>
-              <Typography variant="h6">xFreaKx15</Typography>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                height: '100%',
-              }}
-            >
-              <List
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  rowGap: '8px',
-                }}
-              >
-                {menuItems.main.map((item) => (
-                  <DrawerListItem
-                    key={item.path}
-                    link={item.path}
-                    text={item.label}
-                    icon={item.icon}
-                    theme={theme}
-                  />
-                ))}
-              </List>
-              <CustomButton variant="contained" onClick={openSettings}>
-                Settings
-              </CustomButton>
-            </div>
-          </div>
-        </CustomDrawer>
-        <AppMain $appBarHeight={appBarHeight} $drawerWidth={drawerWidth}>
+        />
+        <AppMain $drawerWidth={drawerWidth}>
           <Outlet />
         </AppMain>
       </AppFrame>

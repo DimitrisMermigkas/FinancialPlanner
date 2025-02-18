@@ -7,6 +7,8 @@ const PageContentDiv = styled.div<{ $hasPaddingTop?: boolean }>`
   height: ${({ $hasPaddingTop }) =>
     $hasPaddingTop ? '100%' : `calc(100% - ${titleHeight}px)`};
   padding: 40px;
+  padding-bottom: 20px;
+  width: 100%;
   padding-top: ${({ $hasPaddingTop }) => ($hasPaddingTop ? '40px' : '0')};
   overflow: auto;
   display: flex;
@@ -67,7 +69,12 @@ export const PageLayout = ({
         </ToolbarDiv>
       )}
       {/* <PageContentDiv style={style} $hasPaddingTop={!(title ?? toolbarContent)}> */}
-      <PageContentDiv style={contentStyle}>{children}</PageContentDiv>
+      <PageContentDiv
+        $hasPaddingTop={!(title ?? toolbarContent)}
+        style={contentStyle}
+      >
+        {children}
+      </PageContentDiv>
     </div>
   );
 };

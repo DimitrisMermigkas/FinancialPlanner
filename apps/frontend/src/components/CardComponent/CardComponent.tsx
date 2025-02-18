@@ -23,17 +23,18 @@ const CardComponent: FC<CardComponentProps> = ({
     <Card
       sx={{
         flex: 1,
-        borderRadius: '16px',
-        background: theme.palette.background.paper,
+        borderRadius: '20px',
+        background: 'linear-gradient(129deg, #151D27 25%, #0b0d1b4d 80%)',
         padding: '16px',
         boxSizing: 'border-box',
-        boxShadow: '5px 5px 8px 0px #2b2d32',
+        color: theme.palette.common.white,
         ...cardStyle,
       }}
     >
       <CardContent
         sx={{
           display: 'flex',
+          padding: '0px',
           flexDirection: 'column',
           rowGap: '16px',
           ...cardContentStyle,
@@ -47,7 +48,18 @@ const CardComponent: FC<CardComponentProps> = ({
             alignItems: 'center',
           }}
         >
-          {title && <Typography variant="h6">{title}</Typography>}
+          {title && (
+            <Typography
+              variant="h6"
+              sx={{
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontSize: 24,
+                fontWeight: 'normal',
+              }}
+            >
+              {title}
+            </Typography>
+          )}
           {buttonText && (
             <CustomButton variant="contained" onClick={onClick}>
               {buttonText}

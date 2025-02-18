@@ -4,280 +4,354 @@ import { v4 as uuidv4 } from 'uuid';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Seed Reason data
+  // Update History entries to match transactions in chronological order
+  await prisma.history.createMany({
+    data: [
+      // Base balances from September to January
+      {
+        id: uuidv4(),
+        amount: 3660.0,
+        createdAt: new Date('2023-09-30T23:59:59.999Z'),
+      },
+      {
+        id: uuidv4(),
+        amount: 2938.56, // 3660 - 721.44 (October expenses)
+        createdAt: new Date('2023-10-31T23:59:59.999Z'),
+      },
+      {
+        id: uuidv4(),
+        amount: 1998.43, // After November transactions and 500 to Japan fund
+        createdAt: new Date('2023-11-30T23:59:59.999Z'),
+      },
+      {
+        id: uuidv4(),
+        amount: 1219.45, // After January transactions and 1500 to Japan fund
+        createdAt: new Date('2024-01-31T23:59:59.999Z'),
+      },
+      // January 2025 detailed transactions
+      {
+        id: uuidv4(),
+        amount: 423.49, // 1219.45 - 795.96 (October expenses)
+        createdAt: new Date('2025-01-31T00:00:01Z'),
+      },
+      {
+        id: uuidv4(),
+        amount: 1423.49, // 423.49 + 1000 (Salary advance)
+        createdAt: new Date('2025-01-14T10:00:01Z'),
+      },
+      {
+        id: uuidv4(),
+        amount: 705.87, // 1423.49 - 717.62 (Paris Trip funds)
+        createdAt: new Date('2025-01-15T00:00:01Z'),
+      },
+      {
+        id: uuidv4(),
+        amount: 658.87, // 705.87 - 47 (Beerway)
+        createdAt: new Date('2025-01-28T13:30:56Z'),
+      },
+      {
+        id: uuidv4(),
+        amount: 2008.87, // 658.87 + 1350 (Income)
+        createdAt: new Date('2025-01-28T13:57:15Z'),
+      },
+      {
+        id: uuidv4(),
+        amount: 1781.25, // 2008.87 - 227.62 (Paris tickets)
+        createdAt: new Date('2025-01-28T16:49:09Z'),
+      },
+      {
+        id: uuidv4(),
+        amount: 1281.25, // 1781.25 - 500 (Cuba funds)
+        createdAt: new Date('2025-01-28T21:08:28Z'),
+      },
+      {
+        id: uuidv4(),
+        amount: 1702.4, // 1281.25 + 421.15 (ΟΠΕΚΕΠΕ income)
+        createdAt: new Date('2025-01-30T18:35:43Z'),
+      },
+      {
+        id: uuidv4(),
+        amount: 1277.7, // 1702.40 - 424.7 (ΟΠΕΚΕΠΕ expense)
+        createdAt: new Date('2025-01-30T18:37:48Z'),
+      },
+      {
+        id: uuidv4(),
+        amount: 1270.5, // 1277.70 - 7.2 (efood)
+        createdAt: new Date('2025-01-29T19:13:28Z'),
+      },
+      {
+        id: uuidv4(),
+        amount: 1248.5, // 1270.50 - 22 (efood and contacts)
+        createdAt: new Date('2025-01-31T19:51:14Z'),
+      },
+      // February 2025 transactions
+      {
+        id: uuidv4(),
+        amount: 1196.3, // 1248.50 - 52.2
+        createdAt: new Date('2025-02-05T18:37:48Z'),
+      },
+      {
+        id: uuidv4(),
+        amount: 1044.1, // 1196.30 - 152.2
+        createdAt: new Date('2025-02-08T18:37:48Z'),
+      },
+      {
+        id: uuidv4(),
+        amount: 1496.3, // 1044.10 + 452.2 (income)
+        createdAt: new Date('2025-02-10T18:37:48Z'),
+      },
+    ],
+  });
+
+  // Add Japan Trip reason
   await prisma.reason.createMany({
     data: [
       {
-        title: 'Paris Trip',
-        description: 'Funds allocated for trip to Paris',
-        createdAt: new Date('2025-01-28T10:42:22.556Z'),
-        updatedAt: new Date('2025-01-28T10:42:22.556Z'),
+        id: uuidv4(),
+        title: 'Japan Trip',
+        description: 'Savings for Japan trip in March 2025',
+        createdAt: new Date('2024-11-23T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
       },
       {
-        title: 'Cuba',
-        description: 'My cuba trip',
-        createdAt: new Date('2025-01-28T15:25:23.263Z'),
-        updatedAt: new Date('2025-01-28T15:25:23.263Z'),
+        id: uuidv4(),
+        title: 'Savings for Investments',
+        description: 'Savings for Investments',
+        createdAt: new Date('2025-10-03T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-15T10:00:00.000Z'),
       },
     ],
   });
 
-  // Retrieve Reason entries by title to get their generated IDs
-  const parisTripReason = await prisma.reason.findUnique({
-    where: { title: 'Paris Trip' },
+  const japanReason = await prisma.reason.findUnique({
+    where: { title: 'Japan Trip' },
   });
-  const cubaReason = await prisma.reason.findUnique({
-    where: { title: 'Cuba' },
+  const investmentsReason = await prisma.reason.findUnique({
+    where: { title: 'Savings for Investments' },
   });
 
-  if (!parisTripReason || !cubaReason) {
-    throw new Error('Reason data not found.');
+  if (!japanReason) {
+    throw new Error('Japan reason not found');
+  }
+  if (!investmentsReason) {
+    throw new Error('Investments reason not found');
   }
 
-  // Seed Funds data
+  // Update Japan Trip funds and other savings
   await prisma.funds.createMany({
     data: [
+      // Japan Trip savings
       {
-        amount: 717.62,
-        description: null,
-        createdAt: new Date('2025-01-28T10:42:22.558Z'),
-        updatedAt: new Date('2025-01-28T10:42:22.558Z'),
-        reasonId: parisTripReason.id,
+        amount: 2000.0,
+        description: 'Savings for Japan trip in March',
+        createdAt: new Date('2024-11-15T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-31T23:59:59.999Z'),
+        reasonId: japanReason.id,
       },
+      // General savings
       {
-        amount: -227.62,
-        description: null,
-        createdAt: new Date('2025-01-28T16:37:11.152Z'),
-        updatedAt: new Date('2025-01-28T16:37:11.152Z'),
-        reasonId: parisTripReason.id,
-      },
-      {
-        amount: -22,
-        description: null,
-        createdAt: new Date('2025-01-31T19:50:11.152Z'),
-        updatedAt: new Date('2025-01-31T19:50:11.152Z'),
-        reasonId: parisTripReason.id,
-      },
-      {
-        amount: 500,
-        description: null,
-        createdAt: new Date('2025-01-28T21:08:27.382Z'),
-        updatedAt: new Date('2025-01-28T21:08:27.382Z'),
-        reasonId: cubaReason.id,
+        amount: 2009.72,
+        description: 'General savings',
+        createdAt: new Date('2024-11-01T10:00:00.000Z'),
+        updatedAt: new Date('2025-01-31T23:59:59.999Z'),
+        reasonId: investmentsReason.id,
       },
     ],
   });
 
-  // Seed Balance data
-  await prisma.history.createMany({
-    data: [
-      {
-        id: uuidv4(),
-        amount: 3660,
-        createdAt: new Date('2025-01-30T19:21:04.189Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 2146.31,
-        createdAt: new Date('2025-01-26T13:32:22.551Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 2099.31,
-        createdAt: new Date('2025-01-27T13:41:02.481Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 3449.31,
-        createdAt: new Date('2025-01-28T13:58:36.829Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 3676.93,
-        createdAt: new Date('2025-01-28T16:57:11.164Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 3449.31,
-        createdAt: new Date('2025-01-28T16:59:28.024Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 2949.31,
-        createdAt: new Date('2025-01-28T21:08:30.539Z'),
-      },
-
-      {
-        id: uuidv4(),
-        amount: 3370.46,
-        createdAt: new Date('2025-01-30T18:35:57.927Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 2945.76,
-        createdAt: new Date('2025-01-30T18:37:47.691Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 2938.56,
-        createdAt: new Date('2025-01-30T19:13:35.827Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 2960.56,
-        createdAt: new Date('2025-02-03T19:50:12.152Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 2168.56,
-        createdAt: new Date('2025-02-05T19:51:15.152Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 2477.0,
-        createdAt: new Date('2025-02-06T19:51:15.152Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 2938.0,
-        createdAt: new Date('2025-02-07T19:51:15.152Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 2960.0,
-        createdAt: new Date('2025-02-09T19:50:12.152Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 2650.0,
-        createdAt: new Date('2025-02-09T19:51:15.152Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 2864.22,
-        createdAt: new Date('2025-02-10T19:51:15.152Z'),
-      },
-      {
-        id: uuidv4(),
-        amount: 3100.11,
-        createdAt: new Date('2025-02-11T19:51:15.152Z'),
-      },
-    ],
+  const japanFund = await prisma.funds.findFirst({
+    where: {
+      reasonId: japanReason.id,
+      amount: 2000,
+    },
+  });
+  const investmentsFund = await prisma.funds.findFirst({
+    where: {
+      reasonId: investmentsReason.id,
+      amount: 2009.72,
+    },
   });
 
-  // Retrieve the funds with specific amounts
-  const fund717 = await prisma.funds.findFirst({
-    where: { amount: 717.62 },
-  });
-  const fund500 = await prisma.funds.findFirst({
-    where: { amount: 500 },
-  });
-
-  if (!fund717 || !fund500) {
-    throw new Error('Reason data not found.');
+  if (!japanFund) {
+    throw new Error('Japan fund not found');
+  }
+  if (!investmentsFund) {
+    throw new Error('Investments fund not found');
   }
 
-  // Seed Transaction data
+  // Add related transactions
   await prisma.transaction.createMany({
     data: [
       {
+        type: TransactionType.fund,
+        description: 'Initial deposit for Japan trip',
+        amount: 1000,
+        completedAt: new Date('2025-01-15T10:00:00.000Z'),
+        fundsId: japanFund.id,
+      },
+      {
+        type: TransactionType.fund,
+        description: 'Second deposit for Japan trip',
+        amount: 500,
+        completedAt: new Date('2025-01-30T15:00:00.000Z'),
+        fundsId: japanFund.id,
+      },
+      {
+        type: TransactionType.fund,
+        description: 'Third deposit for Japan trip',
+        amount: 500,
+        completedAt: new Date('2025-02-10T16:00:00.000Z'),
+        fundsId: japanFund.id,
+      },
+    ],
+  });
+
+  // Add the Goal
+  await prisma.goal.create({
+    data: {
+      id: uuidv4(),
+      description: 'Japan Trip Savings',
+      amount: 3000,
+      type: 'SAVINGS',
+      status: 'IN_PROGRESS',
+      createdAt: new Date('2025-01-15T10:00:00.000Z'),
+    },
+  });
+
+  // Add transactions to match history entries
+  await prisma.transaction.createMany({
+    data: [
+      // Base transactions from September to January
+      {
         type: TransactionType.expense,
-        description: 'October Expenses',
-        amount: 795.96,
+        description: 'October Monthly Expenses',
+        amount: 721.44, // 3660 - 2938.56
+        completedAt: new Date('2023-10-31T15:00:00.000Z'),
+        fundsId: null,
+      },
+      {
+        type: TransactionType.expense,
+        description: 'November Expenses and Japan Fund',
+        amount: 940.13, // 2938.56 - 1998.43
+        completedAt: new Date('2023-11-30T15:00:00.000Z'),
+        fundsId: null,
+      },
+      {
+        type: TransactionType.expense,
+        description: 'January Expenses and Japan Fund',
+        amount: 778.98, // 1998.43 - 1219.45
+        completedAt: new Date('2024-01-31T15:00:00.000Z'),
+        fundsId: null,
+      },
+      // January 2025 detailed transactions
+      {
+        type: TransactionType.expense,
+        description: 'October expenses settlement',
+        amount: 795.96, // 1219.45 - 423.49
         completedAt: new Date('2025-01-31T00:00:00Z'),
         fundsId: null,
       },
       {
+        type: TransactionType.income,
+        description: 'Salary advance',
+        amount: 1000.0, // 423.49 -> 1423.49
+        completedAt: new Date('2025-01-14T10:00:00Z'),
+        fundsId: null,
+      },
+      {
         type: TransactionType.fund,
-        description: 'Funds deposited for Paris Trip',
-        amount: 717.62,
+        description: 'Initial deposit for Japan trip',
+        amount: 717.62, // 1423.49 - 705.87
         completedAt: new Date('2025-01-15T00:00:00Z'),
-        fundsId: fund717.id,
+        fundsId: japanFund.id,
       },
       {
         type: TransactionType.expense,
-        description: 'Beerway melisia',
-        amount: 47,
-        completedAt: new Date('2025-01-28T13:30:55.496Z'),
+        description: 'Beerway',
+        amount: 47.0, // 705.87 - 658.87
+        completedAt: new Date('2025-01-28T13:30:55Z'),
         fundsId: null,
       },
       {
         type: TransactionType.income,
-        description: 'Official Income for October',
-        amount: 1350,
-        completedAt: new Date('2025-01-28T13:57:14.237Z'),
-        fundsId: null,
-      },
-      {
-        type: TransactionType.expense,
-        description: 'tickets Paris and Accommodation',
-        amount: 227.62,
-        completedAt: new Date('2025-01-28T16:49:08.568Z'),
+        description: 'Income',
+        amount: 1350.0, // 658.87 -> 2008.87
+        completedAt: new Date('2025-01-28T13:57:14Z'),
         fundsId: null,
       },
       {
         type: TransactionType.fund,
-        description: 'Funds for Cuba',
-        amount: 500,
-        completedAt: new Date('2025-01-28T21:08:27.383Z'),
-        fundsId: fund500.id,
+        description: 'Second deposit for Japan trip',
+        amount: 227.62, // 2008.87 - 1781.25
+        completedAt: new Date('2025-01-28T16:49:08Z'),
+        fundsId: japanFund.id,
+      },
+      {
+        type: TransactionType.fund,
+        description: 'Investment savings deposit',
+        amount: 500.0, // 1781.25 - 1281.25
+        completedAt: new Date('2025-01-28T21:08:27Z'),
+        fundsId: investmentsFund.id,
       },
       {
         type: TransactionType.income,
-        description: 'ΟΠΕΚΕΠΕ',
-        amount: 421.15,
-        completedAt: new Date('2025-01-30T18:35:42.862Z'),
+        description: 'ΟΠΕΚΕΠΕ income',
+        amount: 421.15, // 1281.25 -> 1702.40
+        completedAt: new Date('2025-01-30T18:35:42Z'),
         fundsId: null,
       },
       {
         type: TransactionType.expense,
-        description: 'Μανα για ΟΠΕΚΕΠΕ',
-        amount: 424.7,
-        completedAt: new Date('2025-01-30T18:37:47.682Z'),
+        description: 'ΟΠΕΚΕΠΕ expense',
+        amount: 424.7, // 1702.40 - 1277.70
+        completedAt: new Date('2025-01-30T18:37:47Z'),
         fundsId: null,
       },
       {
         type: TransactionType.expense,
         description: 'efood',
-        amount: 7.2,
-        completedAt: new Date('2025-01-29T19:13:27.847Z'),
+        amount: 7.2, // 1277.70 - 1270.50
+        completedAt: new Date('2025-01-29T19:13:27Z'),
         fundsId: null,
       },
       {
         type: TransactionType.expense,
-        description: 'efood και φακοί επαφής',
-        amount: 22,
-        completedAt: new Date('2025-01-31T19:51:13.152Z'),
+        description: 'efood and contacts',
+        amount: 22.0, // 1270.50 - 1248.50
+        completedAt: new Date('2025-01-31T19:51:13Z'),
+        fundsId: null,
+      },
+      // February 2025 transactions
+      {
+        type: TransactionType.expense,
+        description: 'February expense 1',
+        amount: 52.2, // 1248.50 - 1196.30
+        completedAt: new Date('2025-02-05T18:37:47Z'),
         fundsId: null,
       },
       {
         type: TransactionType.expense,
-        description: 'asfsa',
-        amount: 52.2,
-        completedAt: new Date('2025-02-05T18:37:47.682Z'),
-        fundsId: null,
-      },
-      {
-        type: TransactionType.expense,
-        description: 'fssga',
-        amount: 152.2,
-        completedAt: new Date('2025-02-08T18:37:47.682Z'),
+        description: 'February expense 2',
+        amount: 152.2, // 1196.30 - 1044.10
+        completedAt: new Date('2025-02-08T18:37:47Z'),
         fundsId: null,
       },
       {
         type: TransactionType.income,
-        description: 'income',
-        amount: 452.2,
-        completedAt: new Date('2025-02-10T18:37:47.682Z'),
+        description: 'February income',
+        amount: 452.2, // 1044.10 -> 1496.30
+        completedAt: new Date('2025-02-10T18:37:47Z'),
         fundsId: null,
       },
     ],
   });
+
+  // Update current balance to match latest state
   await prisma.currentBalance.create({
     data: {
       id: uuidv4(),
-      amount: 3100.11,
-      updatedAt: new Date('2025-02-12T19:21:04.189Z'),
+      amount: 5222.55, // 1219.45 (balance) + 4009.72 (total funds)
+      updatedAt: new Date('2024-02-17T23:59:59.999Z'),
     },
   });
 

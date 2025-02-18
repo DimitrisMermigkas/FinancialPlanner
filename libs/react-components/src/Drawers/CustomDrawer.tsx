@@ -3,6 +3,8 @@ import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer, { DrawerProps } from '@mui/material/Drawer';
 import Typography from '@mui/material/Typography';
+import { useNavigate } from 'react-router-dom';
+import { useTheme } from '@mui/material/styles';
 
 interface CustomDrawerProps extends DrawerProps {
   children?: React.ReactNode;
@@ -42,7 +44,13 @@ export const CustomDrawer: React.FC<CustomDrawerProps> = ({
   anchor,
   ...props
 }) => {
+  const navigate = useNavigate();
+  const theme = useTheme();
   const drawerWidth = 240;
+
+  const handleMenuClick = (path: string) => {
+    navigate(path);
+  };
 
   const MenuItem = styled(Box)(({ theme }) => ({
     display: 'flex',
@@ -96,12 +104,12 @@ export const CustomDrawer: React.FC<CustomDrawerProps> = ({
             mb: 4,
           }}
         >
-          VISION UI FREE
+          FINANCIAL PROJ
         </Typography>
 
         <Box sx={{ mb: 4 }}>
           {menuItems.main.map((item, index) => (
-            <MenuItem key={index}>
+            <MenuItem key={index} onClick={() => handleMenuClick(item.path)}>
               {item.icon}
               <Typography>{item.label}</Typography>
             </MenuItem>
@@ -111,7 +119,7 @@ export const CustomDrawer: React.FC<CustomDrawerProps> = ({
         <SectionTitle>ACCOUNT PAGES</SectionTitle>
         <Box>
           {menuItems.account.map((item, index) => (
-            <MenuItem key={index}>
+            <MenuItem key={index} onClick={() => handleMenuClick(item.path)}>
               {item.icon}
               <Typography>{item.label}</Typography>
             </MenuItem>

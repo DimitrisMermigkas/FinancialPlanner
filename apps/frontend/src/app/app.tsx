@@ -99,7 +99,7 @@ export function App() {
         { path: 'plan', element: <PlannerPage /> },
         { path: 'deposit', element: <DepositPage /> },
         { path: 'info', element: <InfoPage /> },
-        { path: 'settings', element: <SettingsPage /> },
+        { path: 'profile', element: <SettingsPage /> },
       ],
     },
   ]);

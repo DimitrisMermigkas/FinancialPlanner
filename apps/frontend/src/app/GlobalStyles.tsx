@@ -9,6 +9,7 @@ const GlobalStyles = () => (
       #root {
         margin: 0;
         height: 100%;
+        font-family: Plus Jakarta Sans, sans-serif !important;
       }
     `}
   />
