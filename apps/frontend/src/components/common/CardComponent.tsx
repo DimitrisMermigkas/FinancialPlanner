@@ -7,18 +7,27 @@ interface CardComponentProps {
   buttonText?: string;
   cardStyle?: CSSProperties;
   cardContentStyle?: CSSProperties;
+  buttonComponent?: ReactNode;
   children?: ReactNode;
   onClick?: () => void;
 }
 const CardComponent: FC<CardComponentProps> = ({
   title,
   buttonText,
+  buttonComponent,
   cardStyle,
   cardContentStyle,
   onClick,
   children,
 }) => {
   const theme = useTheme();
+  const buttonElement =
+    buttonComponent ||
+    (buttonText && (
+      <CustomButton variant="contained" onClick={onClick}>
+        {buttonText}
+      </CustomButton>
+    ));
   return (
     <Card
       sx={{
@@ -60,11 +69,7 @@ const CardComponent: FC<CardComponentProps> = ({
               {title}
             </Typography>
           )}
-          {buttonText && (
-            <CustomButton variant="contained" onClick={onClick}>
-              {buttonText}
-            </CustomButton>
-          )}
+          {buttonElement}
         </div>
         {children}
       </CardContent>

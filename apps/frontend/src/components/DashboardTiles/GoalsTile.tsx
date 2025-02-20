@@ -190,7 +190,7 @@ const GoalsTile: React.FC = () => {
   return (
     <CardComponent
       title="Goals"
-      cardStyle={{ height: '82.5%', width: '100%' }}
+      cardStyle={{ height: '100%', width: '100%' }}
       cardContentStyle={{ height: '100%' }}
     >
       <Box

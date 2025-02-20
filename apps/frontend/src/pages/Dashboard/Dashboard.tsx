@@ -9,6 +9,7 @@ import ExpensesTile from '../../components/DashboardTiles/ExpensesTile';
 import IncomeTile from '../../components/DashboardTiles/IncomeTile';
 import BalanceChart from '../../components/Balance/BalanceChart';
 import GoalsTile from '../../components/DashboardTiles/GoalsTile';
+import TransactionTile from '../../components/DashboardTiles/TransactionTile';
 
 const Dashboard: React.FC = () => {
   const { data: balanceHistory } = useHistory();
@@ -86,24 +87,26 @@ const Dashboard: React.FC = () => {
           spacing={2}
           sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
         >
-          {/* First Row - 50% */}
-          <Grid2 size={{ xs: 12, md: 12 }} sx={{ height: '50%' }}>
-            {/* Goals Component */}
-            <GoalsTile />
-          </Grid2>
+          <Grid2
+            size={{ xs: 12, md: 12 }}
+            sx={{
+              gap: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100%',
+            }}
+          >
+            {/* First Row - 50% */}
+            <Grid2 size={{ xs: 12, md: 12 }} sx={{ height: '41.3%' }}>
+              {/* Goals Component */}
+              <GoalsTile />
+            </Grid2>
 
-          {/* Second Row - 50% */}
-          <Grid2 size={{ xs: 12, md: 12 }} sx={{ height: '50%' }}>
-            <Box
-              sx={{
-                backgroundColor: '#1A1F2E',
-                borderRadius: '20px',
-                padding: '20px',
-                height: '100%',
-              }}
-            >
+            {/* Second Row - 50% */}
+            <Grid2 size={{ xs: 12, md: 12 }} sx={{ height: '50.5%' }}>
               {/* Transactions List */}
-            </Box>
+              <TransactionTile />
+            </Grid2>
           </Grid2>
         </Grid2>
       </Grid2>

@@ -11,22 +11,22 @@ async function main() {
       {
         id: uuidv4(),
         amount: 3660.0,
-        createdAt: new Date('2023-09-30T23:59:59.999Z'),
+        createdAt: new Date('2024-09-30T23:59:59.999Z'),
       },
       {
         id: uuidv4(),
         amount: 2938.56, // 3660 - 721.44 (October expenses)
-        createdAt: new Date('2023-10-31T23:59:59.999Z'),
+        createdAt: new Date('2024-10-31T23:59:59.999Z'),
       },
       {
         id: uuidv4(),
         amount: 1998.43, // After November transactions and 500 to Japan fund
-        createdAt: new Date('2023-11-30T23:59:59.999Z'),
+        createdAt: new Date('2024-11-30T23:59:59.999Z'),
       },
       {
         id: uuidv4(),
         amount: 1219.45, // After January transactions and 1500 to Japan fund
-        createdAt: new Date('2024-01-31T23:59:59.999Z'),
+        createdAt: new Date('2025-01-31T23:59:59.999Z'),
       },
       // January 2025 detailed transactions
       {
@@ -241,21 +241,21 @@ async function main() {
         type: TransactionType.expense,
         description: 'October Monthly Expenses',
         amount: 721.44, // 3660 - 2938.56
-        completedAt: new Date('2023-10-31T15:00:00.000Z'),
+        completedAt: new Date('2024-10-31T15:00:00.000Z'),
         fundsId: null,
       },
       {
         type: TransactionType.expense,
         description: 'November Expenses and Japan Fund',
         amount: 940.13, // 2938.56 - 1998.43
-        completedAt: new Date('2023-11-30T15:00:00.000Z'),
+        completedAt: new Date('2024-11-30T15:00:00.000Z'),
         fundsId: null,
       },
       {
         type: TransactionType.expense,
         description: 'January Expenses and Japan Fund',
         amount: 778.98, // 1998.43 - 1219.45
-        completedAt: new Date('2024-01-31T15:00:00.000Z'),
+        completedAt: new Date('2025-01-31T15:00:00.000Z'),
         fundsId: null,
       },
       // January 2025 detailed transactions
@@ -356,6 +356,13 @@ async function main() {
         description: 'February income',
         amount: 452.2, // 1044.10 -> 1496.30
         completedAt: new Date('2025-02-10T18:37:47Z'),
+        fundsId: null,
+      },
+      {
+        type: TransactionType.expense,
+        description: 'Train tickets for Japan',
+        amount: 400.25, // 1496.30 -> 1096.05
+        completedAt: new Date('2025-03-10T18:37:47Z'),
         fundsId: null,
       },
     ],
