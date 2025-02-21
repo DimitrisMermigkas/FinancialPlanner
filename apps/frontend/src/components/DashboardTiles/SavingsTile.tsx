@@ -2,13 +2,13 @@ import React from 'react';
 import { useTransactions } from '../../api/apiHooks';
 import StatCard from '../common/StatCard';
 
-const FundsTile: React.FC = () => {
+const SavingsTile: React.FC = () => {
   const [timeFrame, setTimeFrame] = React.useState<
     'This Month' | 'Last Month' | 'This Year'
   >('This Month');
   const { data: transactions = [] } = useTransactions();
 
-  const calculateFunds = () => {
+  const calculateSavings = () => {
     const now = new Date();
     const startDate =
       timeFrame === 'This Month'
@@ -32,8 +32,8 @@ const FundsTile: React.FC = () => {
 
   return (
     <StatCard
-      title="Funds"
-      amount={calculateFunds()}
+      title="Savings"
+      amount={calculateSavings()}
       percentageChange={calculatePercentageChange()}
       timeFrame={timeFrame}
       onTimeFrameChange={setTimeFrame}
@@ -42,4 +42,4 @@ const FundsTile: React.FC = () => {
   );
 };
 
-export default FundsTile;
+export default SavingsTile;

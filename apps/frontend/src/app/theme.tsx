@@ -26,6 +26,10 @@ const colors = {
   orangeLight: '#FFAE53',
   antiflashWhite: '#f2f4f7ff',
 };
+const colors2 = {
+  whiteDark: '#E9EDF7',
+  grayDark: '#A0AEC0',
+};
 
 // Create the theme
 const theme = createTheme({
@@ -58,8 +62,8 @@ const theme = createTheme({
       gradient: `linear-gradient(to bottom, #65676c 0%, ${colors.onyx} 100%)`,
     },
     text: {
-      primary: colors.orange,
-      secondary: colors.antiflashWhite,
+      primary: colors2.whiteDark,
+      secondary: colors2.grayDark,
     },
   },
 });
