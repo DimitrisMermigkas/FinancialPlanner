@@ -14,6 +14,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import PersonIcon from '@mui/icons-material/Person';
 import LoginIcon from '@mui/icons-material/Login';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import SavingsIcon from '@mui/icons-material/Savings';
 
 // const drawerVariant = 'persistent';
 // const drawerAnchor = 'left';
@@ -54,14 +55,14 @@ export function App() {
         path: '/dashboard',
       },
       {
-        icon: <TableChartIcon />,
-        label: 'Tables',
-        path: '/tables',
+        icon: <SavingsIcon />,
+        label: 'Savings',
+        path: '/deposit',
       },
       {
         icon: <PaymentIcon />,
         label: 'Billing',
-        path: '/billing',
+        path: '/plan',
       },
       {
         icon: <SettingsIcon />,
