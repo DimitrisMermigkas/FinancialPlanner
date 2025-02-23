@@ -2,7 +2,10 @@ import React from 'react';
 import { useTransactions } from '../../api/apiHooks';
 import StatCard from '../common/StatCard';
 
-const SavingsTile: React.FC = () => {
+const SavingsTile: React.FC<{ title: string; fullHeight?: boolean }> = ({
+  title,
+  fullHeight,
+}) => {
   const [timeFrame, setTimeFrame] = React.useState<
     'This Month' | 'Last Month' | 'This Year'
   >('This Month');
@@ -32,7 +35,7 @@ const SavingsTile: React.FC = () => {
 
   return (
     <StatCard
-      title="Savings"
+      title={title}
       amount={calculateSavings()}
       percentageChange={calculatePercentageChange()}
       timeFrame={timeFrame}

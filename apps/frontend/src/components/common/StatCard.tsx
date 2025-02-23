@@ -19,7 +19,6 @@ const StyledCard = styled(Card)(({ theme }) => ({
   color: theme.palette.common.white,
   marginBottom: 0,
   boxSizing: 'border-box',
-  height: '100%',
 }));
 
 const StyledSelect = styled(Select)({

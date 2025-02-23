@@ -65,7 +65,7 @@ const Dashboard: React.FC = () => {
               }}
             >
               <Grid2 size={{ xs: 12, md: 3.5 }} sx={{ flex: 1 }}>
-                <SavingsTile />
+                <SavingsTile title="Savings" />
               </Grid2>
               <Grid2 size={{ xs: 12, md: 3.5 }} sx={{ flex: 1 }}>
                 <IncomeTile />

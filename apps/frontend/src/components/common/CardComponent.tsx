@@ -46,6 +46,9 @@ const CardComponent: FC<CardComponentProps> = ({
           padding: '0px',
           flexDirection: 'column',
           rowGap: '16px',
+          '&:last-child': {
+            paddingBottom: '0px',
+          },
           ...cardContentStyle,
         }}
       >
