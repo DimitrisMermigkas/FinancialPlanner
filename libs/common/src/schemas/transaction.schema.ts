@@ -6,6 +6,11 @@ export enum TransactionType {
   fund = 'fund', // Money set aside in Funds (not considered an expense)
 }
 
+export enum PaymentMethod {
+  CARD = 'CARD',
+  BANK_TRANSFER = 'BANK_TRANSFER',
+}
+
 // Transaction Schema
 export const TransactionSchema = z.object({
   id: z.string().uuid(),
@@ -14,6 +19,8 @@ export const TransactionSchema = z.object({
   amount: z.coerce.number().nonnegative().min(1, 'Amount should not be 0'), // Ensuring it's a positive number
   completedAt: z.date(),
   fundsId: z.string().uuid().optional(),
+  paymentMethod: z.nativeEnum(PaymentMethod).default(PaymentMethod.CARD),
+  cardId: z.string().uuid().optional(),
 });
 
 // Array Schema for Transactions
@@ -29,6 +36,8 @@ export const CreateTransactionDto = z.object({
   amount: z.coerce.number().nonnegative().min(1, 'Amount should not be 0'), // Ensuring it's a positive number
   completedAt: z.date(),
   fundsId: z.string().uuid().optional(),
+  paymentMethod: z.nativeEnum(PaymentMethod).default(PaymentMethod.CARD),
+  cardId: z.string().uuid().optional(),
 });
 
 // Exporting inferred type for DTO

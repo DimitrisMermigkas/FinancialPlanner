@@ -7,7 +7,8 @@ import { ReasonsModule } from './reasons/reasons.module';
 import { GoalModule } from './goals/goals.module';
 import { HistoryModule } from './history/history.module';
 import { CurrentBalanceModule } from './currentbalance/currentbalance.module';
-
+import { CardModule } from './card/card.module';
+import { SubscriptionModule } from './subscription/subscription.module';
 @Module({
   imports: [
     PrismaModule,
@@ -17,6 +18,8 @@ import { CurrentBalanceModule } from './currentbalance/currentbalance.module';
     TransactionModule,
     ReasonsModule,
     GoalModule,
+    CardModule,
+    SubscriptionModule,
   ],
   controllers: [],
   providers: [],

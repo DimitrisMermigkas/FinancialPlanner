@@ -15,6 +15,9 @@ model Transaction {
   completedAt DateTime
   fundsId     String?         @db.Uuid
   funds       Funds?          @relation(fields: [fundsId], references: [id])
+  paymentMethod PaymentMethod @default(CARD)
+  cardId      String?         @db.Uuid
+  card        Card?           @relation(fields: [cardId], references: [id])
 
   @@index([type])
 }
@@ -71,6 +74,23 @@ model Balance {
   updatedAt DateTime
 }
 
+model Subscription {
+  id           String                @id @default(uuid()) @db.Uuid
+  type         TransactionType
+  description  String?
+  amount       Float
+  frequency    SubscriptionFrequency
+  startDate    DateTime
+  endDate      DateTime?
+  lastExecuted DateTime?
+  active       Boolean               @default(true)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  paymentMethod PaymentMethod       @default(CARD)
+  cardId       String?              @db.Uuid
+  card         Card?                @relation(fields: [cardId], references: [id])
+}
+
 enum TransactionType {
   income
   expense
@@ -87,4 +107,34 @@ enum GoalStatus {
   IN_PROGRESS
   ACHIEVED
   FAILED
+}
+
+enum SubscriptionFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum PaymentMethod {
+  CARD
+  BANK_TRANSFER
+}
+
+enum CardType {
+  DEBIT
+  CREDIT
+}
+
+model Card {
+  id          String         @id @default(uuid()) @db.Uuid
+  name        String
+  type        CardType
+  lastFourDigits String      @db.VarChar(4)
+  expiryDate  DateTime
+  isDefault   Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  transactions Transaction[]
+  subscriptions Subscription[]
 }

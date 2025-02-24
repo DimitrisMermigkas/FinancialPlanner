@@ -21,6 +21,9 @@ const useFutureBalanceHandlers = ({
 
   // Function to get the latest entry for each month
   const getMonthlyBalanceData = (data: History[]) => {
+    const currentDate = new Date();
+    const currentMMMYY = format(currentDate, 'MMM yy');
+
     const latestEntriesByMonth = Object.entries(
       data.reduce((acc: { [key: string]: History }, entry: History) => {
         // Ensure that createdAt is defined before processing
@@ -30,6 +33,11 @@ const useFutureBalanceHandlers = ({
         const monthKey = `${date.toLocaleString('default', {
           month: 'short',
         })} ${date.getFullYear().toString().slice(-2)}`; // e.g., "Oct 24"
+
+        // Skip entries from current month if before 28th
+        if (monthKey === currentMMMYY && date.getDate() < 28) {
+          return acc;
+        }
 
         // If no entry for the month or if this entry is more recent, update the record for the month
         if (
@@ -117,21 +125,23 @@ const useFutureBalanceHandlers = ({
     balance: MonthlyData[],
     funds?: MonthlyData[]
   ): MonthlyData[] => {
-    // Create a copy of the first array to avoid mutating it
     const mergedData = [...balance];
 
     if (funds) {
-      // Iterate over the second array
-      funds.forEach((item2) => {
-        const index = mergedData.findIndex(
-          (item1) => item1.date === item2.date
-        );
+      funds.forEach((fundItem) => {
+        // Parse the fund date
+        const fundDate = parse(fundItem.date, 'MMM yy', new Date());
 
-        // If the date exists in mergedData
+        // Find the index where this fund should be applied
+        const index = mergedData.findIndex((balanceItem) => {
+          const balanceDate = parse(balanceItem.date, 'MMM yy', new Date());
+          return balanceDate >= fundDate;
+        });
+
+        // If we found a valid index, apply the fund amount to all subsequent months
         if (index !== -1) {
-          // Add the amount to the current date and all subsequent dates
           for (let i = index; i < mergedData.length; i++) {
-            mergedData[i].amount += item2.amount;
+            mergedData[i].amount += fundItem.amount;
           }
         }
       });
@@ -288,14 +298,14 @@ const useFutureBalanceHandlers = ({
     (data) => data.date === currentDate
   );
 
-  // Map over the projectedData to create a new array with amountA and amountB
+  // Map over the projectedData to create a new array with curBalance and projBalance
   const chartData = updatedProjectedData.map((data, index) => ({
     date: data.date,
-    amountA: index <= splitIndex ? data.amount : null, // amountA is the amount if index is less than or equal to splitIndex
-    amountB: index >= splitIndex ? data.amount : null, // amountB is the amount if index is greater than splitIndex
+    curBalance: index <= splitIndex ? data.amount : null, // curBalance is the amount if index is less than or equal to splitIndex
+    projBalance: index >= splitIndex ? data.amount : null, // projBalance is the amount if index is greater than splitIndex
   }));
 
-  // updatedProjectedData now contains both amountA and amountB keys
+  // updatedProjectedData now contains both curBalance and projBalance keys
 
   return {
     chartData,
