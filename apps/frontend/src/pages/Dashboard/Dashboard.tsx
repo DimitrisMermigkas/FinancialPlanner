@@ -10,12 +10,24 @@ import BalanceChart from '../../components/Balance/BalanceChart';
 import GoalsTile from '../../components/DashboardTiles/GoalsTile';
 import TransactionTile from '../../components/DashboardTiles/TransactionTile';
 import SavingsTile from '../../components/DashboardTiles/SavingsTile';
+import { Range } from 'react-date-range';
+
 const Dashboard: React.FC = () => {
   const { data: balanceHistory } = useHistory();
-  const { getYearlyBalances, calculateMonthlyExpenses } =
-    useDashboardHandlers();
+  const { getYearlyBalances, calculateMonthlyExpenses } = useDashboardHandlers();
   const yearlyBalances = getYearlyBalances(balanceHistory);
   const { data: currentBalance } = useCurrentBalance();
+
+  // Initialize date range to current month
+  const [dateRange, setDateRange] = React.useState<Range>(() => {
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    return {
+      startDate: startOfMonth,
+      endDate: today,
+      key: 'selection'
+    };
+  });
 
   return (
     <PageLayout contentStyle={{ overflow: 'hidden' }}>
@@ -51,7 +63,7 @@ const Dashboard: React.FC = () => {
                 <BalanceDisplay balance={currentBalance?.[0]} />
               </Grid2>
               <Grid2 size={{ xs: 12, md: 3.5 }} sx={{ flex: 1 }}>
-                <ExpensesTile />
+                <ExpensesTile dateRange={dateRange} onDateRangeChange={setDateRange} />
               </Grid2>
             </Grid2>
 
@@ -65,10 +77,10 @@ const Dashboard: React.FC = () => {
               }}
             >
               <Grid2 size={{ xs: 12, md: 3.5 }} sx={{ flex: 1 }}>
-                <SavingsTile title="Savings" />
+                <SavingsTile title="Savings" dateRange={dateRange} onDateRangeChange={setDateRange} />
               </Grid2>
               <Grid2 size={{ xs: 12, md: 3.5 }} sx={{ flex: 1 }}>
-                <IncomeTile />
+                <IncomeTile dateRange={dateRange} onDateRangeChange={setDateRange} />
               </Grid2>
             </Grid2>
 

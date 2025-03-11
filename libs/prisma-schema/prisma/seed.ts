@@ -159,6 +159,11 @@ async function main() {
       updatedAt: new Date('2025-02-03T13:00:00.000Z'),
       createdAt: new Date('2025-02-03T13:00:00.000Z'),
     },
+    {
+      amount: 2070.0,
+      updatedAt: new Date('2025-02-28T16:00:00.000Z'),
+      createdAt: new Date('2025-02-28T16:00:00.000Z'),
+    },
   ];
 
   for (const balance of balanceHistory) {
@@ -213,7 +218,18 @@ async function main() {
       type: TransactionType.income,
       amount: 276.55,
       completedAt: new Date('2025-02-03'),
-      description: 'Extra Income February',
+      description: 'Extra Income February I',
+      paymentMethod: PaymentMethod.CARD,
+      cardId: card.id,
+    },
+  });
+  await prisma.transaction.create({
+    data: {
+      id: uuidv4(),
+      type: TransactionType.income,
+      amount: 573.28,
+      completedAt: new Date('2025-02-28T16:00:00.000Z'),
+      description: 'Extra Income February II',
       paymentMethod: PaymentMethod.CARD,
       cardId: card.id,
     },
@@ -222,8 +238,21 @@ async function main() {
   await prisma.currentBalance.create({
     data: {
       id: uuidv4(),
-      amount: 1496.72,
-      updatedAt: new Date('2025-02-03T23:59:59.999Z'),
+      amount: 2070.0,
+      updatedAt: new Date('2025-02-28T16:00:00.000Z'),
+    },
+  });
+
+  // Create a rent subscription
+  await prisma.subscription.create({
+    data: {
+      id: uuidv4(),
+      type: TransactionType.expense,
+      description: 'Monthly Rent',
+      amount: 550,
+      frequency: 'MONTHLY',
+      startDate: new Date('2025-03-03'), // Starting from March 3rd      paymentMethod: PaymentMethod.BANK_TRANSFER,
+      active: true,
     },
   });
 

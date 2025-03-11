@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { format, parse } from 'date-fns';
-import { History, Funds, Transaction } from '@my-workspace/common';
+import {
+  History,
+  Funds,
+  Transaction,
+  Subscription,
+} from '@my-workspace/common';
 
 interface MonthlyData {
   date: string;
@@ -10,11 +15,13 @@ interface FutureBalanceProps {
   funds: Funds[];
   monthlyBalances: History[];
   futureTransactions: Transaction[];
+  subscriptions?: Subscription[];
 }
 const useFutureBalanceHandlers = ({
   funds,
   monthlyBalances,
   futureTransactions,
+  subscriptions = [],
 }: FutureBalanceProps) => {
   const [monthsAhead, setMonthsAhead] = useState(1); // Default months ahead to forecast
   const [myIncome, setMyIncome] = useState<number>(1450);
@@ -150,6 +157,66 @@ const useFutureBalanceHandlers = ({
     return mergedData;
   };
 
+  // Add this new function to calculate subscription payments
+  const calculateMonthlySubscriptions = (subscriptions: Subscription[]) => {
+    const monthlyTotals: Record<string, number> = {};
+    const today = new Date();
+    const endDate = new Date();
+    endDate.setMonth(today.getMonth() + monthsAhead + 1);
+
+    subscriptions.forEach((sub) => {
+      if (!sub.active) return; // Skip inactive subscriptions
+
+      const currentDate = new Date(sub.startDate);
+
+      // Move to the next occurrence if the start date is in the past
+      while (currentDate < today) {
+        switch (sub.frequency) {
+          case 'MONTHLY':
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            break;
+          case 'WEEKLY':
+            currentDate.setDate(currentDate.getDate() + 7);
+            break;
+          case 'YEARLY':
+            currentDate.setFullYear(currentDate.getFullYear() + 1);
+            break;
+        }
+      }
+
+      // Add future occurrences until the forecast end date
+      while (currentDate <= endDate) {
+        const monthKey = format(currentDate, 'MMM yy');
+
+        if (!monthlyTotals[monthKey]) {
+          monthlyTotals[monthKey] = 0;
+        }
+
+        // Add the subscription amount (negative for expenses)
+        monthlyTotals[monthKey] +=
+          sub.type === 'expense' ? -sub.amount : sub.amount;
+
+        // Move to next occurrence
+        switch (sub.frequency) {
+          case 'MONTHLY':
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            break;
+          case 'WEEKLY':
+            currentDate.setDate(currentDate.getDate() + 7);
+            break;
+          case 'YEARLY':
+            currentDate.setFullYear(currentDate.getFullYear() + 1);
+            break;
+        }
+      }
+    });
+
+    return Object.entries(monthlyTotals).map(([date, amount]) => ({
+      date,
+      amount,
+    }));
+  };
+
   // Function to forecast the next few months
   const forecastMonthlyData = (
     currentData: MonthlyData[],
@@ -278,6 +345,8 @@ const useFutureBalanceHandlers = ({
   const monthlyFunds = calculateMonthlyFunds(funds);
   const monthlyFutureTransactions =
     calculateMonthlyFutureTransactions(futureTransactions);
+  const subscriptionData = calculateMonthlySubscriptions(subscriptions);
+
   // Pre-compute the fullMonthlyBalance outside of the useEffect dependency
   const fullMonthlyBalance = addFundsToMonthlyBalance(
     monthlyData,
@@ -292,18 +361,37 @@ const useFutureBalanceHandlers = ({
     monthsAhead
   );
 
+  // Add subscription data to forecast
+  const updatedProjectedDataWithSubscriptions = updatedProjectedData.map(
+    (item) => {
+      const subscriptionIndex = subscriptionData.findIndex(
+        (sub) => sub.date === item.date
+      );
+      return {
+        ...item,
+        amount:
+          item.amount +
+          (subscriptionIndex !== -1
+            ? subscriptionData[subscriptionIndex].amount
+            : 0),
+      };
+    }
+  );
+
   // Split projectedData based on the current date "Nov 24"
   const currentDate = format(new Date(), 'MMM yy'); // Define the current date
-  const splitIndex = updatedProjectedData.findIndex(
+  const splitIndex = updatedProjectedDataWithSubscriptions.findIndex(
     (data) => data.date === currentDate
   );
 
   // Map over the projectedData to create a new array with curBalance and projBalance
-  const chartData = updatedProjectedData.map((data, index) => ({
-    date: data.date,
-    curBalance: index <= splitIndex ? data.amount : null, // curBalance is the amount if index is less than or equal to splitIndex
-    projBalance: index >= splitIndex ? data.amount : null, // projBalance is the amount if index is greater than splitIndex
-  }));
+  const chartData = updatedProjectedDataWithSubscriptions.map(
+    (data, index) => ({
+      date: data.date,
+      curBalance: index <= splitIndex ? data.amount : null, // curBalance is the amount if index is less than or equal to splitIndex
+      projBalance: index >= splitIndex ? data.amount : null, // projBalance is the amount if index is greater than splitIndex
+    })
+  );
 
   // updatedProjectedData now contains both curBalance and projBalance keys
 

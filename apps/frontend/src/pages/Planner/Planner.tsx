@@ -1,6 +1,6 @@
 import React from 'react';
 import { Loading, PageLayout } from '@my-workspace/react-components';
-import { useHistory, useFunds, useTransactions } from '../../api/apiHooks';
+import { useHistory, useFunds, useTransactions, useSubscriptions } from '../../api/apiHooks';
 import FutureBalanceChart from '../../components/Balance/FutureBalanceChart';
 import ExpensesTile from '../../components/DashboardTiles/ExpensesTile';
 import IncomeTile from '../../components/DashboardTiles/IncomeTile';
@@ -14,6 +14,7 @@ const Planner: React.FC = () => {
   const { data: funds, loading: isFundsLoading } = useFunds();
   const { data: transactions, loading: isTransactionsLoading } =
     useTransactions();
+  const { data: subscriptions } = useSubscriptions();
 
   const futureTransactions = transactions.filter(
     (transaction) => new Date(transaction.completedAt) > today
@@ -79,6 +80,7 @@ const Planner: React.FC = () => {
                 balances={balanceHistory}
                 funds={funds}
                 futureTransactions={futureTransactions}
+                subscriptions={subscriptions}
               />
             )}
           </Loading>

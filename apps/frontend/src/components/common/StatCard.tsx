@@ -1,14 +1,9 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Card,
-  styled,
-  Menu,
-  MenuItem,
-  IconButton,
-  Select,
-} from '@mui/material';
+import { Box, Typography, Card, styled, Popover } from '@mui/material';
+import { DateRange, Range, RangeKeyDict } from 'react-date-range';
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
+import '../DashboardTiles/DashboardTiles.css';
 
 const StyledCard = styled(Card)(({ theme }) => ({
   background: 'linear-gradient(129deg, #151D27 25%, #0b0d1b4d 80%)',
@@ -21,36 +16,13 @@ const StyledCard = styled(Card)(({ theme }) => ({
   boxSizing: 'border-box',
 }));
 
-const StyledSelect = styled(Select)({
-  fontSize: '10px',
-  color: 'rgba(255, 255, 255, 0.7)',
-  '& .MuiOutlinedInput-notchedOutline': {
-    border: 'none',
-  },
-  '& .MuiSelect-select': {
-    padding: '4px 8px',
-    paddingRight: '32px !important',
-  },
-  '& .MuiSelect-icon': {
-    color: 'rgba(255, 255, 255, 0.7)',
-    right: '8px',
-  },
-  '&:hover .MuiOutlinedInput-notchedOutline': {
-    border: 'none',
-  },
-  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-    border: 'none',
-  },
-});
-
 interface StatCardProps {
   title: string;
   amount: number;
   percentageChange?: number;
-  timeFrame: 'This Month' | 'Last Month' | 'This Year';
-  onTimeFrameChange: (
-    newTimeFrame: 'This Month' | 'Last Month' | 'This Year'
-  ) => void;
+  dateRange?: Range;
+  onDateRangeChange?: (range: Range) => void;
+  onInternalDateRangeChange?: (range: Range) => void;
   gradientColors: string[];
 }
 
@@ -58,11 +30,23 @@ const StatCard: React.FC<StatCardProps> = ({
   title,
   amount,
   percentageChange,
-  timeFrame,
-  onTimeFrameChange,
+  dateRange,
+  onDateRangeChange,
+  onInternalDateRangeChange,
   gradientColors,
 }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [internalDateRange, setInternalDateRange] = React.useState<Range>(
+    () => {
+      const today = new Date();
+      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      return {
+        startDate: startOfMonth,
+        endDate: today,
+        key: 'selection',
+      };
+    }
+  );
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -72,12 +56,19 @@ const StatCard: React.FC<StatCardProps> = ({
     setAnchorEl(null);
   };
 
-  const handleTimeFrameSelect = (
-    newTimeFrame: 'This Month' | 'Last Month' | 'This Year'
-  ) => {
-    onTimeFrameChange(newTimeFrame);
+  const handleDateRangeChange = (rangesByKey: RangeKeyDict) => {
+    const newRange = rangesByKey.selection;
+    if (onDateRangeChange) {
+      onDateRangeChange(newRange);
+    } else {
+      setInternalDateRange(newRange);
+      onInternalDateRangeChange?.(newRange);
+    }
     handleClose();
   };
+
+  const currentDateRange = dateRange || internalDateRange;
+  const open = Boolean(anchorEl);
 
   return (
     <StyledCard>
@@ -101,21 +92,44 @@ const StatCard: React.FC<StatCardProps> = ({
             {title}
           </Typography>
           <Box display="flex" alignItems="center" gap={1}>
-            <StyledSelect
-              value={timeFrame}
-              onChange={(event) =>
-                handleTimeFrameSelect(
-                  event.target.value as
-                    | 'This Month'
-                    | 'Last Month'
-                    | 'This Year'
-                )
-              }
+            <Typography
+              onClick={handleClick}
+              style={{
+                fontSize: 14,
+                cursor: 'pointer',
+                color: 'rgba(255, 255, 255, 0.7)',
+              }}
             >
-              <MenuItem value="This Month">This Month</MenuItem>
-              <MenuItem value="Last Month">Last Month</MenuItem>
-              <MenuItem value="This Year">This Year</MenuItem>
-            </StyledSelect>
+              {currentDateRange.startDate?.toLocaleDateString()} -{' '}
+              {currentDateRange.endDate?.toLocaleDateString()}
+            </Typography>
+            <Popover
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+            >
+              <Box sx={{ bgcolor: '#151D27', p: 2, borderRadius: 1 }}>
+                <DateRange
+                  className="calendar-container"
+                  ranges={[{ ...currentDateRange, key: 'selection' }]}
+                  onChange={handleDateRangeChange}
+                  months={1}
+                  direction="vertical"
+                  color="#6293b3"
+                  rangeColors={['#6293b3']}
+                  minDate={new Date(2020, 0, 1)}
+                  maxDate={new Date()}
+                />
+              </Box>
+            </Popover>
           </Box>
         </Box>
 

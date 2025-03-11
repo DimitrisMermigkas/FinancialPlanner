@@ -1,38 +1,35 @@
 import React from 'react';
 import { useTransactions } from '../../api/apiHooks';
 import StatCard from '../common/StatCard';
+import { Range } from 'react-date-range';
 
-const ExpensesTile: React.FC = () => {
-  const [timeFrame, setTimeFrame] = React.useState<
-    'This Month' | 'Last Month' | 'This Year'
-  >('This Month');
+interface ExpensesTileProps {
+  dateRange?: Range;
+  onDateRangeChange?: (range: Range) => void;
+}
+
+const ExpensesTile: React.FC<ExpensesTileProps> = ({ dateRange, onDateRangeChange }) => {
   const { data: transactions = [] } = useTransactions();
+  const [internalRange, setInternalRange] = React.useState<Range | undefined>();
 
-  const calculateExpenses = () => {
+  const currentDateRange = dateRange || internalRange;
+
+  const calculateExpenses = React.useMemo(() => {
     const now = new Date();
-    let startDate: Date;
-
-    switch (timeFrame) {
-      case 'Last Month':
-        startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        break;
-      case 'This Year':
-        startDate = new Date(now.getFullYear(), 0, 1);
-        break;
-      default: // This Month
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-    }
+    const startDate = currentDateRange?.startDate || new Date(now.getFullYear(), now.getMonth(), 1);
+    const endDate = currentDateRange?.endDate || now;
 
     const filteredTransactions = transactions.filter(
-      (t) => t.type === 'expense' && new Date(t.completedAt) >= startDate
+      (t) => t.type === 'expense' && 
+      new Date(t.completedAt) >= startDate &&
+      new Date(t.completedAt) <= endDate
     );
 
     return Math.abs(filteredTransactions.reduce((sum, t) => sum + t.amount, 0));
-  };
+  }, [transactions, currentDateRange?.startDate, currentDateRange?.endDate]);
 
   const calculatePercentageChange = () => {
     // Example: comparing with previous period
-    const currentExpenses = calculateExpenses();
     // You would implement logic here to compare with previous period
     return -14; // Example return showing 14% decrease
   };
@@ -40,11 +37,12 @@ const ExpensesTile: React.FC = () => {
   return (
     <StatCard
       title="Expenses"
-      amount={calculateExpenses()}
+      amount={calculateExpenses}
       percentageChange={calculatePercentageChange()}
-      timeFrame={timeFrame}
-      onTimeFrameChange={setTimeFrame}
-      gradientColors={['#2A3A4D', '#151D27']} // You can adjust these colors
+      dateRange={dateRange}
+      onDateRangeChange={onDateRangeChange}
+      onInternalDateRangeChange={setInternalRange}
+      gradientColors={['#2A3A4D', '#151D27']}
     />
   );
 };

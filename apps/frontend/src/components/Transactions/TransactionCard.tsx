@@ -207,12 +207,48 @@ const TransactionsCard: React.FC<TransactionCardProps> = ({
   );
 
   const getNextPaymentDate = (startDate: Date, frequency: string) => {
-    let nextDate = new Date(startDate);
-    while (nextDate <= today) {
-      nextDate = addMonths(nextDate, 1);
+    const today = new Date();
+    const start = new Date(startDate);
+    
+    switch (frequency) {
+      case 'MONTHLY':
+        while (start <= today) {
+          start.setMonth(start.getMonth() + 1);
+        }
+        return start;
+      case 'WEEKLY':
+        while (start <= today) {
+          start.setDate(start.getDate() + 7);
+        }
+        return start;
+      case 'YEARLY':
+        while (start <= today) {
+          start.setFullYear(start.getFullYear() + 1);
+        }
+        return start;
+      default:
+        return start;
     }
-    return nextDate;
   };
+
+  const allPlannedTransactions = [
+    ...subscriptions
+      .filter(sub => sub.active) // Only show active subscriptions
+      .map((subscription) => ({
+        ...subscription,
+        nextPayment: getNextPaymentDate(
+          subscription.startDate,
+          subscription.frequency
+        ),
+      })),
+    ...transactions.filter(t => new Date(t.completedAt) > today).map((ft) => ({
+      ...ft,
+      nextPayment: ft.completedAt,
+    })),
+  ].sort(
+    (a, b) =>
+      new Date(a.nextPayment).getTime() - new Date(b.nextPayment).getTime()
+  );
 
   const PlannedTransactionCard = ({ item }: { item: any }) => (
     <Paper
@@ -230,12 +266,17 @@ const TransactionsCard: React.FC<TransactionCardProps> = ({
         <Typography variant="body2" color="text.secondary">
           Next payment: {format(new Date(item.nextPayment), 'dd MMM yyyy')}
         </Typography>
+        <Typography variant="caption" color="text.secondary">
+          {item.frequency ? `${item.frequency} via ${item.paymentMethod}` : item.paymentMethod}
+        </Typography>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Typography variant="h6" color="error.main">
+        <Typography 
+          variant="h6" 
+          color={item.type === 'expense' ? 'error.main' : 'success.main'}
+        >
           €{item.amount.toFixed(2)}
         </Typography>
-
         <Box>
           <IconButton
             onClick={() => handleEdit(item.id)}
@@ -254,27 +295,6 @@ const TransactionsCard: React.FC<TransactionCardProps> = ({
         </Box>
       </Box>
     </Paper>
-  );
-
-  const futureTransactions = transactions.filter(
-    (t) => new Date(t.completedAt) > today
-  );
-
-  const allPlannedTransactions = [
-    ...subscriptions.map((subscription) => ({
-      ...subscription,
-      nextPayment: getNextPaymentDate(
-        subscription.startDate,
-        subscription.frequency
-      ),
-    })),
-    ...futureTransactions.map((ft) => ({
-      ...ft,
-      nextPayment: ft.completedAt,
-    })),
-  ].sort(
-    (a, b) =>
-      new Date(a.nextPayment).getTime() - new Date(b.nextPayment).getTime()
   );
 
   return (

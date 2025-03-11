@@ -22,6 +22,42 @@ interface MonthlyDetail {
   total: number;
 }
 
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    value: number;
+    payload: {
+      month: string;
+      details: Array<{ date: Date }>;
+    };
+  }>;
+}
+
+const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
+  if (!active || !payload || !payload.length || payload[0].value === 0) return null;
+
+  const data = payload[0].payload;
+  const date = new Date(data.details[0]?.date);
+  const monthName = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+  return (
+    <Box sx={{ 
+      backgroundColor: '#1A1F2E',
+      border: 'none',
+      borderRadius: '8px',
+      padding: '8px 12px',
+      color: 'white'
+    }}>
+      <Typography variant="subtitle1" sx={{ color: 'white', marginBottom: '4px', fontSize: '14px' }}>
+        {monthName}
+      </Typography>
+      <Typography variant="caption" sx={{ color: 'white', fontSize: '12px' }}>
+        Amount: €{payload[0].value.toFixed(2)}
+      </Typography>
+    </Box>
+  );
+};
+
 const SavingsGrowth: React.FC = () => {
   const [itemIndex, setItemIndex] = useState<number | null>(null);
   const { data: transactions = [] } = useTransactions();
@@ -90,20 +126,14 @@ const SavingsGrowth: React.FC = () => {
               axisLine={false}
               tickMargin={10}
             />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#1A1F2E',
-                border: 'none',
-                borderRadius: '8px',
-                color: 'white',
-              }}
-            />
+            <Tooltip content={<CustomTooltip />} />
             <Bar dataKey="total" onClick={handleBarClick}>
               {monthlyData.map((entry, index) => (
                 <Cell
                   cursor="pointer"
-                  fill={index === itemIndex ? '#82ca9d' : '#8884d8'}
+                  fill={index === itemIndex ? '#82ca9d' : '#6293b3'}
                   key={`cell-${index}`}
+                  style={{ transition: 'fill 0.3s ease' }}
                 />
               ))}
             </Bar>

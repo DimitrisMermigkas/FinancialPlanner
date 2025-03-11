@@ -340,8 +340,8 @@ const TransactionTile: React.FC = () => {
             direction="horizontal"
             moveRangeOnFirstSelection={false}
             ranges={dateRange}
-            color="#1976d2"
-            rangeColors={['#1976d2']}
+            color="#6293b3"
+            rangeColors={['#6293b3']}
             months={2}
             maxDate={new Date()}
             showDateDisplay={false}

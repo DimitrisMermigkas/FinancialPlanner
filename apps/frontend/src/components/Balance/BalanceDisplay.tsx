@@ -5,6 +5,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import { useTransactions } from '../../api/apiHooks';
 import SavingsIcon from '@mui/icons-material/Savings';
+import PaidIcon from '@mui/icons-material/Paid';
 
 const BalanceCard = styled(Card)(({ theme }) => ({
   background: 'linear-gradient(129deg, #151D27 25%, #0b0d1b4d 80%)',
@@ -27,9 +28,25 @@ interface BalanceDisplayProps {
   balance: CurrentBalance;
 }
 
+const getTransactionIcon = (type: string) => {
+  switch (type) {
+    case 'fund':
+      return <SavingsIcon style={{ color: '#22c55e' }} />;
+    case 'income':
+      return <PaidIcon style={{ color: '#22c55e' }} />;
+    case 'expense':
+      return <PaidIcon style={{ color: '#FF4842' }} />;
+    default:
+      return <SavingsIcon style={{ color: '#22c55e' }} />;
+  }
+};
+
 const BalanceDisplay: React.FC<BalanceDisplayProps> = ({ balance }) => {
   const { data: transactions } = useTransactions();
-  const mostRecentTransaction = transactions?.[0];
+  const mostRecentTransaction = transactions?.sort(
+    (a, b) =>
+      new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()
+  )[0];
 
   return (
     <BalanceCard>
@@ -96,7 +113,7 @@ const BalanceDisplay: React.FC<BalanceDisplayProps> = ({ balance }) => {
                   justifyContent: 'center',
                 }}
               >
-                <SavingsIcon style={{ color: '#22c55e' }} />
+                {getTransactionIcon(mostRecentTransaction.type)}
               </Box>
               <Box>
                 <Typography variant="subtitle1">

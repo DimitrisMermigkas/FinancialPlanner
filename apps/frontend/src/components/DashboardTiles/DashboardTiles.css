@@ -18,4 +18,17 @@
   .rdrDayPassive span {
     color: #57595b;
   }
+  .rdrDateDisplayWrapper {
+    background-color: transparent;
+  }
+  .rdrDateDisplayItem {
+    background-color: #6293b3;
+    & input {
+      color: white;
+    }
+  }
+  .rdrDateDisplayItemActive {
+    background-color: #6293b3;
+    color: white;
+  }
 }

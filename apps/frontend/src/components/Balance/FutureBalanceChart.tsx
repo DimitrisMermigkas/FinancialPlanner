@@ -12,7 +12,7 @@ import {
   YAxis,
 } from 'recharts';
 import CardComponent from '../common/CardComponent';
-import { History, Funds, Transaction } from '@my-workspace/common';
+import { History, Funds, Transaction, Subscription } from '@my-workspace/common';
 import useDashboardHandlers from '../../handlers/Dashboard.handlers';
 import { Box, Typography } from '@mui/material';
 
@@ -20,6 +20,7 @@ interface FutureBalanceChartProps {
   balances: History[];
   funds: Funds[];
   futureTransactions: Transaction[];
+  subscriptions: Subscription[];
 }
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -53,6 +54,7 @@ const FutureBalanceChart: React.FC<FutureBalanceChartProps> = ({
   balances,
   funds,
   futureTransactions,
+  subscriptions,
 }) => {
   const { getMonthlyBalances } = useDashboardHandlers();
   const monthlyBalances = getMonthlyBalances(balances);
@@ -60,6 +62,7 @@ const FutureBalanceChart: React.FC<FutureBalanceChartProps> = ({
     funds,
     monthlyBalances,
     futureTransactions,
+    subscriptions,
   });
 
   const handleMonthsChange = (event: SelectChangeEvent<number>) => {
