@@ -1,4 +1,10 @@
-import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import {
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Grid,
+  Paper,
+} from '@mui/material';
 import useFutureBalanceHandlers from '../../handlers/FutureBalance.handlers';
 import { useEffect } from 'react';
 import { format } from 'date-fns';
@@ -12,7 +18,12 @@ import {
   YAxis,
 } from 'recharts';
 import CardComponent from '../common/CardComponent';
-import { History, Funds, Transaction, Subscription } from '@my-workspace/common';
+import {
+  History,
+  Funds,
+  Transaction,
+  Subscription,
+} from '@my-workspace/common';
 import useDashboardHandlers from '../../handlers/Dashboard.handlers';
 import { Box, Typography } from '@mui/material';
 
@@ -21,7 +32,121 @@ interface FutureBalanceChartProps {
   funds: Funds[];
   futureTransactions: Transaction[];
   subscriptions: Subscription[];
+  transactions: Transaction[];
 }
+
+interface AnalyticsData {
+  averageMonthlyExpenses: number;
+  averageBalanceGrowth: number;
+  bestIncomeMonth: {
+    month: string;
+    amount: number;
+  };
+  worstIncomeMonth: {
+    month: string;
+    amount: number;
+  };
+}
+
+const calculateAnalytics = (
+  chartData: any[],
+  transactions: Transaction[]
+): AnalyticsData => {
+  if (!chartData || chartData.length === 0) {
+    return {
+      averageMonthlyExpenses: 0,
+      averageBalanceGrowth: 0,
+      bestIncomeMonth: { month: 'No data', amount: 0 },
+      worstIncomeMonth: { month: 'No data', amount: 0 },
+    };
+  }
+
+  // Get only completed months (where curBalance exists)
+  const completedMonths = chartData.filter((data) => data.curBalance !== null);
+
+  // Calculate monthly changes for growth
+  const monthlyChanges = completedMonths.reduce(
+    (acc: { [key: string]: number }, data, index, array) => {
+      if (index === 0) return acc;
+
+      const prevMonth = array[index - 1].curBalance;
+      const change = data.curBalance - prevMonth;
+      acc[data.date] = change;
+
+      return acc;
+    },
+    {}
+  );
+
+  // Group transactions by month and calculate total expenses
+  const monthlyExpenses = transactions.reduce(
+    (acc: { [key: string]: number }, transaction) => {
+      if (transaction.type === 'expense') {
+        const date = new Date(transaction.completedAt);
+        const monthKey = format(date, 'MMM yy');
+
+        if (!acc[monthKey]) {
+          acc[monthKey] = 0;
+        }
+        acc[monthKey] += transaction.amount;
+      }
+      return acc;
+    },
+    {}
+  );
+
+  // Calculate average monthly expenses from transactions
+  const expenseValues = Object.values(monthlyExpenses);
+  const averageMonthlyExpenses =
+    expenseValues.length > 0
+      ? expenseValues.reduce((sum, exp) => sum + exp, 0) / expenseValues.length
+      : 0;
+
+  // Calculate average balance growth (positive changes)
+  const growthChanges = Object.values(monthlyChanges).filter(
+    (change) => change > 0
+  );
+  const averageBalanceGrowth =
+    growthChanges.length > 0
+      ? growthChanges.reduce((sum, growth) => sum + growth, 0) /
+        growthChanges.length
+      : 0;
+
+  // Find best and worst months
+  const monthlyChangeEntries = Object.entries(monthlyChanges);
+  const defaultMonth = { month: 'No data', amount: 0 };
+
+  const bestIncomeMonth =
+    monthlyChangeEntries.length > 0
+      ? monthlyChangeEntries.reduce(
+          (best, [month, change]) =>
+            change > best.amount ? { month, amount: change } : best,
+          {
+            month: monthlyChangeEntries[0][0],
+            amount: monthlyChangeEntries[0][1],
+          }
+        )
+      : defaultMonth;
+
+  const worstIncomeMonth =
+    monthlyChangeEntries.length > 0
+      ? monthlyChangeEntries.reduce(
+          (worst, [month, change]) =>
+            change < worst.amount ? { month, amount: change } : worst,
+          {
+            month: monthlyChangeEntries[0][0],
+            amount: monthlyChangeEntries[0][1],
+          }
+        )
+      : defaultMonth;
+
+  return {
+    averageMonthlyExpenses,
+    averageBalanceGrowth,
+    bestIncomeMonth,
+    worstIncomeMonth,
+  };
+};
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length > 0) {
@@ -55,6 +180,7 @@ const FutureBalanceChart: React.FC<FutureBalanceChartProps> = ({
   funds,
   futureTransactions,
   subscriptions,
+  transactions,
 }) => {
   const { getMonthlyBalances } = useDashboardHandlers();
   const monthlyBalances = getMonthlyBalances(balances);
@@ -65,25 +191,16 @@ const FutureBalanceChart: React.FC<FutureBalanceChartProps> = ({
     subscriptions,
   });
 
+  const analytics = calculateAnalytics(chartData, transactions);
+
   const handleMonthsChange = (event: SelectChangeEvent<number>) => {
     setMonthsAhead(event.target.value as number);
   };
 
   return (
     <CardComponent
-      cardStyle={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-    >
-      <Box
-        sx={{
-          p: 2,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <Typography variant="h6" component="h2">
-          Balance Forecast
-        </Typography>
+      title="Balance Forecast"
+      buttonComponent={
         <Select
           value={monthsAhead}
           onChange={handleMonthsChange}
@@ -96,12 +213,117 @@ const FutureBalanceChart: React.FC<FutureBalanceChartProps> = ({
             </MenuItem>
           ))}
         </Select>
+      }
+      cardStyle={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+    >
+      {/* Analytics Section */}
+      <Box>
+        <Grid container spacing={2}>
+          <Grid item xs={4}>
+            <Paper
+              sx={{
+                p: 1,
+                background: `linear-gradient(165deg, #2A3A4DCC 0%, #0B0D1B5E 100%)`,
+                color: 'white',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <Typography variant="subtitle2" color="rgba(255,255,255,0.7)">
+                Monthly Averages
+              </Typography>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 0.5,
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Typography variant="caption" color="rgba(255,255,255,0.5)">
+                    Expenses
+                  </Typography>
+                  <Typography variant="h6" color="#ff4842">
+                    -€{analytics.averageMonthlyExpenses.toFixed(2)}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Typography variant="caption" color="rgba(255,255,255,0.5)">
+                    Growth
+                  </Typography>
+                  <Typography variant="h6" color="#22c55e">
+                    +€{analytics.averageBalanceGrowth.toFixed(2)}
+                  </Typography>
+                </Box>
+              </Box>
+            </Paper>
+          </Grid>
+          <Grid item xs={4}>
+            <Paper
+              sx={{
+                p: 1,
+                background: `linear-gradient(165deg, #2A3A4DCC 0%, #0B0D1B5E 100%)`,
+                color: 'white',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <Typography variant="subtitle2" color="rgba(255,255,255,0.7)">
+                Best Income Month
+              </Typography>
+              <Typography variant="h6">
+                €{analytics.bestIncomeMonth.amount.toFixed(2)}
+              </Typography>
+              <Typography variant="caption" color="rgba(255,255,255,0.5)">
+                {analytics.bestIncomeMonth.month}
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item xs={4}>
+            <Paper
+              sx={{
+                p: 1,
+                background: `linear-gradient(165deg, #2A3A4DCC 0%, #0B0D1B5E 100%)`,
+                color: 'white',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <Typography variant="subtitle2" color="rgba(255,255,255,0.7)">
+                Worst Income Month
+              </Typography>
+              <Typography variant="h6">
+                €{analytics.worstIncomeMonth.amount.toFixed(2)}
+              </Typography>
+              <Typography variant="caption" color="rgba(255,255,255,0.5)">
+                {analytics.worstIncomeMonth.month}
+              </Typography>
+            </Paper>
+          </Grid>
+        </Grid>
       </Box>
-      <Box sx={{ flex: 1, minHeight: 0 }}>
-        <ResponsiveContainer width="100%" height={650}>
+
+      <Box sx={{ flex: 1, minHeight: 0, p: 2 }}>
+        <ResponsiveContainer width="100%" height={550}>
           <AreaChart
             data={chartData}
-            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            margin={{ top: 10, right: 30, left: 30, bottom: 0 }}
           >
             <defs>
               <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
@@ -111,7 +333,11 @@ const FutureBalanceChart: React.FC<FutureBalanceChartProps> = ({
             </defs>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="date" tickMargin={5} />
-            <YAxis tickMargin={20} />
+            <YAxis
+              tickMargin={20}
+              // width={80}
+              tickFormatter={(value) => `€${value}`}
+            />
             <Tooltip content={<CustomTooltip />} />
             <Area
               name="Balance"

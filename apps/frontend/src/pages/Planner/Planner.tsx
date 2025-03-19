@@ -81,6 +81,7 @@ const Planner: React.FC = () => {
                 funds={funds}
                 futureTransactions={futureTransactions}
                 subscriptions={subscriptions}
+                transactions={transactions}
               />
             )}
           </Loading>
