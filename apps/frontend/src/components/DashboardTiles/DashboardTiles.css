@@ -1,0 +1,34 @@
+.calendar-container {
+  background-color: #151d27;
+  color: white;
+  border-radius: 20px;
+  padding: 16px;
+  & select {
+    color: #e9edf7;
+  }
+  .rdrDayDisabled {
+    background-color: transparent;
+  }
+  .rdrDayDisabled .rdrDayNumber span {
+    color: #57595b;
+  }
+  .rdrDayNumber span {
+    color: #e9edf7;
+  }
+  .rdrDayPassive span {
+    color: #57595b;
+  }
+  .rdrDateDisplayWrapper {
+    background-color: transparent;
+  }
+  .rdrDateDisplayItem {
+    background-color: #6293b3;
+    & input {
+      color: white;
+    }
+  }
+  .rdrDateDisplayItemActive {
+    background-color: #6293b3;
+    color: white;
+  }
+}

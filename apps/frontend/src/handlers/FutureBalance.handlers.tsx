@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { format, parse } from 'date-fns';
-import { History, Funds, Transaction } from '@my-workspace/common';
+import {
+  History,
+  Funds,
+  Transaction,
+  Subscription,
+} from '@my-workspace/common';
 
 interface MonthlyData {
   date: string;
@@ -10,17 +15,22 @@ interface FutureBalanceProps {
   funds: Funds[];
   monthlyBalances: History[];
   futureTransactions: Transaction[];
+  subscriptions?: Subscription[];
 }
 const useFutureBalanceHandlers = ({
   funds,
   monthlyBalances,
   futureTransactions,
+  subscriptions = [],
 }: FutureBalanceProps) => {
   const [monthsAhead, setMonthsAhead] = useState(1); // Default months ahead to forecast
   const [myIncome, setMyIncome] = useState<number>(1450);
 
   // Function to get the latest entry for each month
   const getMonthlyBalanceData = (data: History[]) => {
+    const currentDate = new Date();
+    const currentMMMYY = format(currentDate, 'MMM yy');
+
     const latestEntriesByMonth = Object.entries(
       data.reduce((acc: { [key: string]: History }, entry: History) => {
         // Ensure that createdAt is defined before processing
@@ -30,6 +40,11 @@ const useFutureBalanceHandlers = ({
         const monthKey = `${date.toLocaleString('default', {
           month: 'short',
         })} ${date.getFullYear().toString().slice(-2)}`; // e.g., "Oct 24"
+
+        // Skip entries from current month if before 28th
+        if (monthKey === currentMMMYY && date.getDate() < 28) {
+          return acc;
+        }
 
         // If no entry for the month or if this entry is more recent, update the record for the month
         if (
@@ -117,21 +132,23 @@ const useFutureBalanceHandlers = ({
     balance: MonthlyData[],
     funds?: MonthlyData[]
   ): MonthlyData[] => {
-    // Create a copy of the first array to avoid mutating it
     const mergedData = [...balance];
 
     if (funds) {
-      // Iterate over the second array
-      funds.forEach((item2) => {
-        const index = mergedData.findIndex(
-          (item1) => item1.date === item2.date
-        );
+      funds.forEach((fundItem) => {
+        // Parse the fund date
+        const fundDate = parse(fundItem.date, 'MMM yy', new Date());
 
-        // If the date exists in mergedData
+        // Find the index where this fund should be applied
+        const index = mergedData.findIndex((balanceItem) => {
+          const balanceDate = parse(balanceItem.date, 'MMM yy', new Date());
+          return balanceDate >= fundDate;
+        });
+
+        // If we found a valid index, apply the fund amount to all subsequent months
         if (index !== -1) {
-          // Add the amount to the current date and all subsequent dates
           for (let i = index; i < mergedData.length; i++) {
-            mergedData[i].amount += item2.amount;
+            mergedData[i].amount += fundItem.amount;
           }
         }
       });
@@ -140,12 +157,73 @@ const useFutureBalanceHandlers = ({
     return mergedData;
   };
 
+  // Add this new function to calculate subscription payments
+  const calculateMonthlySubscriptions = (subscriptions: Subscription[]) => {
+    const monthlyTotals: Record<string, number> = {};
+    const today = new Date();
+    const endDate = new Date();
+    endDate.setMonth(today.getMonth() + monthsAhead + 1);
+
+    subscriptions.forEach((sub) => {
+      if (!sub.active) return; // Skip inactive subscriptions
+
+      const currentDate = new Date(sub.startDate);
+
+      // Move to the next occurrence if the start date is in the past
+      while (currentDate < today) {
+        switch (sub.frequency) {
+          case 'MONTHLY':
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            break;
+          case 'WEEKLY':
+            currentDate.setDate(currentDate.getDate() + 7);
+            break;
+          case 'YEARLY':
+            currentDate.setFullYear(currentDate.getFullYear() + 1);
+            break;
+        }
+      }
+
+      // Add future occurrences until the forecast end date
+      while (currentDate <= endDate) {
+        const monthKey = format(currentDate, 'MMM yy');
+
+        if (!monthlyTotals[monthKey]) {
+          monthlyTotals[monthKey] = 0;
+        }
+
+        // Add the subscription amount (negative for expenses)
+        monthlyTotals[monthKey] +=
+          sub.type === 'expense' ? -sub.amount : sub.amount;
+
+        // Move to next occurrence
+        switch (sub.frequency) {
+          case 'MONTHLY':
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            break;
+          case 'WEEKLY':
+            currentDate.setDate(currentDate.getDate() + 7);
+            break;
+          case 'YEARLY':
+            currentDate.setFullYear(currentDate.getFullYear() + 1);
+            break;
+        }
+      }
+    });
+
+    return Object.entries(monthlyTotals).map(([date, amount]) => ({
+      date,
+      amount,
+    }));
+  };
+
   // Function to forecast the next few months
   const forecastMonthlyData = (
     currentData: MonthlyData[],
     futureTransactions: MonthlyData[],
     income: number,
-    monthsAhead: number
+    monthsAhead: number,
+    subscriptionData: MonthlyData[]
   ): MonthlyData[] => {
     const forecastData = [...currentData];
 
@@ -225,12 +303,22 @@ const useFutureBalanceHandlers = ({
         month: 'short',
       });
       const yearString = lastDate.getFullYear().toString().slice(-2);
+      const monthKey = `${monthString} ${yearString}`;
 
-      // Calculate the new amount between income and av.expense
-      lastAmount += income - averageExpense;
+      // Get subscription amount for this month (negative for expenses, positive for income)
+      const subscriptionForMonth = subscriptionData.find(
+        (sub) => sub.date === monthKey
+      );
+      const subscriptionAmount = subscriptionForMonth
+        ? subscriptionForMonth.amount
+        : 0;
+
+      // Calculate the new amount: income - averageExpense - subscription expenses
+      // subscriptionAmount is already negative for expenses, so we add it directly
+      lastAmount += income - averageExpense + subscriptionAmount;
 
       const newMonth = {
-        date: `${monthString} ${yearString}`,
+        date: monthKey,
         amount: parseFloat(lastAmount.toFixed(2)),
       };
 
@@ -268,6 +356,8 @@ const useFutureBalanceHandlers = ({
   const monthlyFunds = calculateMonthlyFunds(funds);
   const monthlyFutureTransactions =
     calculateMonthlyFutureTransactions(futureTransactions);
+  const subscriptionData = calculateMonthlySubscriptions(subscriptions);
+
   // Pre-compute the fullMonthlyBalance outside of the useEffect dependency
   const fullMonthlyBalance = addFundsToMonthlyBalance(
     monthlyData,
@@ -275,11 +365,13 @@ const useFutureBalanceHandlers = ({
   );
 
   // Set the projected data only when necessary dependencies change
+  // Subscriptions are now included in the forecast calculation
   const updatedProjectedData = forecastMonthlyData(
     fullMonthlyBalance,
     monthlyFutureTransactions,
     myIncome,
-    monthsAhead
+    monthsAhead,
+    subscriptionData
   );
 
   // Split projectedData based on the current date "Nov 24"
@@ -288,14 +380,14 @@ const useFutureBalanceHandlers = ({
     (data) => data.date === currentDate
   );
 
-  // Map over the projectedData to create a new array with amountA and amountB
+  // Map over the projectedData to create a new array with curBalance and projBalance
   const chartData = updatedProjectedData.map((data, index) => ({
     date: data.date,
-    amountA: index <= splitIndex ? data.amount : null, // amountA is the amount if index is less than or equal to splitIndex
-    amountB: index >= splitIndex ? data.amount : null, // amountB is the amount if index is greater than splitIndex
+    curBalance: index <= splitIndex ? data.amount : null, // curBalance is the amount if index is less than or equal to splitIndex
+    projBalance: index >= splitIndex ? data.amount : null, // projBalance is the amount if index is greater than splitIndex
   }));
 
-  // updatedProjectedData now contains both amountA and amountB keys
+  // updatedProjectedData now contains both curBalance and projBalance keys
 
   return {
     chartData,

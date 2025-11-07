@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import CardComponent from '../CardComponent/CardComponent';
+import CardComponent from '../common/CardComponent';
 import {
   AutocompleteVirtualizedProps,
   CustomDialog,

@@ -26,12 +26,7 @@ describe('App', () => {
       initialEntries: ['/dashboard'],
     });
     customRender(<RouterProvider router={router} />);
-    await waitFor(() =>
-      expect(
-        screen.getByRole('heading', { name: /current balance/i })
-      ).toBeInTheDocument()
-    );
-    expect(screen.getByText(/current balance/i)).toBeInTheDocument();
+    expect(screen.getByText(/credit balance/i)).toBeInTheDocument();
     // expect(screen.getByText(/transactions/i)).toBeInTheDocument();
   });
 });

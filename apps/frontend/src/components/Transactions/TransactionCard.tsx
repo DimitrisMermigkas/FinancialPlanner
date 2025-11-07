@@ -9,21 +9,37 @@ import {
   MenuItem,
   Box,
   useTheme,
+  IconButton,
+  ToggleButton,
+  ToggleButtonGroup,
+  Switch,
+  Typography,
+  Paper,
 } from '@mui/material';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import { formatTimestamp } from '../../utils/formatDate';
 import { DatePicker } from '@mui/x-date-pickers';
-import CardComponent from '../CardComponent/CardComponent';
-import { Transaction, TransactionType } from '@my-workspace/common';
+import CardComponent from '../common/CardComponent';
+import {
+  PaymentMethod,
+  Transaction,
+  TransactionType,
+} from '@my-workspace/common';
 import {
   useCurrentBalance,
   useHistory,
+  useSubscriptions,
   useTransactions,
 } from '../../api/apiHooks';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { format, addMonths } from 'date-fns';
 
 interface TransactionCardProps {
   calculateMonthlyExpenses: (transactions: Transaction[]) => number;
 }
+
+type ViewMode = 'transactions' | 'planned';
 
 const TransactionsCard: React.FC<TransactionCardProps> = ({
   calculateMonthlyExpenses,
@@ -36,19 +52,15 @@ const TransactionsCard: React.FC<TransactionCardProps> = ({
       type: 'expense' as TransactionType, // Default type
       description: '',
       completedAt: new Date(),
+      paymentMethod: PaymentMethod.CARD,
     }
   );
   const { data: transactions, create: createTransaction } = useTransactions();
   const { create: createHistory, refetch: refetchHistory } = useHistory();
   const { refetch: refetchBalance } = useCurrentBalance();
+  const { data: subscriptions } = useSubscriptions();
   const today = new Date();
-  const paidTransactions = transactions
-    .filter((tran) => new Date(tran.completedAt) <= today)
-    .sort((a, b) => {
-      const dateA = a.completedAt ? new Date(a.completedAt).getTime() : 0;
-      const dateB = b.completedAt ? new Date(b.completedAt).getTime() : 0;
-      return dateB - dateA; // Descending order
-    });
+  const [viewMode, setViewMode] = useState<ViewMode>('transactions');
 
   const cardExpenses = calculateMonthlyExpenses(transactions);
   console.log('🚀 ~ cardExpenses:', cardExpenses);
@@ -100,6 +112,18 @@ const TransactionsCard: React.FC<TransactionCardProps> = ({
     }
   };
 
+  const handleViewChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setViewMode(event.target.checked ? 'planned' : 'transactions');
+  };
+
+  const handleEdit = (id: string) => {
+    console.log('Edit clicked for:', id);
+  };
+
+  const handleDelete = (id: string) => {
+    console.log('Delete clicked for:', id);
+  };
+
   // Define columns for DataGrid
   const columns: GridColDef[] = [
     {
@@ -143,44 +167,208 @@ const TransactionsCard: React.FC<TransactionCardProps> = ({
     {
       field: 'description',
       headerName: 'Description',
-      width: 300,
-      resizable: false,
+      flex: 1,
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 120,
+      renderCell: (params) => (
+        <Box>
+          <IconButton
+            onClick={() => handleEdit(params.row.id)}
+            size="small"
+            sx={{ color: 'primary.main' }}
+          >
+            <EditIcon />
+          </IconButton>
+          <IconButton
+            onClick={() => handleDelete(params.row.id)}
+            size="small"
+            sx={{ color: 'error.main' }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+      ),
     },
   ];
-  const paginationModel = { page: 0, pageSize: 5 };
+
+  const switchButton = (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <Typography>Transactions Planned</Typography>
+      <Switch
+        checked={viewMode === 'planned'}
+        onChange={handleViewChange}
+        color="primary"
+      />
+    </Box>
+  );
+
+  const getNextPaymentDate = (startDate: Date, frequency: string) => {
+    const today = new Date();
+    const start = new Date(startDate);
+
+    switch (frequency) {
+      case 'MONTHLY':
+        while (start <= today) {
+          start.setMonth(start.getMonth() + 1);
+        }
+        return start;
+      case 'WEEKLY':
+        while (start <= today) {
+          start.setDate(start.getDate() + 7);
+        }
+        return start;
+      case 'YEARLY':
+        while (start <= today) {
+          start.setFullYear(start.getFullYear() + 1);
+        }
+        return start;
+      default:
+        return start;
+    }
+  };
+
+  const allPlannedTransactions = [
+    ...subscriptions
+      .filter((sub) => sub.active) // Only show active subscriptions
+      .map((subscription) => ({
+        ...subscription,
+        nextPayment: getNextPaymentDate(
+          subscription.startDate,
+          subscription.frequency
+        ),
+      })),
+    ...transactions
+      .filter((t) => new Date(t.completedAt) > today)
+      .map((ft) => ({
+        ...ft,
+        nextPayment: ft.completedAt,
+      })),
+  ].sort(
+    (a, b) =>
+      new Date(a.nextPayment).getTime() - new Date(b.nextPayment).getTime()
+  );
+
+  const PlannedTransactionCard = ({ item }: { item: any }) => (
+    <Paper
+      sx={{
+        p: 2,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        borderRadius: 2,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}
+    >
+      <Box>
+        <Typography variant="subtitle1">{item.description}</Typography>
+        <Typography variant="body2" color="text.secondary">
+          Next payment: {format(new Date(item.nextPayment), 'dd MMM yyyy')}
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          {item.frequency
+            ? `${item.frequency} via ${item.paymentMethod}`
+            : item.paymentMethod}
+        </Typography>
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Typography
+          variant="h6"
+          color={item.type === 'expense' ? 'error.main' : 'success.main'}
+        >
+          €{item.amount.toFixed(2)}
+        </Typography>
+        <Box>
+          <IconButton
+            onClick={() => handleEdit(item.id)}
+            size="small"
+            sx={{ color: 'primary.main' }}
+          >
+            <EditIcon />
+          </IconButton>
+          <IconButton
+            onClick={() => handleDelete(item.id)}
+            size="small"
+            sx={{ color: 'error.main' }}
+          >
+            <DeleteIcon />
+          </IconButton>
+        </Box>
+      </Box>
+    </Paper>
+  );
 
   return (
-    <>
-      <CardComponent
-        title="Transactions"
-        buttonText="Add Transaction"
-        onClick={handleClickOpen}
-      >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            maxHeight: '520px',
-          }}
-        >
+    <CardComponent
+      title="Transactions"
+      buttonComponent={switchButton}
+      cardStyle={{ height: '100%' }}
+      cardContentStyle={{ height: '100%' }}
+    >
+      <Box sx={{ height: '100%', width: '100%', overflow: 'auto' }}>
+        {viewMode === 'transactions' ? (
           <DataGrid
+            rows={transactions.filter((t) => new Date(t.completedAt) <= today)}
+            columns={columns}
+            pageSizeOptions={[5, 10, 20]}
+            initialState={{
+              pagination: { paginationModel: { pageSize: 5 } },
+            }}
             sx={{
-              borderColor: 'primary.light',
-              '& .MuiDataGrid-cell:hover': {
-                color: theme.palette.primary.main,
+              maxHeight: '550px',
+              border: 'none',
+              '& .MuiDataGrid-cell': {
+                color: 'white',
               },
-              '&. .MuiDataGrid-row--borderBottom': {
-                backgroundColor: theme.palette.secondary.main,
+              '& .MuiDataGrid-columnHeaders': {
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+              },
+              '& .MuiDataGrid-footerContainer': {
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+              },
+              '& .MuiDataGrid-row:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.04)',
               },
             }}
-            rows={paidTransactions}
-            columns={columns}
-            initialState={{ pagination: { paginationModel } }}
-            pageSizeOptions={[5, 10, 20]}
-            getRowId={(row) => row.id} // Set unique ID for each row
           />
-        </div>
-      </CardComponent>
+        ) : (
+          <div
+            style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+          >
+            <Typography>Next Up</Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1,
+                overflow: 'auto',
+                paddingRight: 1,
+                '&::-webkit-scrollbar': {
+                  width: '8px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '4px',
+                  '&:hover': {
+                    background: 'rgba(255, 255, 255, 0.15)',
+                  },
+                },
+              }}
+            >
+              {allPlannedTransactions.map((item, index) => (
+                <PlannedTransactionCard key={index} item={item} />
+              ))}
+            </Box>
+          </div>
+        )}
+      </Box>
 
       {/* Dialog for adding a new transaction */}
       <Dialog open={open} onClose={handleClose}>
@@ -234,7 +422,7 @@ const TransactionsCard: React.FC<TransactionCardProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </CardComponent>
   );
 };
 

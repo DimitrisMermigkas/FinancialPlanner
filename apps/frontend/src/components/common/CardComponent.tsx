@@ -7,35 +7,48 @@ interface CardComponentProps {
   buttonText?: string;
   cardStyle?: CSSProperties;
   cardContentStyle?: CSSProperties;
+  buttonComponent?: ReactNode;
   children?: ReactNode;
   onClick?: () => void;
 }
 const CardComponent: FC<CardComponentProps> = ({
   title,
   buttonText,
+  buttonComponent,
   cardStyle,
   cardContentStyle,
   onClick,
   children,
 }) => {
   const theme = useTheme();
+  const buttonElement =
+    buttonComponent ||
+    (buttonText && (
+      <CustomButton variant="contained" onClick={onClick}>
+        {buttonText}
+      </CustomButton>
+    ));
   return (
     <Card
       sx={{
         flex: 1,
-        borderRadius: '16px',
-        background: theme.palette.background.paper,
+        borderRadius: '20px',
+        background: 'linear-gradient(129deg, #151D27 25%, #0b0d1b4d 80%)',
         padding: '16px',
         boxSizing: 'border-box',
-        boxShadow: '5px 5px 8px 0px #2b2d32',
+        color: theme.palette.common.white,
         ...cardStyle,
       }}
     >
       <CardContent
         sx={{
           display: 'flex',
+          padding: '0px',
           flexDirection: 'column',
           rowGap: '16px',
+          '&:last-child': {
+            paddingBottom: '0px',
+          },
           ...cardContentStyle,
         }}
       >
@@ -47,12 +60,19 @@ const CardComponent: FC<CardComponentProps> = ({
             alignItems: 'center',
           }}
         >
-          {title && <Typography variant="h6">{title}</Typography>}
-          {buttonText && (
-            <CustomButton variant="contained" onClick={onClick}>
-              {buttonText}
-            </CustomButton>
+          {title && (
+            <Typography
+              variant="h6"
+              sx={{
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontSize: 24,
+                fontWeight: 'normal',
+              }}
+            >
+              {title}
+            </Typography>
           )}
+          {buttonElement}
         </div>
         {children}
       </CardContent>

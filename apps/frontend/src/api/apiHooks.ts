@@ -44,6 +44,22 @@ export const useGoals = () => {
   }>('/goals');
 };
 
+export const useSubscriptions = () => {
+  return useDatabase<{
+    create: Dto.CreateSubscription;
+    update: Partial<Dto.CreateSubscription>;
+    response: Dto.Subscription;
+  }>('/subscriptions');
+};
+
+export const useCards = () => {
+  return useDatabase<{
+    create: Dto.CreateCard;
+    update: Partial<Dto.CreateCard>;
+    response: Dto.Card;
+  }>('/cards');
+};
+
 export const useHistory = () => {
   const queryClient = useQueryClient();
 

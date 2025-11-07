@@ -35,6 +35,46 @@ const useDashboardHandlers = () => {
     return result;
   };
 
+  const getYearlyBalances = (balances: History[]) => {
+    // Group by month and keep only the last entry of each month
+    const groupedByMonth = balances.reduce(
+      (acc: Record<string, History>, entry) => {
+        const date = entry.createdAt ? new Date(entry.createdAt) : null;
+        if (!date) return acc;
+
+        // Extract YYYY-MM format for monthly grouping
+        const monthKey = `${date.getFullYear()}-${String(
+          date.getMonth() + 1
+        ).padStart(2, '0')}`;
+
+        // Only keep the entry if it's the latest for the month
+        if (
+          !acc[monthKey] ||
+          (entry.createdAt &&
+            acc[monthKey].createdAt &&
+            new Date(entry.createdAt) > new Date(acc[monthKey].createdAt))
+        ) {
+          acc[monthKey] = entry;
+        }
+
+        return acc;
+      },
+      {}
+    );
+
+    // Convert grouped object to an array and sort by createdAt date
+    const result = Object.values(groupedByMonth).sort(
+      (a, b) =>
+        (a.createdAt ? new Date(a.createdAt).getTime() : 0) -
+        (b.createdAt ? new Date(b.createdAt).getTime() : 0)
+    );
+
+    // Get last 12 months of data
+    const last12Months = result.slice(-12);
+
+    return last12Months;
+  };
+
   const calculateMonthlyExpenses = (transactions: Transaction[]) => {
     // Create a map to store monthly totals
     const monthlyExpenses: any = {};
@@ -61,6 +101,7 @@ const useDashboardHandlers = () => {
   };
   return {
     getMonthlyBalances,
+    getYearlyBalances,
     calculateMonthlyExpenses,
   };
 };

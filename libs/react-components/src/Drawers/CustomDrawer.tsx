@@ -1,28 +1,26 @@
 import * as React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer, { DrawerProps } from '@mui/material/Drawer';
-import IconButton from '@mui/material/IconButton';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import Typography from '@mui/material/Typography';
+import { useNavigate } from 'react-router-dom';
+import { useTheme } from '@mui/material/styles';
 
-interface DrawerHeaderProps {
-  anchor: 'left' | 'right' | 'bottom' | 'top' | undefined;
-}
-
-const DrawerHeader = styled('div')<DrawerHeaderProps>(({ theme, anchor }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  justifyContent: anchor === 'right' ? 'flex-start' : 'flex-end',
-}));
-
-interface CustomDrawer extends DrawerProps {
-  children: React.ReactNode;
+interface CustomDrawerProps extends DrawerProps {
+  children?: React.ReactNode;
   paperStyle?: React.CSSProperties;
-  drawerWidth?: number;
-  onCloseDrawer?: () => void;
+  menuItems: {
+    main: Array<{
+      icon: React.ReactNode;
+      label: string;
+      path: string;
+    }>;
+    account: Array<{
+      icon: React.ReactNode;
+      label: string;
+      path: string;
+    }>;
+  };
 }
 
 /**
@@ -39,67 +37,94 @@ interface CustomDrawer extends DrawerProps {
  * @param {DrawerProps} props - Additional properties from the MUI Drawer component, allowing further customization.
  */
 
-export const CustomDrawer: React.FC<CustomDrawer> = ({
-  children,
-  open,
+export const CustomDrawer: React.FC<CustomDrawerProps> = ({
+  menuItems,
   variant,
-  onCloseDrawer,
   paperStyle,
   anchor,
-  drawerWidth = 240,
   ...props
 }) => {
+  const navigate = useNavigate();
   const theme = useTheme();
-  const openDrawerWidth = drawerWidth;
-  const closedDrawerWidth = 0; // Set the width when drawer is closed
+  const drawerWidth = 240;
 
-  const calcDrawerWidth = () => {
-    if (variant == 'permanent') {
-      return openDrawerWidth;
-    } else {
-      return open ? openDrawerWidth : closedDrawerWidth;
-    }
+  const handleMenuClick = (path: string) => {
+    navigate(path);
   };
+
+  const MenuItem = styled(Box)(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    padding: theme.spacing(1.5, 2),
+    borderRadius: 8,
+    cursor: 'pointer',
+    gap: theme.spacing(2),
+    color: '#FFFFFF',
+    transition: 'background-color 0.2s',
+    '&:hover': {
+      backgroundColor: '#2A3A4D',
+    },
+    '& .MuiSvgIcon-root': {
+      color: '#6292B3',
+    },
+  }));
+
+  const SectionTitle = styled(Typography)(({ theme }) => ({
+    color: '#FFFFFF',
+    padding: theme.spacing(2, 2, 1),
+    fontSize: '0.75rem',
+    fontWeight: 600,
+  }));
+
   return (
     <Drawer
       sx={{
-        width: calcDrawerWidth(),
+        width: drawerWidth,
         flexShrink: 0,
-        transition: theme.transitions.create('width', {
-          easing: theme.transitions.easing.sharp,
-          duration: theme.transitions.duration.enteringScreen,
-        }),
         '& .MuiDrawer-paper': {
-          width: calcDrawerWidth(),
+          width: drawerWidth,
           boxSizing: 'border-box',
+          background: 'linear-gradient(187deg, #080D1BED 50%, #474F5D 100%)',
+          // backgroundSize: '100% 200%',
+          backgroundPosition: 'top',
+          border: 'none',
           ...paperStyle,
         },
       }}
       {...props}
-      open={open}
       variant={variant}
       anchor={anchor}
     >
-      {variant == 'persistent' && onCloseDrawer && (
-        <DrawerHeader anchor={anchor}>
-          <IconButton onClick={onCloseDrawer}>
-            {anchor === 'left' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
-        </DrawerHeader>
-      )}
-      <Box
-        sx={{
-          flexGrow: 1,
-          paddingInline: theme.spacing(3),
-          paddingBottom: theme.spacing(3),
-          transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-          }),
-          display: 'flex',
-        }}
-      >
-        {children}
+      <Box sx={{ p: 3 }}>
+        <Typography
+          variant="h6"
+          sx={{
+            color: '#FFFFFF',
+            fontWeight: 600,
+            mb: 4,
+          }}
+        >
+          FINANCIAL PROJ
+        </Typography>
+
+        <Box sx={{ mb: 4 }}>
+          {menuItems.main.map((item, index) => (
+            <MenuItem key={index} onClick={() => handleMenuClick(item.path)}>
+              {item.icon}
+              <Typography>{item.label}</Typography>
+            </MenuItem>
+          ))}
+        </Box>
+
+        <SectionTitle>ACCOUNT PAGES</SectionTitle>
+        <Box>
+          {menuItems.account.map((item, index) => (
+            <MenuItem key={index} onClick={() => handleMenuClick(item.path)}>
+              {item.icon}
+              <Typography>{item.label}</Typography>
+            </MenuItem>
+          ))}
+        </Box>
       </Box>
     </Drawer>
   );

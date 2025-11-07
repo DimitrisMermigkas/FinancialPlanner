@@ -7,6 +7,7 @@ export const ReasonSchema = z.object({
   description: z.string().optional().nullable(),
   createdAt: z.date().default(() => new Date()),
   updatedAt: z.date().optional(),
+  goalId: z.string().uuid().optional(),
 });
 
 // Array Schema for Reasons
@@ -20,6 +21,7 @@ export const CreateReasonDto = z.object({
   title: z.string().min(1), // Ensuring title is not empty
   description: z.string().optional().nullable(),
   updatedAt: z.date(),
+  goalId: z.string().uuid().optional(),
 });
 
 // Exporting inferred type for DTO

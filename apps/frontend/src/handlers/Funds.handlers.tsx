@@ -1,7 +1,12 @@
 import { useEffect, useState, useMemo } from 'react';
 import { fetchFunds } from '../services/api';
 import { Option } from '@my-workspace/react-components';
-import { Funds, Reason, TransactionType } from '@my-workspace/common';
+import {
+  Funds,
+  PaymentMethod,
+  Reason,
+  TransactionType,
+} from '@my-workspace/common';
 import {
   useFunds,
   useHistory,
@@ -122,6 +127,7 @@ const useFundsHandlers = () => {
         type: 'fund' as TransactionType,
         description: `Funds for ${selectedReason.title}`,
         completedAt: todaysDate,
+        paymentMethod: PaymentMethod.BANK_TRANSFER,
       });
       createHistory.mutate({
         type: 'expense',
