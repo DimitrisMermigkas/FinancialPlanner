@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Grid2, Box } from '@mui/material';
 import { PageLayout } from '@my-workspace/react-components';
 import { useCurrentBalance, useHistory } from '../../api/apiHooks';
@@ -19,7 +19,7 @@ const Dashboard: React.FC = () => {
   const { data: currentBalance } = useCurrentBalance();
 
   // Initialize date range to current month
-  const [dateRange, setDateRange] = React.useState<Range>(() => {
+  const [dateRange, setDateRange] = useState<Range>(() => {
     const today = new Date();
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     return {

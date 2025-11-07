@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTransactions } from '../../api/apiHooks';
 import StatCard from '../common/StatCard';
 import { Range } from 'react-date-range';
@@ -17,19 +17,22 @@ const SavingsTile: React.FC<SavingsTileProps> = ({
   onDateRangeChange,
 }) => {
   const { data: transactions = [] } = useTransactions();
-  const [internalRange, setInternalRange] = React.useState<Range | undefined>();
+  const [internalRange, setInternalRange] = useState<Range | undefined>();
 
   const currentDateRange = dateRange || internalRange;
 
-  const calculateSavings = React.useMemo(() => {
+  const calculateSavings = useMemo(() => {
     const now = new Date();
-    const startDate = currentDateRange?.startDate || new Date(now.getFullYear(), now.getMonth(), 1);
+    const startDate =
+      currentDateRange?.startDate ||
+      new Date(now.getFullYear(), now.getMonth(), 1);
     const endDate = currentDateRange?.endDate || now;
 
     const filteredTransactions = transactions.filter(
-      (t) => t.type === 'fund' && 
-      new Date(t.completedAt) >= startDate &&
-      new Date(t.completedAt) <= endDate
+      (t) =>
+        t.type === 'fund' &&
+        new Date(t.completedAt) >= startDate &&
+        new Date(t.completedAt) <= endDate
     );
 
     return filteredTransactions.reduce((sum, t) => sum + t.amount, 0);

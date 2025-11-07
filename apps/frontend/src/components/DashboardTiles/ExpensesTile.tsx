@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTransactions } from '../../api/apiHooks';
 import StatCard from '../common/StatCard';
 import { Range } from 'react-date-range';
@@ -8,21 +8,27 @@ interface ExpensesTileProps {
   onDateRangeChange?: (range: Range) => void;
 }
 
-const ExpensesTile: React.FC<ExpensesTileProps> = ({ dateRange, onDateRangeChange }) => {
+const ExpensesTile: React.FC<ExpensesTileProps> = ({
+  dateRange,
+  onDateRangeChange,
+}) => {
   const { data: transactions = [] } = useTransactions();
-  const [internalRange, setInternalRange] = React.useState<Range | undefined>();
+  const [internalRange, setInternalRange] = useState<Range | undefined>();
 
   const currentDateRange = dateRange || internalRange;
 
-  const calculateExpenses = React.useMemo(() => {
+  const calculateExpenses = useMemo(() => {
     const now = new Date();
-    const startDate = currentDateRange?.startDate || new Date(now.getFullYear(), now.getMonth(), 1);
+    const startDate =
+      currentDateRange?.startDate ||
+      new Date(now.getFullYear(), now.getMonth(), 1);
     const endDate = currentDateRange?.endDate || now;
 
     const filteredTransactions = transactions.filter(
-      (t) => t.type === 'expense' && 
-      new Date(t.completedAt) >= startDate &&
-      new Date(t.completedAt) <= endDate
+      (t) =>
+        t.type === 'expense' &&
+        new Date(t.completedAt) >= startDate &&
+        new Date(t.completedAt) <= endDate
     );
 
     return Math.abs(filteredTransactions.reduce((sum, t) => sum + t.amount, 0));

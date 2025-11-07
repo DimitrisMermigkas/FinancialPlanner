@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { SyntheticEvent, useState } from 'react';
 import {
   Tabs,
   Tab,
@@ -19,9 +19,9 @@ interface GoalsTabsProps {
 }
 
 const GoalsTabs: React.FC<GoalsTabsProps> = ({ goals, deleteGoal }) => {
-  const [selectedTab, setSelectedTab] = React.useState(0);
+  const [selectedTab, setSelectedTab] = useState(0);
   const dialogContext = useDialogContext();
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (event: SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
   };
 

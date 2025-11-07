@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTransactions } from '../../api/apiHooks';
 import StatCard from '../common/StatCard';
 import { Range } from 'react-date-range';
@@ -8,21 +8,27 @@ interface IncomeTileProps {
   onDateRangeChange?: (range: Range) => void;
 }
 
-const IncomeTile: React.FC<IncomeTileProps> = ({ dateRange, onDateRangeChange }) => {
+const IncomeTile: React.FC<IncomeTileProps> = ({
+  dateRange,
+  onDateRangeChange,
+}) => {
   const { data: transactions = [] } = useTransactions();
-  const [internalRange, setInternalRange] = React.useState<Range | undefined>();
+  const [internalRange, setInternalRange] = useState<Range | undefined>();
 
   const currentDateRange = dateRange || internalRange;
 
-  const calculateIncome = React.useMemo(() => {
+  const calculateIncome = useMemo(() => {
     const now = new Date();
-    const startDate = currentDateRange?.startDate || new Date(now.getFullYear(), now.getMonth(), 1);
+    const startDate =
+      currentDateRange?.startDate ||
+      new Date(now.getFullYear(), now.getMonth(), 1);
     const endDate = currentDateRange?.endDate || now;
 
     const filteredTransactions = transactions.filter(
-      (t) => t.type === 'income' && 
-      new Date(t.completedAt) >= startDate &&
-      new Date(t.completedAt) <= endDate
+      (t) =>
+        t.type === 'income' &&
+        new Date(t.completedAt) >= startDate &&
+        new Date(t.completedAt) <= endDate
     );
 
     return filteredTransactions.reduce((sum, t) => sum + t.amount, 0);
@@ -47,4 +53,4 @@ const IncomeTile: React.FC<IncomeTileProps> = ({ dateRange, onDateRangeChange })
   );
 };
 
-export default IncomeTile; 
+export default IncomeTile;

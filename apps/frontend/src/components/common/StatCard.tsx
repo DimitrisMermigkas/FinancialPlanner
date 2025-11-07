@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { MouseEvent, useState } from 'react';
 import { Box, Typography, Card, styled, Popover } from '@mui/material';
 import { DateRange, Range, RangeKeyDict } from 'react-date-range';
 import 'react-date-range/dist/styles.css';
@@ -35,20 +35,18 @@ const StatCard: React.FC<StatCardProps> = ({
   onInternalDateRangeChange,
   gradientColors,
 }) => {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [internalDateRange, setInternalDateRange] = React.useState<Range>(
-    () => {
-      const today = new Date();
-      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-      return {
-        startDate: startOfMonth,
-        endDate: today,
-        key: 'selection',
-      };
-    }
-  );
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [internalDateRange, setInternalDateRange] = useState<Range>(() => {
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    return {
+      startDate: startOfMonth,
+      endDate: today,
+      key: 'selection',
+    };
+  });
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
