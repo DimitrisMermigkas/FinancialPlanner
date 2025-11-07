@@ -8,10 +8,11 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": ["node"]
   },
   "files": [],
-  "include": [],
+  "include": ["prisma/**/*.ts"],
   "references": [
     {
       "path": "./tsconfig.lib.json"

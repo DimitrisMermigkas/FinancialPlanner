@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSubscription } from '@my-workspace/common';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class SubscriptionService {
@@ -44,7 +45,7 @@ export class SubscriptionService {
   }
 
   toggle(id: string) {
-    return this.prisma.$transaction(async (tx) => {
+    return this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const subscription = await tx.subscription.findUnique({ where: { id } });
       return tx.subscription.update({
         where: { id },

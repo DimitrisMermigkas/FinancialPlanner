@@ -134,7 +134,7 @@ export class GoalService {
     }
 
     const currentAmount = goal.reason.funds.reduce(
-      (sum, fund) => sum + fund.amount,
+      (sum: number, fund: { amount: number }) => sum + fund.amount,
       0
     );
     const percentage = (currentAmount / goal.amount) * 100;
