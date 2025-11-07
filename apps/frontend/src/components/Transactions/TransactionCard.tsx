@@ -196,20 +196,19 @@ const TransactionsCard: React.FC<TransactionCardProps> = ({
 
   const switchButton = (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-      <Typography>Transactions</Typography>
+      <Typography>Transactions Planned</Typography>
       <Switch
         checked={viewMode === 'planned'}
         onChange={handleViewChange}
         color="primary"
       />
-      <Typography>Planned</Typography>
     </Box>
   );
 
   const getNextPaymentDate = (startDate: Date, frequency: string) => {
     const today = new Date();
     const start = new Date(startDate);
-    
+
     switch (frequency) {
       case 'MONTHLY':
         while (start <= today) {
@@ -233,7 +232,7 @@ const TransactionsCard: React.FC<TransactionCardProps> = ({
 
   const allPlannedTransactions = [
     ...subscriptions
-      .filter(sub => sub.active) // Only show active subscriptions
+      .filter((sub) => sub.active) // Only show active subscriptions
       .map((subscription) => ({
         ...subscription,
         nextPayment: getNextPaymentDate(
@@ -241,10 +240,12 @@ const TransactionsCard: React.FC<TransactionCardProps> = ({
           subscription.frequency
         ),
       })),
-    ...transactions.filter(t => new Date(t.completedAt) > today).map((ft) => ({
-      ...ft,
-      nextPayment: ft.completedAt,
-    })),
+    ...transactions
+      .filter((t) => new Date(t.completedAt) > today)
+      .map((ft) => ({
+        ...ft,
+        nextPayment: ft.completedAt,
+      })),
   ].sort(
     (a, b) =>
       new Date(a.nextPayment).getTime() - new Date(b.nextPayment).getTime()
@@ -267,12 +268,14 @@ const TransactionsCard: React.FC<TransactionCardProps> = ({
           Next payment: {format(new Date(item.nextPayment), 'dd MMM yyyy')}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          {item.frequency ? `${item.frequency} via ${item.paymentMethod}` : item.paymentMethod}
+          {item.frequency
+            ? `${item.frequency} via ${item.paymentMethod}`
+            : item.paymentMethod}
         </Typography>
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Typography 
-          variant="h6" 
+        <Typography
+          variant="h6"
           color={item.type === 'expense' ? 'error.main' : 'success.main'}
         >
           €{item.amount.toFixed(2)}

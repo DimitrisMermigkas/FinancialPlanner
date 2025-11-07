@@ -4,9 +4,12 @@ import {
   SelectChangeEvent,
   Grid,
   Paper,
+  Button,
+  FormControlLabel,
+  Switch,
 } from '@mui/material';
 import useFutureBalanceHandlers from '../../handlers/FutureBalance.handlers';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import {
   CartesianGrid,
@@ -26,6 +29,7 @@ import {
 } from '@my-workspace/common';
 import useDashboardHandlers from '../../handlers/Dashboard.handlers';
 import { Box, Typography } from '@mui/material';
+import { ScenarioDialog, ScenarioParams } from './ScenarioDialog';
 
 interface FutureBalanceChartProps {
   balances: History[];
@@ -193,6 +197,53 @@ const FutureBalanceChart: React.FC<FutureBalanceChartProps> = ({
 
   const analytics = calculateAnalytics(chartData, transactions);
 
+  const [scenarioDialogOpen, setScenarioDialogOpen] = useState(false);
+  const [showScenario, setShowScenario] = useState(false);
+  const [scenarioData, setScenarioData] = useState<any[]>([]);
+
+  const calculateScenario = (params: ScenarioParams) => {
+    const newChartData = chartData.map((point) => {
+      if (!point.projBalance) return point;
+
+      const currentDate = format(new Date(), 'MMM yy'); // Define the current date
+      const splitIndex = chartData.findIndex(
+        (data) => data.date === currentDate
+      );
+
+      const monthsFromNow = chartData.indexOf(point) - splitIndex;
+      if (monthsFromNow <= 0) return point;
+
+      // Calculate cumulative effect
+      const expenseMultiplier = Math.pow(
+        1 + params.expenseChange / 100,
+        monthsFromNow
+      );
+      const incomeMultiplier = Math.pow(
+        1 + params.incomeChange / 100,
+        monthsFromNow
+      );
+
+      // Adjust the projected balance based on the scenario
+      const adjustedBalance =
+        point.projBalance * (incomeMultiplier - expenseMultiplier + 1);
+
+      return {
+        ...point,
+        scenarioBalance: adjustedBalance,
+      };
+    });
+
+    setScenarioData(newChartData);
+    setShowScenario(true);
+  };
+
+  const handleScenarioOpen = () => setScenarioDialogOpen(true);
+  const handleScenarioClose = () => setScenarioDialogOpen(false);
+  const handleScenarioConfirm = (params: ScenarioParams) => {
+    calculateScenario(params);
+    handleScenarioClose();
+  };
+
   const handleMonthsChange = (event: SelectChangeEvent<number>) => {
     setMonthsAhead(event.target.value as number);
   };
@@ -201,18 +252,41 @@ const FutureBalanceChart: React.FC<FutureBalanceChartProps> = ({
     <CardComponent
       title="Balance Forecast"
       buttonComponent={
-        <Select
-          value={monthsAhead}
-          onChange={handleMonthsChange}
-          size="small"
-          sx={{ width: 120 }}
-        >
-          {[1, 2, 3, 4, 5, 6].map((month) => (
-            <MenuItem key={month} value={month}>
-              {month} {month === 1 ? 'Month' : 'Months'}
-            </MenuItem>
-          ))}
-        </Select>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Button
+            onClick={handleScenarioOpen}
+            variant="contained"
+            size="small"
+            sx={{ borderRadius: '10px' }}
+            color="primary"
+          >
+            Create Scenario
+          </Button>
+          {scenarioData.length > 0 && (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showScenario}
+                  onChange={(e) => setShowScenario(e.target.checked)}
+                  size="small"
+                />
+              }
+              label="Show Scenario"
+            />
+          )}
+          <Select
+            value={monthsAhead}
+            onChange={handleMonthsChange}
+            size="small"
+            sx={{ width: 120 }}
+          >
+            {[1, 2, 3, 4, 5, 6].map((month) => (
+              <MenuItem key={month} value={month}>
+                {month} {month === 1 ? 'Month' : 'Months'}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
       }
       cardStyle={{ height: '100%', display: 'flex', flexDirection: 'column' }}
     >
@@ -322,7 +396,7 @@ const FutureBalanceChart: React.FC<FutureBalanceChartProps> = ({
       <Box sx={{ flex: 1, minHeight: 0, p: 2 }}>
         <ResponsiveContainer width="100%" height={550}>
           <AreaChart
-            data={chartData}
+            data={showScenario ? scenarioData : chartData}
             margin={{ top: 10, right: 30, left: 30, bottom: 0 }}
           >
             <defs>
@@ -360,9 +434,28 @@ const FutureBalanceChart: React.FC<FutureBalanceChartProps> = ({
               connectNulls
               isAnimationActive={false}
             />
+            {showScenario && (
+              <Area
+                name="Scenario Balance"
+                type="monotone"
+                dataKey="scenarioBalance"
+                stroke="#82ca9d"
+                fill="#82ca9d"
+                fillOpacity={0.3}
+                strokeDasharray="3 3"
+                connectNulls
+                isAnimationActive={false}
+              />
+            )}
           </AreaChart>
         </ResponsiveContainer>
       </Box>
+
+      <ScenarioDialog
+        open={scenarioDialogOpen}
+        onClose={handleScenarioClose}
+        onConfirm={handleScenarioConfirm}
+      />
     </CardComponent>
   );
 };

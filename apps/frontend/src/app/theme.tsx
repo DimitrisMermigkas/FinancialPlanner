@@ -5,6 +5,7 @@ declare module '@mui/material/styles' {
   interface Palette {
     orange: Palette['primary'];
     gray: Palette['primary'];
+    iceBlue: Palette['primary'];
     background: TypeBackground;
   }
   interface TypeBackground {
@@ -13,6 +14,7 @@ declare module '@mui/material/styles' {
   interface PaletteOptions {
     orange?: PaletteOptions['primary'];
     gray?: PaletteOptions['primary'];
+    iceBlue?: PaletteOptions['primary'];
   }
 }
 
@@ -25,6 +27,7 @@ const colors = {
   orange: '#f7992b',
   orangeLight: '#FFAE53',
   antiflashWhite: '#f2f4f7ff',
+  iceBlue: '#6292B3',
 };
 const colors2 = {
   whiteDark: '#E9EDF7',
@@ -47,9 +50,15 @@ const theme = createTheme({
       dark: '#3B3D42',
       light: '#65676c',
     },
+    iceBlue: {
+      main: colors.iceBlue,
+      light: '#7BA8C7',
+      dark: '#4A6B85',
+      contrastText: colors.antiflashWhite,
+    },
 
     primary: {
-      main: colors.orange,
+      main: colors.iceBlue, // Changed from orange to ice blue for main actions
       contrastText: colors.antiflashWhite,
     },
     secondary: {

@@ -222,7 +222,8 @@ const useFutureBalanceHandlers = ({
     currentData: MonthlyData[],
     futureTransactions: MonthlyData[],
     income: number,
-    monthsAhead: number
+    monthsAhead: number,
+    subscriptionData: MonthlyData[]
   ): MonthlyData[] => {
     const forecastData = [...currentData];
 
@@ -302,12 +303,22 @@ const useFutureBalanceHandlers = ({
         month: 'short',
       });
       const yearString = lastDate.getFullYear().toString().slice(-2);
+      const monthKey = `${monthString} ${yearString}`;
 
-      // Calculate the new amount between income and av.expense
-      lastAmount += income - averageExpense;
+      // Get subscription amount for this month (negative for expenses, positive for income)
+      const subscriptionForMonth = subscriptionData.find(
+        (sub) => sub.date === monthKey
+      );
+      const subscriptionAmount = subscriptionForMonth
+        ? subscriptionForMonth.amount
+        : 0;
+
+      // Calculate the new amount: income - averageExpense - subscription expenses
+      // subscriptionAmount is already negative for expenses, so we add it directly
+      lastAmount += income - averageExpense + subscriptionAmount;
 
       const newMonth = {
-        date: `${monthString} ${yearString}`,
+        date: monthKey,
         amount: parseFloat(lastAmount.toFixed(2)),
       };
 
@@ -354,44 +365,27 @@ const useFutureBalanceHandlers = ({
   );
 
   // Set the projected data only when necessary dependencies change
+  // Subscriptions are now included in the forecast calculation
   const updatedProjectedData = forecastMonthlyData(
     fullMonthlyBalance,
     monthlyFutureTransactions,
     myIncome,
-    monthsAhead
-  );
-
-  // Add subscription data to forecast
-  const updatedProjectedDataWithSubscriptions = updatedProjectedData.map(
-    (item) => {
-      const subscriptionIndex = subscriptionData.findIndex(
-        (sub) => sub.date === item.date
-      );
-      return {
-        ...item,
-        amount:
-          item.amount +
-          (subscriptionIndex !== -1
-            ? subscriptionData[subscriptionIndex].amount
-            : 0),
-      };
-    }
+    monthsAhead,
+    subscriptionData
   );
 
   // Split projectedData based on the current date "Nov 24"
   const currentDate = format(new Date(), 'MMM yy'); // Define the current date
-  const splitIndex = updatedProjectedDataWithSubscriptions.findIndex(
+  const splitIndex = updatedProjectedData.findIndex(
     (data) => data.date === currentDate
   );
 
   // Map over the projectedData to create a new array with curBalance and projBalance
-  const chartData = updatedProjectedDataWithSubscriptions.map(
-    (data, index) => ({
-      date: data.date,
-      curBalance: index <= splitIndex ? data.amount : null, // curBalance is the amount if index is less than or equal to splitIndex
-      projBalance: index >= splitIndex ? data.amount : null, // projBalance is the amount if index is greater than splitIndex
-    })
-  );
+  const chartData = updatedProjectedData.map((data, index) => ({
+    date: data.date,
+    curBalance: index <= splitIndex ? data.amount : null, // curBalance is the amount if index is less than or equal to splitIndex
+    projBalance: index >= splitIndex ? data.amount : null, // projBalance is the amount if index is greater than splitIndex
+  }));
 
   // updatedProjectedData now contains both curBalance and projBalance keys
 

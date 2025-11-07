@@ -14,7 +14,7 @@ async function main() {
   const card = await prisma.card.create({
     data: {
       id: uuidv4(),
-      expiryDate: new Date('2026-12'),
+      expiryDate: new Date('2028-12'),
       name: 'DIMITRIOS MERMIGKAS',
       type: 'CREDIT',
       lastFourDigits: '0008',
@@ -47,7 +47,7 @@ async function main() {
       amount: 3000,
       type: GoalType.SAVINGS,
       status: GoalStatus.IN_PROGRESS,
-      dueDate: new Date('2025-03-29'),
+      dueDate: new Date('2026-03-29'),
       reasonId: japanReason.id,
     },
   });
@@ -67,40 +67,64 @@ async function main() {
   // Create Funds entries
   const fundsEntries = [
     {
-      amount: 1000,
-      updatedAt: new Date('2024-11-22'),
+      amount: 750,
+      updatedAt: new Date('2025-03-05'),
+      description: 'Investments',
+      reasonId: investmentsReason.id,
+    },
+    {
+      amount: 600,
+      updatedAt: new Date('2025-03-20'),
+      description: 'Japan Trip',
+      reasonId: japanReason.id,
+    },
+    {
+      amount: 900,
+      updatedAt: new Date('2025-04-10'),
+      description: 'Investments',
+      reasonId: investmentsReason.id,
+    },
+    {
+      amount: 450,
+      updatedAt: new Date('2025-04-22'),
+      description: 'Japan Trip',
+      reasonId: japanReason.id,
+    },
+    {
+      amount: 800,
+      updatedAt: new Date('2025-05-15'),
+      description: 'Japan Trip',
+      reasonId: japanReason.id,
+    },
+    {
+      amount: 650,
+      updatedAt: new Date('2025-06-12'),
       description: 'Investments',
       reasonId: investmentsReason.id,
     },
     {
       amount: 500,
-      updatedAt: new Date('2024-12-13'),
-      description: 'Japan Trip',
-      reasonId: japanReason.id,
-    },
-    {
-      amount: 500,
-      updatedAt: new Date('2024-12-23'),
-      description: 'Japan Trip',
-      reasonId: japanReason.id,
-    },
-    {
-      amount: 511,
-      updatedAt: new Date('2024-12-26'),
+      updatedAt: new Date('2025-07-18'),
       description: 'Investments',
       reasonId: investmentsReason.id,
     },
     {
-      amount: 1000,
-      updatedAt: new Date('2025-01-27'),
+      amount: 700,
+      updatedAt: new Date('2025-08-09'),
       description: 'Japan Trip',
       reasonId: japanReason.id,
     },
     {
-      amount: 500,
-      updatedAt: new Date('2025-01-27'),
+      amount: 550,
+      updatedAt: new Date('2025-09-14'),
       description: 'Investments',
       reasonId: investmentsReason.id,
+    },
+    {
+      amount: 200,
+      updatedAt: new Date('2025-10-03'),
+      description: 'Japan Trip',
+      reasonId: japanReason.id,
     },
   ];
 
@@ -127,42 +151,47 @@ async function main() {
     });
   }
 
-  // Create balance history entries
+  // Create balance history entries (recent months)
   const balanceHistory = [
     {
-      amount: 2210,
-      updatedAt: new Date('2024-09-30T13:00:00.000Z'),
-      createdAt: new Date('2024-09-30T13:00:00.000Z'),
+      amount: 2200.0,
+      updatedAt: new Date('2025-03-31T13:00:00.000Z'),
+      createdAt: new Date('2025-03-31T13:00:00.000Z'),
     },
     {
-      amount: 2938.56,
-      updatedAt: new Date('2024-10-30T13:00:00.000Z'),
-      createdAt: new Date('2024-10-30T13:00:00.000Z'),
+      amount: 2450.25,
+      updatedAt: new Date('2025-04-30T13:00:00.000Z'),
+      createdAt: new Date('2025-04-30T13:00:00.000Z'),
     },
     {
-      amount: 1998.43,
-      updatedAt: new Date('2024-11-30T13:00:00.000Z'),
-      createdAt: new Date('2024-11-30T13:00:00.000Z'),
+      amount: 2310.85,
+      updatedAt: new Date('2025-05-31T13:00:00.000Z'),
+      createdAt: new Date('2025-05-31T13:00:00.000Z'),
     },
     {
-      amount: 2387.43,
-      updatedAt: new Date('2024-12-30T13:00:00.000Z'),
-      createdAt: new Date('2024-12-30T13:00:00.000Z'),
+      amount: 2600.4,
+      updatedAt: new Date('2025-06-30T13:00:00.000Z'),
+      createdAt: new Date('2025-06-30T13:00:00.000Z'),
     },
     {
-      amount: 1219.45,
-      updatedAt: new Date('2025-01-30T13:00:00.000Z'),
-      createdAt: new Date('2025-01-30T13:00:00.000Z'),
+      amount: 2750.9,
+      updatedAt: new Date('2025-07-31T13:00:00.000Z'),
+      createdAt: new Date('2025-07-31T13:00:00.000Z'),
     },
     {
-      amount: 1496.72,
-      updatedAt: new Date('2025-02-03T13:00:00.000Z'),
-      createdAt: new Date('2025-02-03T13:00:00.000Z'),
+      amount: 2905.65,
+      updatedAt: new Date('2025-08-31T13:00:00.000Z'),
+      createdAt: new Date('2025-08-31T13:00:00.000Z'),
     },
     {
-      amount: 2070.0,
-      updatedAt: new Date('2025-02-28T16:00:00.000Z'),
-      createdAt: new Date('2025-02-28T16:00:00.000Z'),
+      amount: 3058.3,
+      updatedAt: new Date('2025-09-30T13:00:00.000Z'),
+      createdAt: new Date('2025-09-30T13:00:00.000Z'),
+    },
+    {
+      amount: 3275.0,
+      updatedAt: new Date('2025-10-31T16:00:00.000Z'),
+      createdAt: new Date('2025-10-31T16:00:00.000Z'),
     },
   ];
 
@@ -177,27 +206,47 @@ async function main() {
     });
   }
 
-  // Create some expense transactions to match the balance changes
+  // Create some expense transactions to match the balance changes (2025)
   const expenses = [
     {
-      amount: 721.44, // September to October difference
-      completedAt: new Date('2024-10-15'),
+      amount: 610.35,
+      completedAt: new Date('2025-03-15'),
+      description: 'Monthly expenses March',
+    },
+    {
+      amount: 540.75,
+      completedAt: new Date('2025-04-15'),
+      description: 'Monthly expenses April',
+    },
+    {
+      amount: 785.9,
+      completedAt: new Date('2025-05-15'),
+      description: 'Monthly expenses May',
+    },
+    {
+      amount: 620.4,
+      completedAt: new Date('2025-06-15'),
+      description: 'Monthly expenses June',
+    },
+    {
+      amount: 670.15,
+      completedAt: new Date('2025-07-15'),
+      description: 'Monthly expenses July',
+    },
+    {
+      amount: 590.2,
+      completedAt: new Date('2025-08-15'),
+      description: 'Monthly expenses August',
+    },
+    {
+      amount: 735.6,
+      completedAt: new Date('2025-09-15'),
+      description: 'Monthly expenses September',
+    },
+    {
+      amount: 680.9,
+      completedAt: new Date('2025-10-15'),
       description: 'Monthly expenses October',
-    },
-    {
-      amount: 940.13, // October to November difference
-      completedAt: new Date('2024-11-15'),
-      description: 'Monthly expenses November',
-    },
-    {
-      amount: 779.11, // November to December expenses
-      completedAt: new Date('2024-12-15'),
-      description: 'Monthly expenses December',
-    },
-    {
-      amount: 778.98, // December to January expenses
-      completedAt: new Date('2025-01-15'),
-      description: 'Monthly expenses January',
     },
   ];
 
@@ -216,9 +265,9 @@ async function main() {
     data: {
       id: uuidv4(),
       type: TransactionType.income,
-      amount: 276.55,
-      completedAt: new Date('2025-02-03'),
-      description: 'Extra Income February I',
+      amount: 350.0,
+      completedAt: new Date('2025-03-10'),
+      description: 'Freelance work March',
       paymentMethod: PaymentMethod.CARD,
       cardId: card.id,
     },
@@ -227,19 +276,30 @@ async function main() {
     data: {
       id: uuidv4(),
       type: TransactionType.income,
-      amount: 573.28,
-      completedAt: new Date('2025-02-28T16:00:00.000Z'),
-      description: 'Extra Income February II',
+      amount: 420.5,
+      completedAt: new Date('2025-06-20'),
+      description: 'Bonus June',
       paymentMethod: PaymentMethod.CARD,
       cardId: card.id,
     },
   });
-  // Update current balance to match latest state
+  await prisma.transaction.create({
+    data: {
+      id: uuidv4(),
+      type: TransactionType.income,
+      amount: 515.25,
+      completedAt: new Date('2025-09-28'),
+      description: 'Side project payout September',
+      paymentMethod: PaymentMethod.CARD,
+      cardId: card.id,
+    },
+  });
+  // Update current balance to match latest state (October 2025)
   await prisma.currentBalance.create({
     data: {
       id: uuidv4(),
-      amount: 2070.0,
-      updatedAt: new Date('2025-02-28T16:00:00.000Z'),
+      amount: 3275.0,
+      updatedAt: new Date('2025-10-31T16:00:00.000Z'),
     },
   });
 
@@ -251,7 +311,8 @@ async function main() {
       description: 'Monthly Rent',
       amount: 550,
       frequency: 'MONTHLY',
-      startDate: new Date('2025-03-03'), // Starting from March 3rd      paymentMethod: PaymentMethod.BANK_TRANSFER,
+      startDate: new Date('2025-03-03'), // Starting from March 3rd
+      paymentMethod: PaymentMethod.BANK_TRANSFER,
       active: true,
     },
   });
